@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paul & Cristina — Step Challenge</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
@@ -102,10 +102,10 @@ body {
 .score-person.right { align-items: flex-end; }
 .score-name { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
 .score-total {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', 'Arial Black', 'Helvetica Neue', sans-serif;
   font-size: 42px;
   font-weight: 800;
-  letter-spacing: -2px;
+  letter-spacing: 0px;
   line-height: 1;
 }
 .score-total.p { color: var(--paul); }
@@ -248,10 +248,10 @@ body {
 .wc-cristina::after { background: var(--cristina); }
 .wc-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; }
 .wc-steps {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Syne', 'Arial Black', 'Helvetica Neue', sans-serif;
   font-size: 38px;
   font-weight: 800;
-  letter-spacing: -1.5px;
+  letter-spacing: 0px;
   line-height: 1;
   margin-bottom: 6px;
 }
@@ -487,14 +487,13 @@ tr:hover td { background: var(--surface2); }
 <nav style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 44px;display:flex;gap:4px;" id="main-nav">
   <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
-  <button class="nav-tab" onclick="showSection('enter')">Enter Data</button>
 </nav>
 
 <!-- ── MAIN ── -->
 <div class="wrap">
 
   <!-- STATUS -->
-  <div class="status-bar status-loading" id="status-bar">
+  <div class="status-bar status-loading" id="status-bar" style="display:none">
     <span class="spin">↻</span> Loading data from Google Sheets...
   </div>
 
@@ -550,48 +549,6 @@ tr:hover td { background: var(--surface2); }
         </thead>
         <tbody id="history-tbody"></tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- ══ ENTER DATA SECTION ══ -->
-  <div id="section-enter" style="display:none">
-    <div class="entry-card">
-      <div class="entry-title">Add weekly steps</div>
-      <div class="entry-sub">
-        Enter the <strong>weekly total</strong> for each person — read it from your watch's weekly summary screen, just like in the screenshots. Select the week first, then type the number and save.
-      </div>
-
-      <div style="margin-bottom:20px;">
-        <label class="field-lbl">Week</label>
-        <select class="week-sel" id="entry-week-sel" style="max-width:380px;" onchange="onEntryWeekChange()"></select>
-      </div>
-
-      <div class="entry-grid">
-        <div class="entry-person ep-paul">
-          <div class="ep-name">Paul</div>
-          <label class="field-lbl">Weekly total steps</label>
-          <input class="step-inp" id="paul-inp" type="number" min="0" max="999999" placeholder="e.g. 54000" />
-          <button class="save-btn btn-paul" onclick="saveEntry('paul')">Save Paul's week</button>
-        </div>
-        <div class="entry-person ep-cristina">
-          <div class="ep-name">Cristina</div>
-          <label class="field-lbl">Weekly total steps</label>
-          <input class="step-inp c-inp" id="cristina-inp" type="number" min="0" max="999999" placeholder="e.g. 61000" />
-          <button class="save-btn btn-cristina" onclick="saveEntry('cristina')">Save Cristina's week</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="entry-card" style="border-left:3px solid var(--cristina);">
-      <div class="entry-title" style="color:var(--cristina);">How Cristina updates her data</div>
-      <div class="entry-sub" style="margin-bottom:0;">
-        Share this Google Sheet link with Cristina so she can enter her own numbers directly:<br>
-        <a href="https://docs.google.com/spreadsheets/d/1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg/edit" target="_blank"
-           style="color:var(--cristina);font-size:13px;word-break:break-all;border-bottom:1px solid var(--cristina-mid);">
-          docs.google.com/spreadsheets/d/1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg
-        </a><br><br>
-        She opens it on her phone, finds the right row (matching the week_key), and types her step total in the <strong>Cristina_steps</strong> column. Then click <strong>Sync from Sheet</strong> at the top of this dashboard to refresh.
-      </div>
     </div>
   </div>
 
@@ -725,11 +682,11 @@ async function loadFromSheet(manual = false) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     parseCSV(text);
-    setStatus('ok', '✓ Synced from Google Sheets');
+    document.getElementById('status-bar').style.display = 'none';
     setSyncState(true);
-    if (manual) showToast('Synced! Data is up to date.');
+    if (manual) showToast('✓ Synced from Google Sheets');
   } catch(e) {
-    setStatus('err', '✗ Could not reach Google Sheets — showing local data. Make sure the sheet is shared publicly.');
+    if (manual) { setStatus('err', '✗ Could not reach Google Sheets'); document.getElementById('status-bar').style.display = 'flex'; setTimeout(() => { document.getElementById('status-bar').style.display = 'none'; }, 4000); }
     setSyncState(false);
     if (manual) showToast('Sync failed — check sheet visibility.');
   }
@@ -767,7 +724,6 @@ function renderAll() {
   renderHero();
   renderWeekly();
   renderHistory();
-  renderEntrySelect();
 }
 
 function renderHero() {
@@ -983,14 +939,13 @@ function saveEntry(person) {
 }
 
 function showSection(name) {
-  ['weekly','history','enter'].forEach(s => {
+  ['weekly','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name ? '' : 'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','history','enter'][i] === name);
+    btn.classList.toggle('active', ['weekly','history'][i] === name);
   });
   if (name === 'history') renderHistory();
-  if (name === 'enter') renderEntrySelect();
 }
 
 function showToast(msg) {
