@@ -38,7 +38,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+ 
 /* ── HERO HEADER ── */
 .hero {
   background: var(--surface);
@@ -91,7 +91,7 @@ body {
 .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); }
 .sync-dot.live { background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E80; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
+ 
 /* ── SCORE STRIP ── */
 .score-strip {
   display: grid;
@@ -128,7 +128,7 @@ body {
   white-space: nowrap;
 }
 .vs-badge .leader { display: block; font-size: 10px; font-weight: 400; color: var(--muted2); margin-top: 2px; text-align: center; }
-
+ 
 /* ── BAR ── */
 .vs-bar-row {
   padding: 0 44px 20px;
@@ -144,7 +144,7 @@ body {
 }
 .vb-paul { background: var(--paul); transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
 .vb-cristina { background: var(--cristina); transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
-
+ 
 /* ── NAV ── */
 .nav {
   background: var(--surface);
@@ -168,10 +168,10 @@ body {
 }
 .nav-tab:hover { color: var(--text); }
 .nav-tab.active { color: var(--text); border-bottom-color: var(--paul); }
-
+ 
 /* ── CONTAINER ── */
 .wrap { max-width: 1060px; margin: 0 auto; padding: 36px 44px; }
-
+ 
 /* ── SECTION HEADERS ── */
 .sec-head {
   display: flex;
@@ -188,7 +188,7 @@ body {
   letter-spacing: -0.3px;
 }
 .sec-meta { font-size: 12px; color: var(--muted); }
-
+ 
 /* ── WEEK NAV ── */
 .week-nav {
   display: flex;
@@ -225,7 +225,7 @@ body {
 }
 .nav-btn:hover { background: var(--surface3); }
 .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-
+ 
 /* ── WEEK SUMMARY CARDS ── */
 .week-cards {
   display: grid;
@@ -273,7 +273,7 @@ body {
 .delta-win { background: rgba(91,222,142,0.12); color: #5BDE8E; }
 .delta-loss { background: rgba(226,91,91,0.12); color: #E25B5B; }
 .delta-tie { background: var(--surface3); color: var(--muted); }
-
+ 
 /* ── CHART ── */
 .chart-card {
   background: var(--surface);
@@ -290,7 +290,7 @@ body {
 .legend { display: flex; gap: 16px; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
 .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
+ 
 /* ── WEEKLY TABLE ── */
 .table-card {
   background: var(--surface);
@@ -333,7 +333,7 @@ tr:hover td { background: var(--surface2); }
 .pill-paul { background: var(--paul-soft); color: var(--paul); }
 .pill-cristina { background: var(--cristina-soft); color: var(--cristina); }
 .pill-tie { background: var(--surface3); color: var(--muted); }
-
+ 
 /* ── ENTER DATA ── */
 .entry-card {
   background: var(--surface);
@@ -410,7 +410,7 @@ tr:hover td { background: var(--surface2); }
 .btn-paul:hover { background: #ff8655; }
 .btn-cristina { background: var(--cristina); color: #0C0C0E; }
 .btn-cristina:hover { background: #6fded7; }
-
+ 
 /* ── LOADING / STATUS ── */
 .status-bar {
   display: flex; align-items: center; gap: 8px;
@@ -424,7 +424,7 @@ tr:hover td { background: var(--surface2); }
 .status-err { background: rgba(226,91,91,0.08); border: 1px solid rgba(226,91,91,0.2); color: #E25B5B; }
 .spin { display: inline-block; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
+ 
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 24px; right: 24px;
@@ -433,10 +433,10 @@ tr:hover td { background: var(--surface2); }
   opacity: 0; transform: translateY(8px); transition: all 0.25s; z-index: 999; pointer-events: none;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
-
+ 
 /* ── EMPTY ── */
 .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
-
+ 
 /* ── RESPONSIVE ── */
 @media(max-width:680px){
   .hero { padding: 24px 20px 0; }
@@ -449,7 +449,7 @@ tr:hover td { background: var(--surface2); }
 </style>
 </head>
 <body>
-
+ 
 <!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-top">
@@ -462,7 +462,7 @@ tr:hover td { background: var(--surface2); }
       <span id="sync-label">Sync from Sheet</span>
     </button>
   </div>
-
+ 
   <div class="score-strip">
     <div class="score-person">
       <div class="score-name">Paul</div>
@@ -479,28 +479,28 @@ tr:hover td { background: var(--surface2); }
     </div>
   </div>
 </div>
-
+ 
 <div class="vs-bar-row">
   <div class="vs-bar">
     <div class="vb-paul" id="vb-paul" style="width:50%"></div>
     <div class="vb-cristina" id="vb-cristina" style="width:50%"></div>
   </div>
 </div>
-
+ 
 <!-- ── NAV ── -->
 <nav style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 44px;display:flex;gap:4px;" id="main-nav">
   <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
 </nav>
-
+ 
 <!-- ── MAIN ── -->
 <div class="wrap">
-
+ 
   <!-- STATUS -->
   <div class="status-bar status-loading" id="status-bar" style="display:none">
     <span class="spin">↻</span> Loading data from Google Sheets...
   </div>
-
+ 
   <!-- ══ WEEKLY SECTION ══ -->
   <div id="section-weekly">
     <div class="week-nav">
@@ -508,14 +508,14 @@ tr:hover td { background: var(--surface2); }
       <button class="nav-btn" id="btn-prev" onclick="changeWeek(-1)">←</button>
       <button class="nav-btn" id="btn-next" onclick="changeWeek(1)" disabled>→</button>
     </div>
-
+ 
     <div class="sec-head">
       <div class="sec-title" id="week-title">Week –</div>
       <div class="sec-meta" id="week-dates">–</div>
     </div>
-
+ 
     <div class="week-cards" id="week-cards"></div>
-
+ 
     <div class="chart-card">
       <div class="chart-header">
         <div class="chart-title">Week over week</div>
@@ -529,16 +529,16 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
   </div>
-
+ 
   <!-- ══ HISTORY SECTION ══ -->
   <div id="section-history" style="display:none">
     <div class="sec-head" style="margin-bottom:20px;">
       <div class="sec-title">All weeks</div>
       <div class="sec-meta" id="history-meta">–</div>
     </div>
-
+ 
     <div class="month-chips" id="month-filter-chips" style="margin-bottom:20px;"></div>
-
+ 
     <div class="table-card">
       <div class="table-head-bar">Week by week</div>
       <table>
@@ -555,24 +555,24 @@ tr:hover td { background: var(--surface2); }
       </table>
     </div>
   </div>
-
+ 
 </div><!-- /wrap -->
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 // ══════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════
 const SHEET_ID = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpyle4KnajpmMU2KSeUCW-llzJ-7jSSBgqJqRRqZldNm0VOzkq0tDbaaH73jDU2-wx74jXoYjxHse6/pub?gid=0&single=true&output=csv';
-
+ 
 // ══════════════════════════════════════════
 // WEEK SYSTEM
 // ══════════════════════════════════════════
 const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_F = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
+ 
 function getWeeksForMonth(year, month) {
   const weeks = [];
   const firstDay = new Date(year, month, 1);
@@ -593,25 +593,25 @@ function getWeeksForMonth(year, month) {
   }
   return weeks;
 }
-
+ 
 function fmtShort(d) { return `${MONTHS_S[d.getMonth()]} ${d.getDate()}`; }
 function fmtKey(y,m,w) { return `${y}-${String(m+1).padStart(2,'0')}-W${w}`; }
-
+ 
 const TODAY = new Date();
 let allWeeksFlat = []; // all weeks across all months we have data for
 let currentWeekIdx = 0;
 let filterMonth = null; // for history view
-
+ 
 // ══════════════════════════════════════════
 // DATA STORE (local + sheet merge)
 // ══════════════════════════════════════════
 // DB: { [week_key]: { paul: number|null, cristina: number|null, label: string } }
 let DB = JSON.parse(localStorage.getItem('steps_v3') || '{}');
-
+ 
 function saveDB() {
   localStorage.setItem('steps_v3', JSON.stringify(DB));
 }
-
+ 
 function ensureCurrentMonthWeeks() {
   const weeks = getWeeksForMonth(TODAY.getFullYear(), TODAY.getMonth());
   weeks.forEach(w => {
@@ -620,7 +620,7 @@ function ensureCurrentMonthWeeks() {
     }
   });
 }
-
+ 
 function buildWeeksFlat() {
   // Build from all keys in DB, sorted
   const keys = Object.keys(DB).sort();
@@ -646,7 +646,7 @@ function buildWeeksFlat() {
   });
   allWeeksFlat = uniq;
 }
-
+ 
 // ══════════════════════════════════════════
 // GOOGLE SHEETS FETCH
 // ══════════════════════════════════════════
@@ -659,7 +659,7 @@ function parseCSV(text) {
   const crIdx = header.findIndex(h => h.includes('cristina'));
   const lbIdx = header.findIndex(h => h.includes('label'));
   if (wkIdx < 0) return;
-
+ 
   for (let i = 1; i < lines.length; i++) {
     const row = lines[i];
     const key = row[wkIdx];
@@ -677,7 +677,7 @@ function parseCSV(text) {
   }
   saveDB();
 }
-
+ 
 async function loadFromSheet(manual = false) {
   setStatus('loading', '↻ Syncing from Google Sheets...');
   setSyncState(false);
@@ -699,7 +699,7 @@ async function loadFromSheet(manual = false) {
   findCurrentWeek();
   renderAll();
 }
-
+ 
 function setStatus(type, msg) {
   const el = document.getElementById('status-bar');
   el.className = `status-bar status-${type}`;
@@ -709,12 +709,12 @@ function setSyncState(ok) {
   document.getElementById('sync-dot').className = ok ? 'sync-dot live' : 'sync-dot';
   document.getElementById('sync-label').textContent = ok ? 'Synced' : 'Sync from Sheet';
 }
-
+ 
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
 let wowChart = null;
-
+ 
 function findCurrentWeek() {
   if (!allWeeksFlat.length) { currentWeekIdx = 0; return; }
   for (let i = 0; i < allWeeksFlat.length; i++) {
@@ -723,13 +723,13 @@ function findCurrentWeek() {
   }
   currentWeekIdx = allWeeksFlat.length - 1;
 }
-
+ 
 function renderAll() {
   renderHero();
   renderWeekly();
   renderHistory();
 }
-
+ 
 function renderHero() {
   const allPaul = allWeeksFlat.reduce((a,w) => a + (DB[w.key]?.paul || 0), 0);
   const allCristina = allWeeksFlat.reduce((a,w) => a + (DB[w.key]?.cristina || 0), 0);
@@ -752,7 +752,7 @@ function renderHero() {
   document.getElementById('hero-paul-sub').textContent = `across ${weeks} week${weeks!==1?'s':''}`;
   document.getElementById('hero-cristina-sub').textContent = `across ${weeks} week${weeks!==1?'s':''}`;
 }
-
+ 
 function renderWeekly() {
   if (!allWeeksFlat.length) {
     document.getElementById('week-cards').innerHTML =
@@ -761,12 +761,12 @@ function renderWeekly() {
   }
   document.getElementById('btn-prev').disabled = currentWeekIdx <= 0;
   document.getElementById('btn-next').disabled = currentWeekIdx >= allWeeksFlat.length - 1;
-
+ 
   const w = allWeeksFlat[currentWeekIdx];
   const d = DB[w.key] || {};
   document.getElementById('week-title').textContent = `Week ${w.num}`;
   document.getElementById('week-dates').textContent = `${MONTHS_F[w.month]} — ${fmtShort(w.start)} to ${fmtShort(w.end)}`;
-
+ 
   // Month chips
   const months = [...new Set(allWeeksFlat.map(x => `${x.year}-${String(x.month+1).padStart(2,'0')}`))]
     .map(mk => { const [y,mo] = mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
@@ -774,12 +774,12 @@ function renderWeekly() {
   document.getElementById('month-chips').innerHTML = months.map(m =>
     `<div class="chip ${m.key===curMonthKey?'active':''}" onclick="jumpToMonth('${m.key}')">${m.label}</div>`
   ).join('');
-
+ 
   // Cards
   const prev = currentWeekIdx > 0 ? DB[allWeeksFlat[currentWeekIdx-1].key] : null;
   const pSteps = d.paul;
   const cSteps = d.cristina;
-
+ 
   function deltaHtml(val, prevVal) {
     if (!val || !prevVal) return '';
     const diff = val - prevVal;
@@ -787,14 +787,14 @@ function renderWeekly() {
     if (diff < 0) return `<div class="wc-delta delta-loss">${diff.toLocaleString()}</div>`;
     return `<div class="wc-delta delta-tie">Same</div>`;
   }
-
+ 
   let winnerNote = '';
   if (pSteps && cSteps) {
     if (pSteps > cSteps) winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--paul);">🏆 Paul wins this week by ${(pSteps-cSteps).toLocaleString()} steps</div>`;
     else if (cSteps > pSteps) winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--cristina);">🏆 Cristina wins this week by ${(cSteps-pSteps).toLocaleString()} steps</div>`;
     else winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--muted);">This week is a tie!</div>`;
   }
-
+ 
   document.getElementById('week-cards').innerHTML = `
     <div class="week-card wc-paul">
       ${deltaHtml(pSteps, prev?.paul)}
@@ -810,13 +810,13 @@ function renderWeekly() {
     </div>
     ${winnerNote ? `<div style="grid-column:1/-1">${winnerNote}</div>` : ''}
   `;
-
+ 
   // WoW Chart — show all weeks in current month
   const monthWeeks = allWeeksFlat.filter(x => x.month === w.month && x.year === w.year);
   const labels = monthWeeks.map(x => `W${x.num}`);
   const paulData = monthWeeks.map(x => DB[x.key]?.paul || 0);
   const cristinaData = monthWeeks.map(x => DB[x.key]?.cristina || 0);
-
+ 
   if (wowChart) { wowChart.destroy(); wowChart = null; }
   wowChart = new Chart(document.getElementById('wowChart'), {
     type: 'bar',
@@ -848,27 +848,27 @@ function renderWeekly() {
     }
   });
 }
-
+ 
 function renderHistory() {
   const weeks = filterMonth
     ? allWeeksFlat.filter(w => `${w.year}-${String(w.month+1).padStart(2,'0')}` === filterMonth)
     : allWeeksFlat;
-
+ 
   const months = [...new Set(allWeeksFlat.map(x => `${x.year}-${String(x.month+1).padStart(2,'0')}`))]
     .map(mk => { const [y,mo] = mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
   document.getElementById('month-filter-chips').innerHTML =
     `<div class="chip ${!filterMonth?'active':''}" onclick="setHistoryFilter(null)">All</div>` +
     months.map(m => `<div class="chip ${m.key===filterMonth?'active':''}" onclick="setHistoryFilter('${m.key}')">${m.label}</div>`).join('');
-
+ 
   const withData = weeks.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina);
   document.getElementById('history-meta').textContent = `${withData.length} week${withData.length!==1?'s':''} of data`;
-
+ 
   if (!withData.length) {
     document.getElementById('history-tbody').innerHTML =
       '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet</td></tr>';
     return;
   }
-
+ 
   document.getElementById('history-tbody').innerHTML = [...withData].reverse().map(w => {
     const d = DB[w.key] || {};
     const p = d.paul, c = d.cristina;
@@ -888,7 +888,7 @@ function renderHistory() {
     </tr>`;
   }).join('');
 }
-
+ 
 function renderEntrySelect() {
   const sel = document.getElementById('entry-week-sel');
   const cur = sel.value;
@@ -903,14 +903,14 @@ function renderEntrySelect() {
   }
   onEntryWeekChange();
 }
-
+ 
 function onEntryWeekChange() {
   const key = document.getElementById('entry-week-sel').value;
   const d = DB[key] || {};
   document.getElementById('paul-inp').value = d.paul || '';
   document.getElementById('cristina-inp').value = d.cristina || '';
 }
-
+ 
 // ══════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════
@@ -918,17 +918,17 @@ function changeWeek(dir) {
   currentWeekIdx = Math.max(0, Math.min(allWeeksFlat.length-1, currentWeekIdx+dir));
   renderWeekly();
 }
-
+ 
 function jumpToMonth(mk) {
   const idx = allWeeksFlat.findIndex(w => `${w.year}-${String(w.month+1).padStart(2,'0')}` === mk);
   if (idx >= 0) { currentWeekIdx = idx; renderWeekly(); }
 }
-
+ 
 function setHistoryFilter(mk) {
   filterMonth = mk;
   renderHistory();
 }
-
+ 
 function saveEntry(person) {
   const key = document.getElementById('entry-week-sel').value;
   const val = parseInt(document.getElementById(`${person}-inp`).value);
@@ -941,7 +941,7 @@ function saveEntry(person) {
   const name = person === 'paul' ? 'Paul' : 'Cristina';
   showToast(`${name}'s week saved! ✓`);
 }
-
+ 
 function showSection(name) {
   ['weekly','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name ? '' : 'none';
@@ -951,14 +951,14 @@ function showSection(name) {
   });
   if (name === 'history') renderHistory();
 }
-
+ 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
-
+ 
 // ══════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════
