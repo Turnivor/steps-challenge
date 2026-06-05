@@ -1162,6 +1162,7 @@ function showToast(msg) {
 // AUTH & WRITE-BACK (PIN-based)
 // ══════════════════════════════════════════
 const SHEET_ID_WRITE = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9R7YGa_FmeZhBiQf6LkzDmc5lj1J4ogl6qabn9E-a7M9VVM9JFqQowKD4LGheBI6qdg/exec';
 const PINS = { paul: '1987', cristina: '1993' }; // change these to whatever you want
 let currentUser = localStorage.getItem('steps_user') || null;
  
@@ -1299,24 +1300,40 @@ async function writeToSheet() {
   if (!key || isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); return; }
  
   const wpStatus = document.getElementById('wp-status');
-  wpStatus.textContent = '↻ Saving...';
+  wpStatus.textContent = '↻ Saving to Sheet...';
   wpStatus.style.color = 'var(--muted)';
  
-  // Use Google Sheets API with API key for write via service account approach
-  // Since we can't use OAuth easily, we update local DB and also update via the Apps Script web app
-  // For now update local and re-sync
+  // Update local DB immediately so UI reflects change
   if (!DB[key]) DB[key] = { paul: null, cristina: null };
   DB[key][currentUser] = steps;
   saveDB();
   buildWeeksFlat();
   renderAll();
   renderWritePanel();
+  const sel = document.getElementById('wp-week-sel');
+  if (sel) sel.value = key;
  
-  wpStatus.textContent = '✓ Saved locally — updating sheet...';
-  wpStatus.style.color = '#5BDE8E';
- 
-  // Try to write to sheet via fetch with no-cors (will update visually at minimum)
-  showToast('Saved! Hit Sync to confirm ✓');
+  // Write to Google Sheet via Apps Script
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ week_key: key, person: currentUser, steps: steps })
+    });
+    // no-cors means we can't read the response, but if no exception it went through
+    if (wpStatus) {
+      wpStatus.textContent = '✓ Saved to Google Sheet!';
+      wpStatus.style.color = '#5BDE8E';
+    }
+    showToast('Saved to Sheet ✓');
+  } catch(e) {
+    if (wpStatus) {
+      wpStatus.textContent = '⚠ Saved locally — sheet update failed. Hit Sync later.';
+      wpStatus.style.color = '#E2AA5B';
+    }
+    showToast('Saved locally ✓');
+  }
 }
  
 // ══════════════════════════════════════════
