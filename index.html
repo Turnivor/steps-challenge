@@ -41,7 +41,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
- 
+
 /* ── CRAWLING MONTH BANNER ── */
 .crawling-banner {
   text-align: center;
@@ -70,7 +70,7 @@ body {
   opacity: 0.7;
 }
 .crawling-title span { color: #8B4513; opacity: 0.9; }
- 
+
 /* ── HERO HEADER ── */
 .hero {
   background: var(--surface);
@@ -132,7 +132,7 @@ body {
 .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted2); flex-shrink: 0; }
 .sync-dot.live { background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E80; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
- 
+
 /* ── FIGHTER ARENA ── */
 .arena {
   display: grid;
@@ -146,10 +146,10 @@ body {
 .fighter-side { display: flex; align-items: center; gap: 16px; }
 .fighter-side.right { flex-direction: row-reverse; }
 .fighter-wrap { position: relative; }
- 
+
 /* PIXEL ART BOXER — pure CSS/SVG inline */
 .boxer-canvas { width: 64px; height: 80px; display: block; image-rendering: pixelated; }
- 
+
 /* Fighter info */
 .fighter-info { display: flex; flex-direction: column; }
 .fighter-info.right { align-items: flex-end; }
@@ -164,7 +164,7 @@ body {
 .f-score.p { color: var(--paul); }
 .f-score.c { color: var(--cristina); }
 .f-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
- 
+
 /* VS center */
 .vs-center { text-align: center; }
 .vs-ring {
@@ -196,7 +196,7 @@ body {
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
- 
+
 /* ── VS BAR ── */
 .vs-bar-row {
   padding: 0 44px 18px;
@@ -212,7 +212,7 @@ body {
 }
 .vb-paul { background: linear-gradient(90deg, var(--paul), #ff9966); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
 .vb-cristina { background: linear-gradient(90deg, #6fded7, var(--cristina)); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
- 
+
 /* ── NAV ── */
 nav.main-nav {
   background: var(--surface);
@@ -235,10 +235,10 @@ nav.main-nav {
 }
 .nav-tab:hover { color: var(--text); }
 .nav-tab.active { color: var(--text); border-bottom-color: var(--paul); }
- 
+
 /* ── WRAP ── */
 .wrap { max-width: 1060px; margin: 0 auto; padding: 32px 44px; }
- 
+
 /* ── WEEK NAV ── */
 .week-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
 .month-chips { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
@@ -269,12 +269,12 @@ nav.main-nav {
 }
 .nav-btn:hover { background: var(--surface3); }
 .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
- 
+
 /* ── SEC HEAD ── */
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
 .sec-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 .sec-meta { font-size: 12px; color: var(--muted); }
- 
+
 /* ── WEEK CARDS ── */
 .week-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 @media(max-width:600px){ .week-cards { grid-template-columns: 1fr; } }
@@ -307,7 +307,7 @@ nav.main-nav {
 .delta-win { background: rgba(91,222,142,0.1); color: #5BDE8E; }
 .delta-loss { background: rgba(226,91,91,0.1); color: #E25B5B; }
 .delta-tie { background: var(--surface3); color: var(--muted); }
- 
+
 /* ── WINNER NOTE ── */
 .winner-note {
   grid-column: 1/-1;
@@ -324,7 +324,7 @@ nav.main-nav {
 .winner-note.paul-wins { background: var(--paul-soft); border: 1px solid var(--paul-mid); color: var(--paul); }
 .winner-note.cristina-wins { background: var(--cristina-soft); border: 1px solid var(--cristina-mid); color: var(--cristina); }
 .winner-note.tie { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
- 
+
 /* ── CHART ── */
 .chart-card {
   background: var(--surface);
@@ -338,7 +338,7 @@ nav.main-nav {
 .legend { display: flex; gap: 14px; }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
 .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
- 
+
 /* ── MILESTONES ── */
 .milestones-section { margin-bottom: 24px; }
 .milestones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
@@ -379,7 +379,7 @@ nav.main-nav {
 .ms-prog-bar { height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
 .ms-prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
 .ms-prog-label { font-size: 10px; color: var(--muted2); margin-top: 3px; }
- 
+
 /* ── REWARDS ── */
 .rewards-section { margin-bottom: 24px; }
 .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
@@ -408,7 +408,7 @@ nav.main-nav {
 .reward-earned { background: rgba(91,222,142,0.15); color: #5BDE8E; }
 .reward-paul { background: var(--paul-soft); color: var(--paul); }
 .reward-cristina { background: var(--cristina-soft); color: var(--cristina); }
- 
+
 /* ── HISTORY TABLE ── */
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
 .table-head-bar { padding: 14px 20px; border-bottom: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
@@ -424,7 +424,7 @@ tr:hover td { background: var(--surface2); }
 .pill-paul { background: var(--paul-soft); color: var(--paul); }
 .pill-cristina { background: var(--cristina-soft); color: var(--cristina); }
 .pill-tie { background: var(--surface3); color: var(--muted); }
- 
+
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 24px; right: 24px;
@@ -433,7 +433,7 @@ tr:hover td { background: var(--surface2); }
   opacity: 0; transform: translateY(8px); transition: all 0.25s; z-index: 999; pointer-events: none;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
- 
+
 /* ── STATUS ── */
 .status-bar { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 18px; }
 .status-loading { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
@@ -441,7 +441,7 @@ tr:hover td { background: var(--surface2); }
 .status-err { background: rgba(226,91,91,0.08); border: 1px solid rgba(226,91,91,0.2); color: #E25B5B; }
 .spin { display: inline-block; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
- 
+
 /* ── RESPONSIVE ── */
 @media(max-width:680px){
   .hero, .vs-bar-row { padding-left: 20px; padding-right: 20px; }
@@ -452,27 +452,92 @@ tr:hover td { background: var(--surface2); }
   .boxer-canvas { width: 44px; height: 56px; }
   .nav-tab { padding: 11px 12px; font-size: 12px; }
 }
- 
+
 /* ── PIXEL BOXER ANIMATIONS ── */
-@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-@keyframes wobble { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
-@keyframes punch-right { 0%,100%{transform:translateX(0)} 50%{transform:translateX(8px)} }
-@keyframes punch-left { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-8px)} }
-@keyframes dizzy { 0%,100%{transform:rotate(0) translateY(0)} 25%{transform:rotate(-5deg) translateY(2px)} 75%{transform:rotate(5deg) translateY(2px)} }
- 
-.boxer-winner { animation: bob 0.8s ease-in-out infinite, punch-right 1.2s ease-in-out infinite; }
-.boxer-winner-left { animation: bob 0.8s ease-in-out infinite, punch-left 1.2s ease-in-out infinite; }
-.boxer-loser { animation: wobble 1.5s ease-in-out infinite; opacity: 0.7; }
-.boxer-tie { animation: bob 1.2s ease-in-out infinite; }
+@keyframes winner-dance {
+  0%   { transform: translateY(0) rotate(0deg) scaleX(1); }
+  10%  { transform: translateY(-8px) rotate(-4deg) scaleX(1.05); }
+  20%  { transform: translateY(-12px) rotate(0deg) scaleX(0.95); }
+  30%  { transform: translateY(-8px) rotate(4deg) scaleX(1.05); }
+  40%  { transform: translateY(0) rotate(0deg) scaleX(1); }
+  50%  { transform: translateY(-4px) rotate(-2deg) scaleX(1); }
+  60%  { transform: translateY(0) rotate(2deg) scaleX(1); }
+  70%  { transform: translateY(-6px) rotate(0deg) scaleX(1.08); }
+  80%  { transform: translateY(0) rotate(-3deg) scaleX(1); }
+  90%  { transform: translateY(-3px) rotate(3deg) scaleX(1); }
+  100% { transform: translateY(0) rotate(0deg) scaleX(1); }
+}
+
+@keyframes punch-combo {
+  0%   { transform: translateX(0) scaleX(1); }
+  10%  { transform: translateX(12px) scaleX(1.1); }
+  20%  { transform: translateX(2px) scaleX(0.95); }
+  30%  { transform: translateX(14px) scaleX(1.1); }
+  40%  { transform: translateX(0) scaleX(1); }
+  55%  { transform: translateX(10px) scaleX(1.08); }
+  65%  { transform: translateX(0) scaleX(1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+
+@keyframes punch-combo-left {
+  0%   { transform: translateX(0) scaleX(1); }
+  10%  { transform: translateX(-12px) scaleX(1.1); }
+  20%  { transform: translateX(-2px) scaleX(0.95); }
+  30%  { transform: translateX(-14px) scaleX(1.1); }
+  40%  { transform: translateX(0) scaleX(1); }
+  55%  { transform: translateX(-10px) scaleX(1.08); }
+  65%  { transform: translateX(0) scaleX(1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+
+@keyframes loser-stagger {
+  0%   { transform: rotate(0deg) translateY(0) scaleY(1); }
+  15%  { transform: rotate(-8deg) translateY(3px) scaleY(0.95); }
+  30%  { transform: rotate(6deg) translateY(1px) scaleY(1); }
+  45%  { transform: rotate(-5deg) translateY(4px) scaleY(0.93); }
+  60%  { transform: rotate(4deg) translateY(2px) scaleY(0.97); }
+  75%  { transform: rotate(-6deg) translateY(3px) scaleY(0.95); }
+  90%  { transform: rotate(3deg) translateY(1px) scaleY(1); }
+  100% { transform: rotate(0deg) translateY(0) scaleY(1); }
+}
+
+@keyframes tie-bounce {
+  0%,100% { transform: translateY(0) scaleY(1); }
+  25%     { transform: translateY(-10px) scaleY(1.05); }
+  50%     { transform: translateY(0) scaleY(0.95); }
+  75%     { transform: translateY(-5px) scaleY(1.02); }
+}
+
+@keyframes winner-glow {
+  0%,100% { filter: drop-shadow(0 0 4px currentColor); }
+  50%     { filter: drop-shadow(0 0 12px currentColor); }
+}
+
+.boxer-winner {
+  animation: winner-dance 1.4s ease-in-out infinite, punch-combo 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #FF6B35);
+}
+.boxer-winner-left {
+  animation: winner-dance 1.4s ease-in-out infinite, punch-combo-left 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #4ECDC4);
+}
+.boxer-loser {
+  animation: loser-stagger 1.8s ease-in-out infinite;
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+.boxer-tie {
+  animation: tie-bounce 0.9s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
- 
+
 <!-- ── CRAWLING MONTH BANNER ── -->
 <div class="crawling-banner">
   <div class="crawling-title">☠ <span>Crawling Month</span> — June 2026 ☠</div>
 </div>
- 
+
 <!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-top">
@@ -485,7 +550,7 @@ tr:hover td { background: var(--surface2); }
       <span id="sync-label">Sync</span>
     </button>
   </div>
- 
+
   <div class="arena">
     <!-- PAUL SIDE -->
     <div class="fighter-side">
@@ -530,13 +595,13 @@ tr:hover td { background: var(--surface2); }
         <div class="f-sub" id="hero-paul-sub">all-time steps</div>
       </div>
     </div>
- 
+
     <!-- VS CENTER -->
     <div class="vs-center">
       <div class="vs-ring" id="vs-ring">VS</div>
       <div class="vs-leader-tag" id="vs-leader">–</div>
     </div>
- 
+
     <!-- CRISTINA SIDE -->
     <div class="fighter-side right">
       <div class="fighter-wrap">
@@ -589,14 +654,14 @@ tr:hover td { background: var(--surface2); }
     <div id="auth-area" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"></div>
 </div>
 </div>
- 
+
 <div class="vs-bar-row">
   <div class="vs-bar">
     <div class="vb-paul" id="vb-paul" style="width:50%"></div>
     <div class="vb-cristina" id="vb-cristina" style="width:50%"></div>
   </div>
 </div>
- 
+
 <!-- ── NAV ── -->
 <nav class="main-nav">
   <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
@@ -604,12 +669,12 @@ tr:hover td { background: var(--surface2); }
   <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
 </nav>
- 
+
 <div class="wrap">
   <div class="status-bar status-loading" id="status-bar" style="display:none">
     <span class="spin">↻</span> Syncing...
   </div>
- 
+
   <!-- ══ THIS WEEK ══ -->
   <div id="section-weekly">
     <div class="week-nav">
@@ -633,7 +698,7 @@ tr:hover td { background: var(--surface2); }
       <div style="position:relative;height:260px;"><canvas id="wowChart"></canvas></div>
     </div>
   </div>
- 
+
   <!-- ══ MILESTONES ══ -->
   <div id="section-milestones" style="display:none">
     <div class="sec-head" style="margin-bottom:20px;">
@@ -642,7 +707,7 @@ tr:hover td { background: var(--surface2); }
     </div>
     <div class="milestones-grid" id="milestones-grid"></div>
   </div>
- 
+
   <!-- ══ REWARDS ══ -->
   <div id="section-rewards" style="display:none">
     <div class="sec-head" style="margin-bottom:6px;">
@@ -651,7 +716,7 @@ tr:hover td { background: var(--surface2); }
     <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Win weeks, hit milestones, earn symbolic prizes. Small things, big satisfaction.</div>
     <div class="rewards-grid" id="rewards-grid"></div>
   </div>
- 
+
   <!-- ══ ALL WEEKS ══ -->
   <div id="section-history" style="display:none">
     <div class="sec-head" style="margin-bottom:16px;">
@@ -667,17 +732,17 @@ tr:hover td { background: var(--surface2); }
       </table>
     </div>
   </div>
- 
+
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
 // ══════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpyle4KnajpmMU2KSeUCW-llzJ-7jSSBgqJqRRqZldNm0VOzkq0tDbaaH73jDU2-wx74jXoYjxHse6/pub?gid=0&single=true&output=csv';
- 
+
 // ══════════════════════════════════════════
 // MILESTONES DEFINITION
 // ══════════════════════════════════════════
@@ -697,7 +762,7 @@ const MILESTONES = [
   { id:'comeback', icon:'💥', name:'Comeback Kid', desc:'Win a week after losing the previous one', check:null, type:'both', special:true },
   { id:'three_streak', icon:'🔱', name:'Hat Trick', desc:'Win 3 weeks in a row', check:null, type:'both', special:true },
 ];
- 
+
 // ══════════════════════════════════════════
 // REWARDS DEFINITION
 // ══════════════════════════════════════════
@@ -714,13 +779,13 @@ const REWARDS = [
   { icon:'🗺️', name:'Mystery Route', trigger:'Win any week — winner picks a walking route, loser follows without complaining or knowing the destination in advance', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
   { icon:'🎲', name:'Mystery Gift', trigger:'Win 3 weeks in a row — loser buys something random under 20 RON', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
 ];
- 
+
 // ══════════════════════════════════════════
 // WEEK SYSTEM
 // ══════════════════════════════════════════
 const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_F = ['January','February','March','April','May','June','July','August','September','October','November','December'];
- 
+
 function getWeeksForMonth(year, month) {
   const weeks = [], lastDay = new Date(year, month + 1, 0);
   let start = new Date(year, month, 1);
@@ -737,18 +802,18 @@ function getWeeksForMonth(year, month) {
   return weeks;
 }
 function fmtShort(d) { return `${MONTHS_S[d.getMonth()]} ${d.getDate()}`; }
- 
+
 const TODAY = new Date();
 let allWeeksFlat = [], currentWeekIdx = 0, filterMonth = null;
 let DB = JSON.parse(localStorage.getItem('steps_v3') || '{}');
 function saveDB() { localStorage.setItem('steps_v3', JSON.stringify(DB)); }
- 
+
 function ensureCurrentMonthWeeks() {
   getWeeksForMonth(TODAY.getFullYear(), TODAY.getMonth()).forEach(w => {
     if (!DB[w.key]) DB[w.key] = { paul:null, cristina:null };
   });
 }
- 
+
 function buildWeeksFlat() {
   const seenKeys = new Set();
   allWeeksFlat = [];
@@ -761,7 +826,7 @@ function buildWeeksFlat() {
     if (w) { seenKeys.add(k); allWeeksFlat.push(w); }
   });
 }
- 
+
 function parseCSV(text) {
   const lines = text.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
   if (lines.length < 2) return;
@@ -780,7 +845,7 @@ function parseCSV(text) {
   }
   saveDB();
 }
- 
+
 async function loadFromSheet(manual=false) {
   setSyncState(false);
   if (manual) { document.getElementById('status-bar').style.display='flex'; setStatus('loading','↻ Syncing...'); }
@@ -799,7 +864,7 @@ async function loadFromSheet(manual=false) {
   findCurrentWeek();
   renderAll();
 }
- 
+
 function setStatus(type, msg) {
   const el = document.getElementById('status-bar');
   el.className = `status-bar status-${type}`;
@@ -809,7 +874,7 @@ function setSyncState(ok) {
   document.getElementById('sync-dot').className = ok ? 'sync-dot live' : 'sync-dot';
   document.getElementById('sync-label').textContent = ok ? 'Synced' : 'Sync';
 }
- 
+
 function findCurrentWeek() {
   if (!allWeeksFlat.length) { currentWeekIdx=0; return; }
   for (let i=0; i<allWeeksFlat.length; i++) {
@@ -818,7 +883,7 @@ function findCurrentWeek() {
   }
   currentWeekIdx = allWeeksFlat.length-1;
 }
- 
+
 // ══════════════════════════════════════════
 // STATS CALCULATOR
 // ══════════════════════════════════════════
@@ -842,7 +907,7 @@ function calcStats() {
   });
   return { paulTotal, cristinaTotal, paulWins, cristinaWins, ties, paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length };
 }
- 
+
 // ══════════════════════════════════════════
 // RENDER HERO
 // ══════════════════════════════════════════
@@ -852,7 +917,7 @@ function renderHero() {
   document.getElementById('hero-cristina').textContent = s.cristinaTotal.toLocaleString();
   document.getElementById('hero-paul-sub').textContent = `${s.paulWins}W · ${s.weeksWithData} weeks`;
   document.getElementById('hero-cristina-sub').textContent = `${s.cristinaWins}W · ${s.weeksWithData} weeks`;
- 
+
   const total = s.paulTotal + s.cristinaTotal;
   let pp = 50;
   if (total > 0) {
@@ -860,17 +925,17 @@ function renderHero() {
     document.getElementById('vb-paul').style.width = pp+'%';
     document.getElementById('vb-cristina').style.width = (100-pp)+'%';
   }
- 
+
   // VS ring conic gradient via style
   document.getElementById('vs-ring').style.setProperty('--paul-pct', pp+'%');
- 
+
   const leaderEl = document.getElementById('vs-leader');
   const paulBox = document.getElementById('boxer-paul');
   const cristinaBox = document.getElementById('boxer-cristina');
- 
+
   paulBox.className = 'boxer-canvas';
   cristinaBox.className = 'boxer-canvas';
- 
+
   if (s.paulTotal > s.cristinaTotal) {
     leaderEl.innerHTML = `<span style="color:var(--paul)">Paul leads</span>`;
     paulBox.classList.add('boxer-winner');
@@ -885,7 +950,7 @@ function renderHero() {
     cristinaBox.classList.add('boxer-tie');
   }
 }
- 
+
 // ══════════════════════════════════════════
 // RENDER WEEKLY
 // ══════════════════════════════════════════
@@ -897,22 +962,22 @@ function renderWeekly() {
   }
   document.getElementById('btn-prev').disabled = currentWeekIdx<=0;
   document.getElementById('btn-next').disabled = currentWeekIdx>=allWeeksFlat.length-1;
- 
+
   const w = allWeeksFlat[currentWeekIdx];
   const d = DB[w.key]||{};
   document.getElementById('week-title').textContent = `Week ${w.num}`;
   document.getElementById('week-dates').textContent = `${MONTHS_F[w.month]} — ${fmtShort(w.start)} to ${fmtShort(w.end)}`;
- 
+
   const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
     .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
   const curMK = `${w.year}-${String(w.month+1).padStart(2,'0')}`;
   document.getElementById('month-chips').innerHTML = months.map(m=>
     `<div class="chip ${m.key===curMK?'active':''}" onclick="jumpToMonth('${m.key}')">${m.label}</div>`
   ).join('');
- 
+
   const prev = currentWeekIdx>0 ? DB[allWeeksFlat[currentWeekIdx-1].key] : null;
   const pS = d.paul, cS = d.cristina;
- 
+
   function delta(val, pv) {
     if (!val||!pv) return '';
     const diff = val-pv;
@@ -920,14 +985,14 @@ function renderWeekly() {
     if (diff<0) return `<div class="wc-delta delta-loss">${diff.toLocaleString()}</div>`;
     return `<div class="wc-delta delta-tie">Same</div>`;
   }
- 
+
   let winnerHtml = '';
   if (pS && cS) {
     if (pS>cS) winnerHtml = `<div class="winner-note paul-wins">🥊 Paul wins this week by <strong>${(pS-cS).toLocaleString()}</strong> steps</div>`;
     else if (cS>pS) winnerHtml = `<div class="winner-note cristina-wins">🥊 Cristina wins this week by <strong>${(cS-pS).toLocaleString()}</strong> steps</div>`;
     else winnerHtml = `<div class="winner-note tie">🤝 Dead even this week</div>`;
   }
- 
+
   document.getElementById('week-cards').innerHTML = `
     <div class="week-card wc-paul">
       ${delta(pS, prev?.paul)}
@@ -943,7 +1008,7 @@ function renderWeekly() {
     </div>
     ${winnerHtml}
   `;
- 
+
   const mw = allWeeksFlat.filter(x=>x.month===w.month&&x.year===w.year);
   if (wowChart) { wowChart.destroy(); wowChart=null; }
   wowChart = new Chart(document.getElementById('wowChart'), {
@@ -969,14 +1034,14 @@ function renderWeekly() {
     }
   });
 }
- 
+
 // ══════════════════════════════════════════
 // RENDER MILESTONES
 // ══════════════════════════════════════════
 function renderMilestones() {
   const s = calcStats();
   const weeksData = allWeeksFlat.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina);
- 
+
   // Check special milestones
   let paulComeback=false, cristinaComeback=false;
   let paulHatTrick=false, cristinaHatTrick=false;
@@ -995,12 +1060,12 @@ function renderMilestones() {
       } else { paulCur=0; cristinaCur=0; }
     }
   });
- 
+
   let unlocked=0;
   const html = MILESTONES.map(ms => {
     let isUnlocked = false;
     let whoUnlocked = '';
- 
+
     if (ms.special) {
       if (ms.id==='comeback') {
         if (paulComeback&&cristinaComeback) { isUnlocked=true; whoUnlocked='both'; }
@@ -1019,9 +1084,9 @@ function renderMilestones() {
       );
       whoUnlocked = ms.type;
     }
- 
+
     if (isUnlocked) unlocked++;
- 
+
     // Progress bar for total milestones
     let progressHtml = '';
     const totalMilestones = [100000,250000,500000,1000000];
@@ -1035,16 +1100,16 @@ function renderMilestones() {
       const pct = Math.min(100, Math.round((s.cristinaTotal/target)*100));
       if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--cristina)"></div></div><div class="ms-prog-label">${s.cristinaTotal.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
     }
- 
+
     let whoLabel = '';
     if (isUnlocked) {
       if (whoUnlocked==='paul') whoLabel = `<div class="ms-who" style="color:var(--paul)">Paul ✓</div>`;
       else if (whoUnlocked==='cristina') whoLabel = `<div class="ms-who" style="color:var(--cristina)">Cristina ✓</div>`;
       else whoLabel = `<div class="ms-who" style="color:var(--muted)">Both ✓</div>`;
     }
- 
+
     const colorClass = isUnlocked ? (whoUnlocked==='paul'?'paul-ms':whoUnlocked==='cristina'?'cristina-ms':'both-ms') : '';
- 
+
     return `<div class="milestone-card ${isUnlocked?'unlocked '+colorClass:''}">
       <div class="ms-icon">${ms.icon}</div>
       <div class="ms-body">
@@ -1055,11 +1120,11 @@ function renderMilestones() {
       </div>
     </div>`;
   }).join('');
- 
+
   document.getElementById('milestones-grid').innerHTML = html;
   document.getElementById('ms-unlocked-count').textContent = `${unlocked} of ${MILESTONES.length} unlocked`;
 }
- 
+
 // ══════════════════════════════════════════
 // RENDER REWARDS
 // ══════════════════════════════════════════
@@ -1086,7 +1151,7 @@ function renderRewards() {
   }).join('');
   document.getElementById('rewards-grid').innerHTML = html;
 }
- 
+
 // ══════════════════════════════════════════
 // RENDER HISTORY
 // ══════════════════════════════════════════
@@ -1099,10 +1164,10 @@ function renderHistory() {
   document.getElementById('month-filter-chips').innerHTML =
     `<div class="chip ${!filterMonth?'active':''}" onclick="setHistoryFilter(null)">All</div>` +
     months.map(m=>`<div class="chip ${m.key===filterMonth?'active':''}" onclick="setHistoryFilter('${m.key}')">${m.label}</div>`).join('');
- 
+
   const wd = weeks.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina);
   document.getElementById('history-meta').textContent = `${wd.length} week${wd.length!==1?'s':''} of data`;
- 
+
   if (!wd.length) {
     document.getElementById('history-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet</td></tr>';
     return;
@@ -1125,12 +1190,12 @@ function renderHistory() {
     </tr>`;
   }).join('');
 }
- 
+
 // ══════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════
 function renderAll() { renderHero(); renderWeekly(); }
- 
+
 function changeWeek(dir) {
   currentWeekIdx = Math.max(0,Math.min(allWeeksFlat.length-1,currentWeekIdx+dir));
   renderWeekly();
@@ -1140,7 +1205,7 @@ function jumpToMonth(mk) {
   if (idx>=0) { currentWeekIdx=idx; renderWeekly(); }
 }
 function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
- 
+
 function showSection(name) {
   ['weekly','milestones','rewards','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
@@ -1152,13 +1217,13 @@ function showSection(name) {
   if (name==='rewards') renderRewards();
   if (name==='history') renderHistory();
 }
- 
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
 }
- 
+
 // ══════════════════════════════════════════
 // AUTH & WRITE-BACK (PIN-based)
 // ══════════════════════════════════════════
@@ -1166,7 +1231,7 @@ const SHEET_ID_WRITE = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9R7YGa_FmeZhBiQf6LkzDmc5lj1J4ogl6qabn9E-a7M9VVM9JFqQowKD4LGheBI6qdg/exec';
 const PINS = { paul: '1987', cristina: '1993' }; // change these to whatever you want
 let currentUser = localStorage.getItem('steps_user') || null;
- 
+
 function renderAuthArea() {
   const area = document.getElementById('auth-area');
   if (!currentUser) {
@@ -1178,7 +1243,7 @@ function renderAuthArea() {
     renderWritePanel();
   }
 }
- 
+
 function showPinModal() {
   let modal = document.getElementById('pin-modal');
   if (modal) { modal.style.display = 'flex'; return; }
@@ -1207,7 +1272,7 @@ function showPinModal() {
   `;
   document.body.appendChild(modal);
 }
- 
+
 let selectedPinUser = null;
 function selectPinUser(who) {
   selectedPinUser = who;
@@ -1216,7 +1281,7 @@ function selectPinUser(who) {
   if (paulBtn) paulBtn.style.borderColor = who === 'paul' ? 'var(--paul)' : 'var(--border)';
   if (cristinaBtn) cristinaBtn.style.borderColor = who === 'cristina' ? 'var(--cristina)' : 'var(--border)';
 }
- 
+
 function submitPin() {
   const pin = document.getElementById('pin-input')?.value;
   const errEl = document.getElementById('pin-error');
@@ -1229,12 +1294,12 @@ function submitPin() {
   renderAuthArea();
   showToast('Signed in as ' + (currentUser === 'paul' ? 'Paul' : 'Cristina') + ' ✓');
 }
- 
+
 function closePinModal() {
   const m = document.getElementById('pin-modal');
   if (m) m.style.display = 'none';
 }
- 
+
 function signOut() {
   currentUser = null;
   localStorage.removeItem('steps_user');
@@ -1242,7 +1307,7 @@ function signOut() {
   const wp = document.getElementById('write-panel');
   if (wp) wp.style.display = 'none';
 }
- 
+
 function renderWritePanel() {
   let wp = document.getElementById('write-panel');
   if (!wp) {
@@ -1251,7 +1316,7 @@ function renderWritePanel() {
     document.querySelector('.wrap').prepend(wp);
   }
   if (!currentUser) { wp.style.display = 'none'; return; }
- 
+
   const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
   const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
   const weekOpts = allWeeksFlat.map(w =>
@@ -1259,7 +1324,7 @@ function renderWritePanel() {
   ).join('');
   const curKey = allWeeksFlat[currentWeekIdx]?.key || '';
   const curVal = curKey && DB[curKey]?.[currentUser] ? DB[curKey][currentUser] : '';
- 
+
   wp.style.display = '';
   wp.innerHTML = `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;border-top:3px solid ${color};">
@@ -1281,11 +1346,11 @@ function renderWritePanel() {
       <div id="wp-status" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
     </div>
   `;
- 
+
   const sel = document.getElementById('wp-week-sel');
   if (sel && curKey) sel.value = curKey;
 }
- 
+
 function onWpWeekChange() {
   const key = document.getElementById('wp-week-sel')?.value;
   if (!key || !currentUser) return;
@@ -1293,17 +1358,17 @@ function onWpWeekChange() {
   const inp = document.getElementById('wp-steps-inp');
   if (inp) inp.value = val || '';
 }
- 
+
 async function writeToSheet() {
   if (!currentUser) { showToast('Please sign in first'); return; }
   const key = document.getElementById('wp-week-sel')?.value;
   const steps = parseInt(document.getElementById('wp-steps-inp')?.value);
   if (!key || isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); return; }
- 
+
   const wpStatus = document.getElementById('wp-status');
   wpStatus.textContent = '↻ Saving to Sheet...';
   wpStatus.style.color = 'var(--muted)';
- 
+
   // Update local DB immediately so UI reflects change
   if (!DB[key]) DB[key] = { paul: null, cristina: null };
   DB[key][currentUser] = steps;
@@ -1313,7 +1378,7 @@ async function writeToSheet() {
   renderWritePanel();
   const sel = document.getElementById('wp-week-sel');
   if (sel) sel.value = key;
- 
+
   // Write to Google Sheet via Apps Script
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
@@ -1336,7 +1401,7 @@ async function writeToSheet() {
     showToast('Saved locally ✓');
   }
 }
- 
+
 // ══════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════
@@ -1345,9 +1410,9 @@ buildWeeksFlat();
 findCurrentWeek();
 renderAll();
 loadFromSheet(false);
- 
+
 // Init Google Auth after GIS script loads
 renderAuthArea();
 </script>
 </body>
-</html
+</html>
