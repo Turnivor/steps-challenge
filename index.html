@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paul & Cristina — Step Challenge</title>
+<title>Paul & Cristina — Crawling Month</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Creepster&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --paul: #FF6B35;
@@ -16,17 +17,18 @@
   --cristina: #4ECDC4;
   --cristina-soft: rgba(78,205,196,0.15);
   --cristina-mid: rgba(78,205,196,0.4);
-  --bg: #0C0C0E;
-  --surface: #141417;
-  --surface2: #1C1C21;
-  --surface3: #24242B;
-  --border: #2A2A33;
-  --border2: #33333D;
+  --bg: #0A0A0C;
+  --surface: #111114;
+  --surface2: #191920;
+  --surface3: #212128;
+  --border: #272730;
+  --border2: #32323E;
   --text: #EDEDF0;
   --muted: #72728A;
   --muted2: #48485A;
   --radius: 16px;
   --radius-sm: 10px;
+  --grit: rgba(255,255,255,0.015);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -34,43 +36,82 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding-bottom: 60px;
+  padding-bottom: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
- 
+
+/* ── CRAWLING MONTH BANNER ── */
+.crawling-banner {
+  text-align: center;
+  padding: 10px 20px 8px;
+  background: linear-gradient(90deg, transparent, rgba(255,107,53,0.05) 30%, rgba(78,205,196,0.05) 70%, transparent);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.crawling-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--paul), transparent);
+  animation: scanline 4s linear infinite;
+}
+@keyframes scanline { to { left: 200%; } }
+.crawling-title {
+  font-family: 'Creepster', cursive;
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.7;
+}
+.crawling-title span { color: #8B4513; opacity: 0.9; }
+
 /* ── HERO HEADER ── */
 .hero {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 32px 44px 0;
+  padding: 28px 44px 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--paul-mid), transparent 40%, transparent 60%, var(--cristina-mid));
 }
 .hero-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 16px;
 }
 .wordmark {
   font-family: 'Syne', sans-serif;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
   line-height: 1;
 }
 .wordmark .p { color: var(--paul); }
-.wordmark .vs { color: var(--muted2); font-size: 20px; font-weight: 400; margin: 0 4px; }
+.wordmark .vs { color: var(--muted2); font-size: 18px; font-weight: 400; margin: 0 6px; }
 .wordmark .c { color: var(--cristina); }
 .wordmark .sub {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
-  color: var(--muted);
-  letter-spacing: 2.5px;
+  color: var(--muted2);
+  letter-spacing: 3px;
   text-transform: uppercase;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 .sync-btn {
   display: flex;
@@ -79,7 +120,7 @@ body {
   background: var(--surface2);
   border: 1px solid var(--border2);
   border-radius: 20px;
-  padding: 8px 16px;
+  padding: 7px 14px;
   font-size: 12px;
   font-weight: 500;
   color: var(--muted);
@@ -88,65 +129,92 @@ body {
   transition: all 0.2s;
 }
 .sync-btn:hover { border-color: var(--cristina-mid); color: var(--cristina); }
-.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted2); flex-shrink: 0; }
 .sync-dot.live { background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E80; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
- 
-/* ── SCORE STRIP ── */
-.score-strip {
+
+/* ── FIGHTER ARENA ── */
+.arena {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr 160px 1fr;
   align-items: center;
-  gap: 20px;
-  padding: 24px 0;
+  gap: 0;
+  padding: 16px 0 24px;
   border-top: 1px solid var(--border);
   margin-top: 8px;
 }
-.score-person { display: flex; flex-direction: column; }
-.score-person.right { align-items: flex-end; }
-.score-name { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
-.score-total {
-  font-family: 'Bebas Neue', 'Syne', sans-serif;
-  font-size: 48px;
+.fighter-side { display: flex; align-items: center; gap: 16px; }
+.fighter-side.right { flex-direction: row-reverse; }
+.fighter-wrap { position: relative; }
+
+/* PIXEL ART BOXER — pure CSS/SVG inline */
+.boxer-canvas { width: 64px; height: 80px; display: block; image-rendering: pixelated; }
+
+/* Fighter info */
+.fighter-info { display: flex; flex-direction: column; }
+.fighter-info.right { align-items: flex-end; }
+.f-name { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
+.f-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
   font-weight: 400;
   letter-spacing: 2px;
   line-height: 1;
 }
-.score-total.p { color: var(--paul); }
-.score-total.c { color: var(--cristina); }
-.score-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.score-vs { text-align: center; }
-.vs-badge {
-  background: var(--surface3);
+.f-score.p { color: var(--paul); }
+.f-score.c { color: var(--cristina); }
+.f-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* VS center */
+.vs-center { text-align: center; }
+.vs-ring {
+  background: var(--surface2);
   border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 8px 16px;
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: 50%;
+  width: 56px; height: 56px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
   color: var(--muted);
+  position: relative;
+}
+.vs-ring::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(var(--paul) 0%, var(--paul) var(--paul-pct, 50%), var(--cristina) var(--paul-pct, 50%), var(--cristina) 100%);
+  z-index: -1;
+  opacity: 0.5;
+}
+.vs-leader-tag {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
-.vs-badge .leader { display: block; font-size: 10px; font-weight: 400; color: var(--muted2); margin-top: 2px; text-align: center; }
- 
-/* ── BAR ── */
+
+/* ── VS BAR ── */
 .vs-bar-row {
-  padding: 0 44px 20px;
+  padding: 0 44px 18px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
 .vs-bar {
-  height: 6px;
+  height: 5px;
   border-radius: 3px;
   overflow: hidden;
   background: var(--surface3);
   display: flex;
 }
-.vb-paul { background: var(--paul); transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
-.vb-cristina { background: var(--cristina); transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1); }
- 
+.vb-paul { background: linear-gradient(90deg, var(--paul), #ff9966); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+.vb-cristina { background: linear-gradient(90deg, #6fded7, var(--cristina)); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+
 /* ── NAV ── */
-.nav {
+nav.main-nav {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 0 44px;
@@ -154,7 +222,7 @@ body {
   gap: 4px;
 }
 .nav-tab {
-  padding: 14px 18px;
+  padding: 13px 18px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
@@ -164,42 +232,18 @@ body {
   border-bottom: 2px solid transparent;
   font-family: 'DM Sans', sans-serif;
   transition: all 0.15s;
-  letter-spacing: 0.2px;
 }
 .nav-tab:hover { color: var(--text); }
 .nav-tab.active { color: var(--text); border-bottom-color: var(--paul); }
- 
-/* ── CONTAINER ── */
-.wrap { max-width: 1060px; margin: 0 auto; padding: 36px 44px; }
- 
-/* ── SECTION HEADERS ── */
-.sec-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.sec-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-}
-.sec-meta { font-size: 12px; color: var(--muted); }
- 
+
+/* ── WRAP ── */
+.wrap { max-width: 1060px; margin: 0 auto; padding: 32px 44px; }
+
 /* ── WEEK NAV ── */
-.week-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
+.week-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
 .month-chips { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
 .chip {
-  padding: 6px 14px;
+  padding: 5px 14px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
@@ -215,7 +259,7 @@ body {
   background: var(--surface2);
   border: 1px solid var(--border);
   color: var(--text);
-  width: 34px; height: 34px;
+  width: 32px; height: 32px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
@@ -225,231 +269,210 @@ body {
 }
 .nav-btn:hover { background: var(--surface3); }
 .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
- 
-/* ── WEEK SUMMARY CARDS ── */
-.week-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 28px;
-}
+
+/* ── SEC HEAD ── */
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.sec-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.sec-meta { font-size: 12px; color: var(--muted); }
+
+/* ── WEEK CARDS ── */
+.week-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 @media(max-width:600px){ .week-cards { grid-template-columns: 1fr; } }
 .week-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: 20px 22px;
   position: relative;
   overflow: hidden;
+  transition: border-color 0.2s;
 }
-.week-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-}
-.wc-paul::after { background: var(--paul); }
-.wc-cristina::after { background: var(--cristina); }
-.wc-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; }
+.week-card:hover { border-color: var(--border2); }
+.week-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.wc-paul::after { background: linear-gradient(90deg, var(--paul), transparent); }
+.wc-cristina::after { background: linear-gradient(90deg, var(--cristina), transparent); }
+.wc-name { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 8px; }
 .wc-steps {
-  font-family: 'Bebas Neue', 'Syne', sans-serif;
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 44px;
   font-weight: 400;
   letter-spacing: 2px;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .wc-paul .wc-steps { color: var(--paul); }
 .wc-cristina .wc-steps { color: var(--cristina); }
 .wc-meta { font-size: 12px; color: var(--muted); }
-.wc-delta {
-  position: absolute;
-  top: 22px; right: 22px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-.delta-win { background: rgba(91,222,142,0.12); color: #5BDE8E; }
-.delta-loss { background: rgba(226,91,91,0.12); color: #E25B5B; }
+.wc-delta { position: absolute; top: 18px; right: 18px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.delta-win { background: rgba(91,222,142,0.1); color: #5BDE8E; }
+.delta-loss { background: rgba(226,91,91,0.1); color: #E25B5B; }
 .delta-tie { background: var(--surface3); color: var(--muted); }
- 
+
+/* ── WINNER NOTE ── */
+.winner-note {
+  grid-column: 1/-1;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.winner-note.paul-wins { background: var(--paul-soft); border: 1px solid var(--paul-mid); color: var(--paul); }
+.winner-note.cristina-wins { background: var(--cristina-soft); border: 1px solid var(--cristina-mid); color: var(--cristina); }
+.winner-note.tie { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+
 /* ── CHART ── */
 .chart-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 22px;
   margin-bottom: 24px;
 }
-.chart-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-}
-.chart-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
-.legend { display: flex; gap: 16px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
- 
-/* ── WEEKLY TABLE ── */
-.table-card {
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.chart-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.legend { display: flex; gap: 14px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── MILESTONES ── */
+.milestones-section { margin-bottom: 24px; }
+.milestones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.milestone-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: all 0.2s;
+  position: relative;
   overflow: hidden;
-  margin-bottom: 24px;
 }
-.table-head-bar {
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--border);
-  font-family: 'Syne', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-}
-table { width: 100%; border-collapse: collapse; }
-th {
-  padding: 10px 22px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--muted);
-  text-align: left;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.milestone-card.unlocked {
+  border-color: var(--border2);
   background: var(--surface2);
-  border-bottom: 1px solid var(--border);
 }
-td { padding: 14px 22px; font-size: 14px; border-bottom: 1px solid var(--border); }
+.milestone-card.unlocked::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+.milestone-card.unlocked.paul-ms::before { background: var(--paul); }
+.milestone-card.unlocked.cristina-ms::before { background: var(--cristina); }
+.milestone-card.unlocked.both-ms::before { background: linear-gradient(180deg, var(--paul), var(--cristina)); }
+.ms-icon { font-size: 22px; flex-shrink: 0; filter: grayscale(1); opacity: 0.3; transition: all 0.3s; }
+.milestone-card.unlocked .ms-icon { filter: none; opacity: 1; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes popIn { from { transform: scale(0.5); } to { transform: scale(1); } }
+.ms-body { flex: 1; min-width: 0; }
+.ms-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.milestone-card:not(.unlocked) .ms-name { color: var(--muted); }
+.ms-desc { font-size: 11px; color: var(--muted2); line-height: 1.4; }
+.ms-who { font-size: 10px; font-weight: 600; margin-top: 5px; letter-spacing: 0.5px; text-transform: uppercase; }
+.ms-progress { margin-top: 6px; }
+.ms-prog-bar { height: 3px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+.ms-prog-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+.ms-prog-label { font-size: 10px; color: var(--muted2); margin-top: 3px; }
+
+/* ── REWARDS ── */
+.rewards-section { margin-bottom: 24px; }
+.rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.reward-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
+}
+.reward-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.reward-card.claimed { border-color: rgba(91,222,142,0.3); background: rgba(91,222,142,0.05); }
+.reward-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.reward-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.reward-trigger { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+.reward-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.reward-locked { background: var(--surface3); color: var(--muted2); }
+.reward-earned { background: rgba(91,222,142,0.15); color: #5BDE8E; }
+.reward-paul { background: var(--paul-soft); color: var(--paul); }
+.reward-cristina { background: var(--cristina-soft); color: var(--cristina); }
+
+/* ── HISTORY TABLE ── */
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
+.table-head-bar { padding: 14px 20px; border-bottom: 1px solid var(--border); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 9px 20px; font-size: 11px; font-weight: 500; color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: 1px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+td { padding: 13px 20px; font-size: 14px; border-bottom: 1px solid var(--border); }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--surface2); }
-.td-week { font-size: 13px; color: var(--muted); }
-.td-paul { color: var(--paul); font-weight: 600; font-family: 'Syne', sans-serif; font-size: 15px; }
-.td-cristina { color: var(--cristina); font-weight: 600; font-family: 'Syne', sans-serif; font-size: 15px; }
-.pill {
-  display: inline-block;
-  font-size: 11px; font-weight: 500;
-  padding: 3px 9px;
-  border-radius: 10px;
-}
+.td-week { font-size: 12px; color: var(--muted); }
+.td-paul { color: var(--paul); font-weight: 600; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; }
+.td-cristina { color: var(--cristina); font-weight: 600; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1px; }
+.pill { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; }
 .pill-paul { background: var(--paul-soft); color: var(--paul); }
 .pill-cristina { background: var(--cristina-soft); color: var(--cristina); }
 .pill-tie { background: var(--surface3); color: var(--muted); }
- 
-/* ── ENTER DATA ── */
-.entry-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 20px;
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #1A2E1A; border: 1px solid rgba(91,222,142,0.3); color: #5BDE8E;
+  padding: 11px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+  opacity: 0; transform: translateY(8px); transition: all 0.25s; z-index: 999; pointer-events: none;
 }
-.entry-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px; font-weight: 700;
-  margin-bottom: 6px;
-}
-.entry-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
-.entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(max-width:560px){ .entry-grid { grid-template-columns: 1fr; } }
-.entry-person {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
-}
-.ep-paul { border-top: 3px solid var(--paul); }
-.ep-cristina { border-top: 3px solid var(--cristina); }
-.ep-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-.ep-paul .ep-name { color: var(--paul); }
-.ep-cristina .ep-name { color: var(--cristina); }
-.field-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); display: block; margin-bottom: 6px; }
-.week-sel {
-  width: 100%;
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  outline: none;
-  margin-bottom: 14px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.week-sel:focus { border-color: var(--paul); }
-.step-inp {
-  width: 100%;
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  color: var(--text);
-  font-family: 'Syne', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  outline: none;
-  transition: border-color 0.15s;
-  margin-bottom: 14px;
-}
-.step-inp::placeholder { color: var(--muted2); font-size: 16px; font-weight: 400; font-family: 'DM Sans', sans-serif; }
-.step-inp:focus { border-color: var(--paul); }
-.step-inp.c-inp:focus { border-color: var(--cristina); }
-.save-btn {
-  width: 100%;
-  padding: 11px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.save-btn:active { transform: scale(0.98); }
-.btn-paul { background: var(--paul); color: #fff; }
-.btn-paul:hover { background: #ff8655; }
-.btn-cristina { background: var(--cristina); color: #0C0C0E; }
-.btn-cristina:hover { background: #6fded7; }
- 
-/* ── LOADING / STATUS ── */
-.status-bar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  margin-bottom: 20px;
-}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── STATUS ── */
+.status-bar { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 18px; }
 .status-loading { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
 .status-ok { background: rgba(91,222,142,0.08); border: 1px solid rgba(91,222,142,0.2); color: #5BDE8E; }
 .status-err { background: rgba(226,91,91,0.08); border: 1px solid rgba(226,91,91,0.2); color: #E25B5B; }
 .spin { display: inline-block; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
- 
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: #1A2E1A; border: 1px solid rgba(91,222,142,0.3); color: #5BDE8E;
-  padding: 12px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
-  opacity: 0; transform: translateY(8px); transition: all 0.25s; z-index: 999; pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
- 
-/* ── EMPTY ── */
-.empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
- 
+
 /* ── RESPONSIVE ── */
 @media(max-width:680px){
-  .hero { padding: 24px 20px 0; }
-  .nav { padding: 0 20px; }
+  .hero, .vs-bar-row { padding-left: 20px; padding-right: 20px; }
+  nav.main-nav { padding: 0 20px; }
   .wrap { padding: 24px 20px; }
-  .vs-bar-row { padding: 0 20px 18px; }
-  .score-total { font-size: 32px; }
-  .nav-tab { padding: 12px 12px; font-size: 12px; }
+  .arena { grid-template-columns: 1fr 80px 1fr; gap: 0; }
+  .f-score { font-size: 34px; }
+  .boxer-canvas { width: 44px; height: 56px; }
+  .nav-tab { padding: 11px 12px; font-size: 12px; }
 }
+
+/* ── PIXEL BOXER ANIMATIONS ── */
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+@keyframes wobble { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
+@keyframes punch-right { 0%,100%{transform:translateX(0)} 50%{transform:translateX(8px)} }
+@keyframes punch-left { 0%,100%{transform:translateX(0)} 50%{transform:translateX(-8px)} }
+@keyframes dizzy { 0%,100%{transform:rotate(0) translateY(0)} 25%{transform:rotate(-5deg) translateY(2px)} 75%{transform:rotate(5deg) translateY(2px)} }
+
+.boxer-winner { animation: bob 0.8s ease-in-out infinite, punch-right 1.2s ease-in-out infinite; }
+.boxer-winner-left { animation: bob 0.8s ease-in-out infinite, punch-left 1.2s ease-in-out infinite; }
+.boxer-loser { animation: wobble 1.5s ease-in-out infinite; opacity: 0.7; }
+.boxer-tie { animation: bob 1.2s ease-in-out infinite; }
 </style>
 </head>
 <body>
- 
+
+<!-- ── CRAWLING MONTH BANNER ── -->
+<div class="crawling-banner">
+  <div class="crawling-title">☠ <span>Crawling Month</span> — June 2026 ☠</div>
+</div>
+
 <!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-top">
@@ -459,63 +482,146 @@ tr:hover td { background: var(--surface2); }
     </div>
     <button class="sync-btn" onclick="loadFromSheet(true)">
       <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-label">Sync from Sheet</span>
+      <span id="sync-label">Sync</span>
     </button>
   </div>
- 
-  <div class="score-strip">
-    <div class="score-person">
-      <div class="score-name">Paul</div>
-      <div class="score-total p" id="hero-paul">–</div>
-      <div class="score-sub" id="hero-paul-sub">all-time steps</div>
+
+  <div class="arena">
+    <!-- PAUL SIDE -->
+    <div class="fighter-side">
+      <div class="fighter-wrap">
+        <svg class="boxer-canvas" id="boxer-paul" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
+          <!-- head -->
+          <rect x="5" y="0" width="6" height="5" fill="#FF9966"/>
+          <rect x="4" y="1" width="1" height="3" fill="#FF9966"/>
+          <rect x="11" y="1" width="1" height="3" fill="#FF9966"/>
+          <!-- hair -->
+          <rect x="5" y="0" width="6" height="1" fill="#663300"/>
+          <rect x="4" y="1" width="2" height="1" fill="#663300"/>
+          <!-- eyes -->
+          <rect x="6" y="2" width="1" height="1" fill="#1a1a2e"/>
+          <rect x="9" y="2" width="1" height="1" fill="#1a1a2e"/>
+          <!-- mouth -->
+          <rect x="7" y="4" width="2" height="1" fill="#cc4400"/>
+          <!-- body -->
+          <rect x="5" y="5" width="6" height="6" fill="#FF6B35"/>
+          <!-- shorts -->
+          <rect x="5" y="11" width="6" height="3" fill="#cc4400"/>
+          <!-- gloves -->
+          <rect x="2" y="6" width="3" height="3" fill="#FF6B35"/>
+          <rect x="11" y="6" width="3" height="3" fill="#FF6B35"/>
+          <rect x="1" y="7" width="2" height="2" fill="#FF9966"/>
+          <rect x="13" y="7" width="2" height="2" fill="#FF9966"/>
+          <!-- legs -->
+          <rect x="5" y="14" width="2" height="4" fill="#FF9966"/>
+          <rect x="9" y="14" width="2" height="4" fill="#FF9966"/>
+          <!-- shoes -->
+          <rect x="4" y="17" width="4" height="2" fill="#333"/>
+          <rect x="8" y="17" width="4" height="2" fill="#333"/>
+          <!-- belt -->
+          <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
+          <!-- shine -->
+          <rect x="6" y="6" width="1" height="2" fill="#FF9966" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="fighter-info">
+        <div class="f-name">Paul</div>
+        <div class="f-score p" id="hero-paul">–</div>
+        <div class="f-sub" id="hero-paul-sub">all-time steps</div>
+      </div>
     </div>
-    <div class="score-vs">
-      <div class="vs-badge" id="vs-badge">VS<span class="leader" id="vs-leader">loading...</span></div>
+
+    <!-- VS CENTER -->
+    <div class="vs-center">
+      <div class="vs-ring" id="vs-ring">VS</div>
+      <div class="vs-leader-tag" id="vs-leader">–</div>
     </div>
-    <div class="score-person right">
-      <div class="score-name">Cristina</div>
-      <div class="score-total c" id="hero-cristina">–</div>
-      <div class="score-sub" id="hero-cristina-sub">all-time steps</div>
+
+    <!-- CRISTINA SIDE -->
+    <div class="fighter-side right">
+      <div class="fighter-wrap">
+        <svg class="boxer-canvas" id="boxer-cristina" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
+          <!-- head -->
+          <rect x="5" y="0" width="6" height="5" fill="#FFCCAA"/>
+          <rect x="4" y="1" width="1" height="3" fill="#FFCCAA"/>
+          <rect x="11" y="1" width="1" height="3" fill="#FFCCAA"/>
+          <!-- hair long -->
+          <rect x="4" y="0" width="8" height="1" fill="#4a1a00"/>
+          <rect x="3" y="1" width="2" height="5" fill="#4a1a00"/>
+          <rect x="11" y="1" width="2" height="5" fill="#4a1a00"/>
+          <rect x="4" y="0" width="1" height="2" fill="#4a1a00"/>
+          <rect x="11" y="0" width="1" height="2" fill="#4a1a00"/>
+          <!-- eyes -->
+          <rect x="6" y="2" width="1" height="1" fill="#1a1a2e"/>
+          <rect x="9" y="2" width="1" height="1" fill="#1a1a2e"/>
+          <!-- eyelash -->
+          <rect x="6" y="1" width="2" height="1" fill="#4a1a00"/>
+          <rect x="9" y="1" width="2" height="1" fill="#4a1a00"/>
+          <!-- mouth smile -->
+          <rect x="7" y="4" width="2" height="1" fill="#ff6688"/>
+          <!-- body -->
+          <rect x="5" y="5" width="6" height="6" fill="#4ECDC4"/>
+          <!-- shorts -->
+          <rect x="5" y="11" width="6" height="3" fill="#2a9d95"/>
+          <!-- gloves -->
+          <rect x="2" y="6" width="3" height="3" fill="#4ECDC4"/>
+          <rect x="11" y="6" width="3" height="3" fill="#4ECDC4"/>
+          <rect x="1" y="7" width="2" height="2" fill="#6fded7"/>
+          <rect x="13" y="7" width="2" height="2" fill="#6fded7"/>
+          <!-- legs -->
+          <rect x="5" y="14" width="2" height="4" fill="#FFCCAA"/>
+          <rect x="9" y="14" width="2" height="4" fill="#FFCCAA"/>
+          <!-- shoes -->
+          <rect x="4" y="17" width="4" height="2" fill="#222"/>
+          <rect x="8" y="17" width="4" height="2" fill="#222"/>
+          <!-- belt -->
+          <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
+          <!-- shine -->
+          <rect x="6" y="6" width="1" height="2" fill="#6fded7" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="fighter-info right">
+        <div class="f-name">Cristina</div>
+        <div class="f-score c" id="hero-cristina">–</div>
+        <div class="f-sub" id="hero-cristina-sub">all-time steps</div>
+      </div>
     </div>
-  </div>
+    <div id="auth-area" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"></div>
 </div>
- 
+</div>
+
 <div class="vs-bar-row">
   <div class="vs-bar">
     <div class="vb-paul" id="vb-paul" style="width:50%"></div>
     <div class="vb-cristina" id="vb-cristina" style="width:50%"></div>
   </div>
 </div>
- 
+
 <!-- ── NAV ── -->
-<nav style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 44px;display:flex;gap:4px;" id="main-nav">
+<nav class="main-nav">
   <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
+  <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
+  <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
 </nav>
- 
-<!-- ── MAIN ── -->
+
 <div class="wrap">
- 
-  <!-- STATUS -->
   <div class="status-bar status-loading" id="status-bar" style="display:none">
-    <span class="spin">↻</span> Loading data from Google Sheets...
+    <span class="spin">↻</span> Syncing...
   </div>
- 
-  <!-- ══ WEEKLY SECTION ══ -->
+
+  <!-- ══ THIS WEEK ══ -->
   <div id="section-weekly">
     <div class="week-nav">
       <div class="month-chips" id="month-chips"></div>
       <button class="nav-btn" id="btn-prev" onclick="changeWeek(-1)">←</button>
       <button class="nav-btn" id="btn-next" onclick="changeWeek(1)" disabled>→</button>
     </div>
- 
     <div class="sec-head">
       <div class="sec-title" id="week-title">Week –</div>
       <div class="sec-meta" id="week-dates">–</div>
     </div>
- 
     <div class="week-cards" id="week-cards"></div>
- 
     <div class="chart-card">
       <div class="chart-header">
         <div class="chart-title">Week over week</div>
@@ -524,441 +630,756 @@ tr:hover td { background: var(--surface2); }
           <div class="legend-item"><div class="legend-dot" style="background:var(--cristina)"></div>Cristina</div>
         </div>
       </div>
-      <div style="position:relative;height:280px;">
-        <canvas id="wowChart" role="img" aria-label="Week over week step comparison for Paul and Cristina">No data yet.</canvas>
-      </div>
+      <div style="position:relative;height:260px;"><canvas id="wowChart"></canvas></div>
     </div>
   </div>
- 
-  <!-- ══ HISTORY SECTION ══ -->
-  <div id="section-history" style="display:none">
+
+  <!-- ══ MILESTONES ══ -->
+  <div id="section-milestones" style="display:none">
     <div class="sec-head" style="margin-bottom:20px;">
-      <div class="sec-title">All weeks</div>
+      <div class="sec-title">Milestones & Badges</div>
+      <div class="sec-meta" id="ms-unlocked-count">–</div>
+    </div>
+    <div class="milestones-grid" id="milestones-grid"></div>
+  </div>
+
+  <!-- ══ REWARDS ══ -->
+  <div id="section-rewards" style="display:none">
+    <div class="sec-head" style="margin-bottom:6px;">
+      <div class="sec-title">Reward Board</div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Win weeks, hit milestones, earn symbolic prizes. Small things, big satisfaction.</div>
+    <div class="rewards-grid" id="rewards-grid"></div>
+  </div>
+
+  <!-- ══ ALL WEEKS ══ -->
+  <div id="section-history" style="display:none">
+    <div class="sec-head" style="margin-bottom:16px;">
+      <div class="sec-title">All Weeks</div>
       <div class="sec-meta" id="history-meta">–</div>
     </div>
- 
-    <div class="month-chips" id="month-filter-chips" style="margin-bottom:20px;"></div>
- 
+    <div class="month-chips" id="month-filter-chips" style="margin-bottom:16px;"></div>
     <div class="table-card">
       <div class="table-head-bar">Week by week</div>
       <table>
-        <thead>
-          <tr>
-            <th>Week</th>
-            <th>Paul</th>
-            <th>Cristina</th>
-            <th>Difference</th>
-            <th>Winner</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Week</th><th>Paul</th><th>Cristina</th><th>Gap</th><th>Winner</th></tr></thead>
         <tbody id="history-tbody"></tbody>
       </table>
     </div>
   </div>
- 
-</div><!-- /wrap -->
- 
+
+</div>
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
 // ══════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════
-const SHEET_ID = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpyle4KnajpmMU2KSeUCW-llzJ-7jSSBgqJqRRqZldNm0VOzkq0tDbaaH73jDU2-wx74jXoYjxHse6/pub?gid=0&single=true&output=csv';
- 
+
+// ══════════════════════════════════════════
+// MILESTONES DEFINITION
+// ══════════════════════════════════════════
+const MILESTONES = [
+  { id:'first_blood', icon:'🥊', name:'First Blood', desc:'First week of data entered', check:(p,c,pw,cw)=>pw>0||cw>0, type:'both' },
+  { id:'p_10k', icon:'👟', name:'10K Week', desc:'Paul hits 70,000 steps in a week', check:(p,c,pw,cw)=>pw>=70000, type:'paul' },
+  { id:'c_10k', icon:'👟', name:'10K Week', desc:'Cristina hits 70,000 steps in a week', check:(p,c,pw,cw)=>cw>=70000, type:'cristina' },
+  { id:'p_100k', icon:'🔥', name:'100K Club', desc:'Paul crosses 100,000 total steps', check:(p,c)=>p>=100000, type:'paul' },
+  { id:'c_100k', icon:'🔥', name:'100K Club', desc:'Cristina crosses 100,000 total steps', check:(p,c)=>c>=100000, type:'cristina' },
+  { id:'p_250k', icon:'💀', name:'Quarter Million', desc:'Paul reaches 250,000 total steps', check:(p,c)=>p>=250000, type:'paul' },
+  { id:'c_250k', icon:'💀', name:'Quarter Million', desc:'Cristina reaches 250,000 total steps', check:(p,c)=>c>=250000, type:'cristina' },
+  { id:'p_500k', icon:'👑', name:'Half a Million', desc:'Paul walks 500,000 total steps', check:(p,c)=>p>=500000, type:'paul' },
+  { id:'c_500k', icon:'👑', name:'Half a Million', desc:'Cristina walks 500,000 total steps', check:(p,c)=>c>=500000, type:'cristina' },
+  { id:'p_1m', icon:'🏆', name:'One Million Steps', desc:'Paul reaches 1,000,000 steps', check:(p,c)=>p>=1000000, type:'paul' },
+  { id:'c_1m', icon:'🏆', name:'One Million Steps', desc:'Cristina reaches 1,000,000 steps', check:(p,c)=>c>=1000000, type:'cristina' },
+  { id:'neck_neck', icon:'⚔️', name:'Neck & Neck', desc:'Both within 5% of each other total', check:(p,c)=>p>0&&c>0&&Math.abs(p-c)/Math.max(p,c)<0.05, type:'both' },
+  { id:'comeback', icon:'💥', name:'Comeback Kid', desc:'Win a week after losing the previous one', check:null, type:'both', special:true },
+  { id:'three_streak', icon:'🔱', name:'Hat Trick', desc:'Win 3 weeks in a row', check:null, type:'both', special:true },
+];
+
+// ══════════════════════════════════════════
+// REWARDS DEFINITION
+// ══════════════════════════════════════════
+const REWARDS = [
+  { icon:'🍕', name:'Pizza Slice', trigger:'Win any week', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
+  { icon:'🍣', name:'1 Piece of Sushi', trigger:'Win 2 weeks in a month', condition:(stats)=>stats.paulWins>=2||stats.cristinaWins>=2, winner:true },
+  { icon:'💊', name:'Vitamin Pack', trigger:'Hit 100K total steps', condition:(stats)=>stats.paulTotal>=100000||stats.cristinaTotal>=100000, winner:false },
+  { icon:'☕', name:'Fancy Coffee', trigger:'Win 3 weeks in a row', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
+  { icon:'🧃', name:'Smoothie', trigger:'Both reach 50K total steps', condition:(stats)=>stats.paulTotal>=50000&&stats.cristinaTotal>=50000, winner:false },
+  { icon:'🍫', name:'Dark Chocolate Box', trigger:'First to 250K total steps', condition:(stats)=>stats.paulTotal>=250000||stats.cristinaTotal>=250000, winner:true },
+  { icon:'🧦', name:'1 Sock (just one)', trigger:'Hit 500K total steps', condition:(stats)=>stats.paulTotal>=500000||stats.cristinaTotal>=500000, winner:true },
+  { icon:'🥗', name:'Healthy Lunch Out', trigger:'Both complete a full month of data', condition:(stats)=>stats.weeksWithBothData>=4, winner:false },
+  { icon:'🍵', name:'Fancy Tea', trigger:'Win 4 weeks total', condition:(stats)=>stats.paulWins>=4||stats.cristinaWins>=4, winner:true },
+  { icon:'🗺️', name:'Mystery Route', trigger:'Win any week — winner picks a walking route, loser follows without complaining or knowing the destination in advance', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
+  { icon:'🎲', name:'Mystery Gift', trigger:'Win 3 weeks in a row — loser buys something random under 20 RON', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
+];
+
 // ══════════════════════════════════════════
 // WEEK SYSTEM
 // ══════════════════════════════════════════
 const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_F = ['January','February','March','April','May','June','July','August','September','October','November','December'];
- 
+
 function getWeeksForMonth(year, month) {
-  const weeks = [];
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  let startMon = new Date(firstDay);
-  const dow = startMon.getDay();
-  startMon.setDate(startMon.getDate() + (dow === 0 ? -6 : 1 - dow));
-  let wn = 1, cur = new Date(startMon);
+  const weeks = [], lastDay = new Date(year, month + 1, 0);
+  let start = new Date(year, month, 1);
+  const dow = start.getDay();
+  start.setDate(start.getDate() + (dow === 0 ? -6 : 1 - dow));
+  let wn = 1, cur = new Date(start);
   while (cur <= lastDay) {
     const s = new Date(cur), e = new Date(cur);
     e.setDate(e.getDate() + 6);
-    weeks.push({
-      key: `${year}-${String(month+1).padStart(2,'0')}-W${wn}`,
-      num: wn, start: s, end: e, year, month
-    });
+    weeks.push({ key:`${year}-${String(month+1).padStart(2,'0')}-W${wn}`, num:wn, start:s, end:e, year, month });
     cur.setDate(cur.getDate() + 7);
     wn++;
   }
   return weeks;
 }
- 
 function fmtShort(d) { return `${MONTHS_S[d.getMonth()]} ${d.getDate()}`; }
-function fmtKey(y,m,w) { return `${y}-${String(m+1).padStart(2,'0')}-W${w}`; }
- 
+
 const TODAY = new Date();
-let allWeeksFlat = []; // all weeks across all months we have data for
-let currentWeekIdx = 0;
-let filterMonth = null; // for history view
- 
-// ══════════════════════════════════════════
-// DATA STORE (local + sheet merge)
-// ══════════════════════════════════════════
-// DB: { [week_key]: { paul: number|null, cristina: number|null, label: string } }
+let allWeeksFlat = [], currentWeekIdx = 0, filterMonth = null;
 let DB = JSON.parse(localStorage.getItem('steps_v3') || '{}');
- 
-function saveDB() {
-  localStorage.setItem('steps_v3', JSON.stringify(DB));
-}
- 
+function saveDB() { localStorage.setItem('steps_v3', JSON.stringify(DB)); }
+
 function ensureCurrentMonthWeeks() {
-  const weeks = getWeeksForMonth(TODAY.getFullYear(), TODAY.getMonth());
-  weeks.forEach(w => {
-    if (!DB[w.key]) {
-      DB[w.key] = { paul: null, cristina: null, label: `${fmtShort(w.start)} – ${fmtShort(w.end)}` };
-    }
+  getWeeksForMonth(TODAY.getFullYear(), TODAY.getMonth()).forEach(w => {
+    if (!DB[w.key]) DB[w.key] = { paul:null, cristina:null };
   });
 }
- 
+
 function buildWeeksFlat() {
-  // Build from all keys in DB, sorted
-  const keys = Object.keys(DB).sort();
-  const seen = new Set();
+  const seenKeys = new Set();
   allWeeksFlat = [];
-  keys.forEach(k => {
+  Object.keys(DB).sort().forEach(k => {
+    if (seenKeys.has(k)) return;
     const m = k.match(/^(\d{4})-(\d{2})-W(\d+)$/);
     if (!m) return;
     const y = parseInt(m[1]), mo = parseInt(m[2])-1, wn = parseInt(m[3]);
-    const monthKey = `${y}-${m[2]}`;
-    if (!seen.has(monthKey)) {
-      seen.add(monthKey);
-    }
-    const weeks = getWeeksForMonth(y, mo);
-    const w = weeks.find(x => x.num === wn);
-    if (w) allWeeksFlat.push({ ...w, data: DB[k] });
+    const w = getWeeksForMonth(y, mo).find(x => x.num === wn);
+    if (w) { seenKeys.add(k); allWeeksFlat.push(w); }
   });
-  // Deduplicate
-  const uniq = [];
-  const seenKeys = new Set();
-  allWeeksFlat.forEach(w => {
-    if (!seenKeys.has(w.key)) { seenKeys.add(w.key); uniq.push(w); }
-  });
-  allWeeksFlat = uniq;
 }
- 
-// ══════════════════════════════════════════
-// GOOGLE SHEETS FETCH
-// ══════════════════════════════════════════
+
 function parseCSV(text) {
   const lines = text.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
   if (lines.length < 2) return;
-  const header = lines[0].map(h => h.toLowerCase().replace(/\s/g,''));
-  const wkIdx = header.findIndex(h => h.includes('week'));
-  const plIdx = header.findIndex(h => h.includes('paul'));
-  const crIdx = header.findIndex(h => h.includes('cristina'));
-  const lbIdx = header.findIndex(h => h.includes('label'));
-  if (wkIdx < 0) return;
- 
+  const hdr = lines[0].map(h => h.toLowerCase().replace(/\s/g,''));
+  const wkI = hdr.findIndex(h => h.includes('week'));
+  const plI = hdr.findIndex(h => h.includes('paul'));
+  const crI = hdr.findIndex(h => h.includes('cristina'));
+  if (wkI < 0) return;
   for (let i = 1; i < lines.length; i++) {
     const row = lines[i];
-    const key = row[wkIdx];
+    const key = row[wkI];
     if (!key || !key.match(/\d{4}-\d{2}-W\d/)) continue;
-    const m = key.match(/^(\d{4})-(\d{2})-W(\d+)$/);
-    if (!m) continue;
-    const y = parseInt(m[1]), mo = parseInt(m[2])-1, wn = parseInt(m[3]);
-    const weeks = getWeeksForMonth(y, mo);
-    const w = weeks.find(x => x.num === wn);
-    const label = (lbIdx >= 0 && row[lbIdx]) ? row[lbIdx]
-                  : w ? `${fmtShort(w.start)} – ${fmtShort(w.end)}` : key;
-    const paul = plIdx >= 0 && row[plIdx] !== '' ? parseInt(row[plIdx]) : null;
-    const cristina = crIdx >= 0 && row[crIdx] !== '' ? parseInt(row[crIdx]) : null;
-    DB[key] = { paul: isNaN(paul) ? null : paul, cristina: isNaN(cristina) ? null : cristina, label };
+    const paul = plI >= 0 && row[plI] !== '' ? parseInt(row[plI]) : null;
+    const cristina = crI >= 0 && row[crI] !== '' ? parseInt(row[crI]) : null;
+    DB[key] = { paul: isNaN(paul)?null:paul, cristina: isNaN(cristina)?null:cristina };
   }
   saveDB();
 }
- 
-async function loadFromSheet(manual = false) {
-  setStatus('loading', '↻ Syncing from Google Sheets...');
+
+async function loadFromSheet(manual=false) {
   setSyncState(false);
+  if (manual) { document.getElementById('status-bar').style.display='flex'; setStatus('loading','↻ Syncing...'); }
   try {
     const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    parseCSV(text);
-    document.getElementById('status-bar').style.display = 'none';
+    if (!res.ok) throw new Error();
+    parseCSV(await res.text());
     setSyncState(true);
-    if (manual) showToast('✓ Synced from Google Sheets');
+    if (manual) { showToast('✓ Synced!'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 1500); }
   } catch(e) {
-    if (manual) { setStatus('err', '✗ Could not reach Google Sheets'); document.getElementById('status-bar').style.display = 'flex'; setTimeout(() => { document.getElementById('status-bar').style.display = 'none'; }, 4000); }
     setSyncState(false);
-    if (manual) showToast('Sync failed — check sheet visibility.');
+    if (manual) { setStatus('err','✗ Could not reach Google Sheets'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 3000); showToast('Sync failed'); }
   }
   ensureCurrentMonthWeeks();
   buildWeeksFlat();
   findCurrentWeek();
   renderAll();
 }
- 
+
 function setStatus(type, msg) {
   const el = document.getElementById('status-bar');
   el.className = `status-bar status-${type}`;
-  el.innerHTML = type === 'loading' ? `<span class="spin">↻</span> ${msg}` : msg;
+  el.innerHTML = type==='loading' ? `<span class="spin">↻</span> ${msg}` : msg;
 }
 function setSyncState(ok) {
   document.getElementById('sync-dot').className = ok ? 'sync-dot live' : 'sync-dot';
-  document.getElementById('sync-label').textContent = ok ? 'Synced' : 'Sync from Sheet';
+  document.getElementById('sync-label').textContent = ok ? 'Synced' : 'Sync';
 }
- 
+
+function findCurrentWeek() {
+  if (!allWeeksFlat.length) { currentWeekIdx=0; return; }
+  for (let i=0; i<allWeeksFlat.length; i++) {
+    const w = allWeeksFlat[i];
+    if (TODAY >= w.start && TODAY <= w.end) { currentWeekIdx=i; return; }
+  }
+  currentWeekIdx = allWeeksFlat.length-1;
+}
+
 // ══════════════════════════════════════════
-// RENDER
+// STATS CALCULATOR
+// ══════════════════════════════════════════
+function calcStats() {
+  let paulTotal=0, cristinaTotal=0, paulWins=0, cristinaWins=0, ties=0;
+  let paulStreak=0, cristinaStreak=0, paulCurStreak=0, cristinaCurStreak=0;
+  let weeksWithBothData=0;
+  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul||DB[w.key]?.cristina);
+  weeks.forEach(w => {
+    const d = DB[w.key]||{};
+    const p = d.paul||0, c = d.cristina||0;
+    paulTotal += p; cristinaTotal += c;
+    if (p>0&&c>0) {
+      weeksWithBothData++;
+      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; }
+      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; }
+      else { ties++; paulCurStreak=0; cristinaCurStreak=0; }
+      paulStreak = Math.max(paulStreak, paulCurStreak);
+      cristinaStreak = Math.max(cristinaStreak, cristinaCurStreak);
+    }
+  });
+  return { paulTotal, cristinaTotal, paulWins, cristinaWins, ties, paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length };
+}
+
+// ══════════════════════════════════════════
+// RENDER HERO
+// ══════════════════════════════════════════
+function renderHero() {
+  const s = calcStats();
+  document.getElementById('hero-paul').textContent = s.paulTotal.toLocaleString();
+  document.getElementById('hero-cristina').textContent = s.cristinaTotal.toLocaleString();
+  document.getElementById('hero-paul-sub').textContent = `${s.paulWins}W · ${s.weeksWithData} weeks`;
+  document.getElementById('hero-cristina-sub').textContent = `${s.cristinaWins}W · ${s.weeksWithData} weeks`;
+
+  const total = s.paulTotal + s.cristinaTotal;
+  let pp = 50;
+  if (total > 0) {
+    pp = Math.round((s.paulTotal/total)*100);
+    document.getElementById('vb-paul').style.width = pp+'%';
+    document.getElementById('vb-cristina').style.width = (100-pp)+'%';
+  }
+
+  // VS ring conic gradient via style
+  document.getElementById('vs-ring').style.setProperty('--paul-pct', pp+'%');
+
+  const leaderEl = document.getElementById('vs-leader');
+  const paulBox = document.getElementById('boxer-paul');
+  const cristinaBox = document.getElementById('boxer-cristina');
+
+  paulBox.className = 'boxer-canvas';
+  cristinaBox.className = 'boxer-canvas';
+
+  if (s.paulTotal > s.cristinaTotal) {
+    leaderEl.innerHTML = `<span style="color:var(--paul)">Paul leads</span>`;
+    paulBox.classList.add('boxer-winner');
+    cristinaBox.classList.add('boxer-loser');
+  } else if (s.cristinaTotal > s.paulTotal) {
+    leaderEl.innerHTML = `<span style="color:var(--cristina)">Cristina leads</span>`;
+    cristinaBox.classList.add('boxer-winner-left');
+    paulBox.classList.add('boxer-loser');
+  } else {
+    leaderEl.textContent = 'All tied up!';
+    paulBox.classList.add('boxer-tie');
+    cristinaBox.classList.add('boxer-tie');
+  }
+}
+
+// ══════════════════════════════════════════
+// RENDER WEEKLY
 // ══════════════════════════════════════════
 let wowChart = null;
- 
-function findCurrentWeek() {
-  if (!allWeeksFlat.length) { currentWeekIdx = 0; return; }
-  for (let i = 0; i < allWeeksFlat.length; i++) {
-    const w = allWeeksFlat[i];
-    if (TODAY >= w.start && TODAY <= w.end) { currentWeekIdx = i; return; }
-  }
-  currentWeekIdx = allWeeksFlat.length - 1;
-}
- 
-function renderAll() {
-  renderHero();
-  renderWeekly();
-  renderHistory();
-}
- 
-function renderHero() {
-  const allPaul = allWeeksFlat.reduce((a,w) => a + (DB[w.key]?.paul || 0), 0);
-  const allCristina = allWeeksFlat.reduce((a,w) => a + (DB[w.key]?.cristina || 0), 0);
-  document.getElementById('hero-paul').textContent = allPaul.toLocaleString();
-  document.getElementById('hero-cristina').textContent = allCristina.toLocaleString();
-  const total = allPaul + allCristina;
-  if (total > 0) {
-    const pp = Math.round((allPaul/total)*100);
-    document.getElementById('vb-paul').style.width = pp + '%';
-    document.getElementById('vb-cristina').style.width = (100-pp) + '%';
-    if (allPaul > allCristina) {
-      document.getElementById('vs-badge').innerHTML = `VS<span class="leader" style="color:var(--paul)">Paul leads</span>`;
-    } else if (allCristina > allPaul) {
-      document.getElementById('vs-badge').innerHTML = `VS<span class="leader" style="color:var(--cristina)">Cristina leads</span>`;
-    } else {
-      document.getElementById('vs-badge').innerHTML = `VS<span class="leader">Tied!</span>`;
-    }
-  }
-  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina).length;
-  document.getElementById('hero-paul-sub').textContent = `across ${weeks} week${weeks!==1?'s':''}`;
-  document.getElementById('hero-cristina-sub').textContent = `across ${weeks} week${weeks!==1?'s':''}`;
-}
- 
 function renderWeekly() {
   if (!allWeeksFlat.length) {
-    document.getElementById('week-cards').innerHTML =
-      '<div class="empty" style="grid-column:1/-1">No data yet — add your first week in <strong>Enter Data</strong></div>';
+    document.getElementById('week-cards').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet — update the Google Sheet to get started.</div>';
     return;
   }
-  document.getElementById('btn-prev').disabled = currentWeekIdx <= 0;
-  document.getElementById('btn-next').disabled = currentWeekIdx >= allWeeksFlat.length - 1;
- 
+  document.getElementById('btn-prev').disabled = currentWeekIdx<=0;
+  document.getElementById('btn-next').disabled = currentWeekIdx>=allWeeksFlat.length-1;
+
   const w = allWeeksFlat[currentWeekIdx];
-  const d = DB[w.key] || {};
+  const d = DB[w.key]||{};
   document.getElementById('week-title').textContent = `Week ${w.num}`;
   document.getElementById('week-dates').textContent = `${MONTHS_F[w.month]} — ${fmtShort(w.start)} to ${fmtShort(w.end)}`;
- 
-  // Month chips
-  const months = [...new Set(allWeeksFlat.map(x => `${x.year}-${String(x.month+1).padStart(2,'0')}`))]
-    .map(mk => { const [y,mo] = mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
-  const curMonthKey = `${w.year}-${String(w.month+1).padStart(2,'0')}`;
-  document.getElementById('month-chips').innerHTML = months.map(m =>
-    `<div class="chip ${m.key===curMonthKey?'active':''}" onclick="jumpToMonth('${m.key}')">${m.label}</div>`
+
+  const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
+    .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
+  const curMK = `${w.year}-${String(w.month+1).padStart(2,'0')}`;
+  document.getElementById('month-chips').innerHTML = months.map(m=>
+    `<div class="chip ${m.key===curMK?'active':''}" onclick="jumpToMonth('${m.key}')">${m.label}</div>`
   ).join('');
- 
-  // Cards
-  const prev = currentWeekIdx > 0 ? DB[allWeeksFlat[currentWeekIdx-1].key] : null;
-  const pSteps = d.paul;
-  const cSteps = d.cristina;
- 
-  function deltaHtml(val, prevVal) {
-    if (!val || !prevVal) return '';
-    const diff = val - prevVal;
-    if (diff > 0) return `<div class="wc-delta delta-win">+${diff.toLocaleString()}</div>`;
-    if (diff < 0) return `<div class="wc-delta delta-loss">${diff.toLocaleString()}</div>`;
+
+  const prev = currentWeekIdx>0 ? DB[allWeeksFlat[currentWeekIdx-1].key] : null;
+  const pS = d.paul, cS = d.cristina;
+
+  function delta(val, pv) {
+    if (!val||!pv) return '';
+    const diff = val-pv;
+    if (diff>0) return `<div class="wc-delta delta-win">+${diff.toLocaleString()}</div>`;
+    if (diff<0) return `<div class="wc-delta delta-loss">${diff.toLocaleString()}</div>`;
     return `<div class="wc-delta delta-tie">Same</div>`;
   }
- 
-  let winnerNote = '';
-  if (pSteps && cSteps) {
-    if (pSteps > cSteps) winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--paul);">🏆 Paul wins this week by ${(pSteps-cSteps).toLocaleString()} steps</div>`;
-    else if (cSteps > pSteps) winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--cristina);">🏆 Cristina wins this week by ${(cSteps-pSteps).toLocaleString()} steps</div>`;
-    else winnerNote = `<div style="margin-top:12px;font-size:12px;color:var(--muted);">This week is a tie!</div>`;
+
+  let winnerHtml = '';
+  if (pS && cS) {
+    if (pS>cS) winnerHtml = `<div class="winner-note paul-wins">🥊 Paul wins this week by <strong>${(pS-cS).toLocaleString()}</strong> steps</div>`;
+    else if (cS>pS) winnerHtml = `<div class="winner-note cristina-wins">🥊 Cristina wins this week by <strong>${(cS-pS).toLocaleString()}</strong> steps</div>`;
+    else winnerHtml = `<div class="winner-note tie">🤝 Dead even this week</div>`;
   }
- 
+
   document.getElementById('week-cards').innerHTML = `
     <div class="week-card wc-paul">
-      ${deltaHtml(pSteps, prev?.paul)}
+      ${delta(pS, prev?.paul)}
       <div class="wc-name">Paul</div>
-      <div class="wc-steps">${pSteps ? pSteps.toLocaleString() : '–'}</div>
-      <div class="wc-meta">${pSteps ? 'steps this week' : 'no data yet'}</div>
+      <div class="wc-steps">${pS ? pS.toLocaleString() : '–'}</div>
+      <div class="wc-meta">${pS ? 'steps this week' : 'no data yet'}</div>
     </div>
     <div class="week-card wc-cristina">
-      ${deltaHtml(cSteps, prev?.cristina)}
+      ${delta(cS, prev?.cristina)}
       <div class="wc-name">Cristina</div>
-      <div class="wc-steps">${cSteps ? cSteps.toLocaleString() : '–'}</div>
-      <div class="wc-meta">${cSteps ? 'steps this week' : 'no data yet'}</div>
+      <div class="wc-steps">${cS ? cS.toLocaleString() : '–'}</div>
+      <div class="wc-meta">${cS ? 'steps this week' : 'no data yet'}</div>
     </div>
-    ${winnerNote ? `<div style="grid-column:1/-1">${winnerNote}</div>` : ''}
+    ${winnerHtml}
   `;
- 
-  // WoW Chart — show all weeks in current month
-  const monthWeeks = allWeeksFlat.filter(x => x.month === w.month && x.year === w.year);
-  const labels = monthWeeks.map(x => `W${x.num}`);
-  const paulData = monthWeeks.map(x => DB[x.key]?.paul || 0);
-  const cristinaData = monthWeeks.map(x => DB[x.key]?.cristina || 0);
- 
-  if (wowChart) { wowChart.destroy(); wowChart = null; }
+
+  const mw = allWeeksFlat.filter(x=>x.month===w.month&&x.year===w.year);
+  if (wowChart) { wowChart.destroy(); wowChart=null; }
   wowChart = new Chart(document.getElementById('wowChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label:'Paul', data:paulData, backgroundColor:'rgba(255,107,53,0.7)', borderColor:'#FF6B35', borderWidth:2, borderRadius:8, borderSkipped:false },
-        { label:'Cristina', data:cristinaData, backgroundColor:'rgba(78,205,196,0.7)', borderColor:'#4ECDC4', borderWidth:2, borderRadius:8, borderSkipped:false }
+    type:'bar',
+    data:{
+      labels: mw.map(x=>`W${x.num}`),
+      datasets:[
+        { label:'Paul', data:mw.map(x=>DB[x.key]?.paul||0), backgroundColor:'rgba(255,107,53,0.65)', borderColor:'#FF6B35', borderWidth:2, borderRadius:8, borderSkipped:false },
+        { label:'Cristina', data:mw.map(x=>DB[x.key]?.cristina||0), backgroundColor:'rgba(78,205,196,0.65)', borderColor:'#4ECDC4', borderWidth:2, borderRadius:8, borderSkipped:false }
       ]
     },
-    options: {
+    options:{
       responsive:true, maintainAspectRatio:false,
-      plugins: {
-        legend: { display:false },
-        tooltip: {
-          backgroundColor:'#1C1C21', borderColor:'#2A2A33', borderWidth:1,
-          titleColor:'#EDEDF0', bodyColor:'#72728A',
-          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()} steps` }
-        }
+      plugins:{
+        legend:{display:false},
+        tooltip:{ backgroundColor:'#191920', borderColor:'#272730', borderWidth:1, titleColor:'#EDEDF0', bodyColor:'#72728A',
+          callbacks:{ label: ctx=>` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()} steps` } }
       },
-      scales: {
-        x: { grid:{ color:'rgba(42,42,51,0.6)' }, ticks:{ color:'#72728A', font:{size:12} } },
-        y: {
-          grid:{ color:'rgba(42,42,51,0.6)' },
-          ticks:{ color:'#72728A', font:{size:11}, callback: v => v>=1000 ? Math.round(v/1000)+'k' : v },
-          beginAtZero:true
-        }
+      scales:{
+        x:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:12}} },
+        y:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:11},callback:v=>v>=1000?Math.round(v/1000)+'k':v}, beginAtZero:true }
       }
     }
   });
 }
- 
+
+// ══════════════════════════════════════════
+// RENDER MILESTONES
+// ══════════════════════════════════════════
+function renderMilestones() {
+  const s = calcStats();
+  const weeksData = allWeeksFlat.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina);
+
+  // Check special milestones
+  let paulComeback=false, cristinaComeback=false;
+  let paulHatTrick=false, cristinaHatTrick=false;
+  let paulCur=0, cristinaCur=0;
+  weeksData.forEach((w,i) => {
+    const d=DB[w.key]||{}, p=d.paul||0, c=d.cristina||0;
+    if (p>0&&c>0) {
+      if (p>c) {
+        if (cristinaCur>0) paulComeback=true;
+        paulCur++; cristinaCur=0;
+        if (paulCur>=3) paulHatTrick=true;
+      } else if (c>p) {
+        if (paulCur>0) cristinaComeback=true;
+        cristinaCur++; paulCur=0;
+        if (cristinaCur>=3) cristinaHatTrick=true;
+      } else { paulCur=0; cristinaCur=0; }
+    }
+  });
+
+  let unlocked=0;
+  const html = MILESTONES.map(ms => {
+    let isUnlocked = false;
+    let whoUnlocked = '';
+
+    if (ms.special) {
+      if (ms.id==='comeback') {
+        if (paulComeback&&cristinaComeback) { isUnlocked=true; whoUnlocked='both'; }
+        else if (paulComeback) { isUnlocked=true; whoUnlocked='paul'; }
+        else if (cristinaComeback) { isUnlocked=true; whoUnlocked='cristina'; }
+      }
+      if (ms.id==='three_streak') {
+        if (paulHatTrick&&cristinaHatTrick) { isUnlocked=true; whoUnlocked='both'; }
+        else if (paulHatTrick) { isUnlocked=true; whoUnlocked='paul'; }
+        else if (cristinaHatTrick) { isUnlocked=true; whoUnlocked='cristina'; }
+      }
+    } else {
+      isUnlocked = ms.check(s.paulTotal, s.cristinaTotal,
+        allWeeksFlat.reduce((mx,w)=>Math.max(mx,DB[w.key]?.paul||0),0),
+        allWeeksFlat.reduce((mx,w)=>Math.max(mx,DB[w.key]?.cristina||0),0)
+      );
+      whoUnlocked = ms.type;
+    }
+
+    if (isUnlocked) unlocked++;
+
+    // Progress bar for total milestones
+    let progressHtml = '';
+    const totalMilestones = [100000,250000,500000,1000000];
+    if (['p_100k','p_250k','p_500k','p_1m'].includes(ms.id)) {
+      const target = totalMilestones[['p_100k','p_250k','p_500k','p_1m'].indexOf(ms.id)];
+      const pct = Math.min(100, Math.round((s.paulTotal/target)*100));
+      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--paul)"></div></div><div class="ms-prog-label">${s.paulTotal.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
+    }
+    if (['c_100k','c_250k','c_500k','c_1m'].includes(ms.id)) {
+      const target = totalMilestones[['c_100k','c_250k','c_500k','c_1m'].indexOf(ms.id)];
+      const pct = Math.min(100, Math.round((s.cristinaTotal/target)*100));
+      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--cristina)"></div></div><div class="ms-prog-label">${s.cristinaTotal.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
+    }
+
+    let whoLabel = '';
+    if (isUnlocked) {
+      if (whoUnlocked==='paul') whoLabel = `<div class="ms-who" style="color:var(--paul)">Paul ✓</div>`;
+      else if (whoUnlocked==='cristina') whoLabel = `<div class="ms-who" style="color:var(--cristina)">Cristina ✓</div>`;
+      else whoLabel = `<div class="ms-who" style="color:var(--muted)">Both ✓</div>`;
+    }
+
+    const colorClass = isUnlocked ? (whoUnlocked==='paul'?'paul-ms':whoUnlocked==='cristina'?'cristina-ms':'both-ms') : '';
+
+    return `<div class="milestone-card ${isUnlocked?'unlocked '+colorClass:''}">
+      <div class="ms-icon">${ms.icon}</div>
+      <div class="ms-body">
+        <div class="ms-name">${ms.name}</div>
+        <div class="ms-desc">${ms.desc}</div>
+        ${whoLabel}
+        ${progressHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('milestones-grid').innerHTML = html;
+  document.getElementById('ms-unlocked-count').textContent = `${unlocked} of ${MILESTONES.length} unlocked`;
+}
+
+// ══════════════════════════════════════════
+// RENDER REWARDS
+// ══════════════════════════════════════════
+function renderRewards() {
+  const s = calcStats();
+  const html = REWARDS.map(r => {
+    const earned = r.condition(s);
+    let statusHtml = '';
+    if (!earned) {
+      statusHtml = `<span class="reward-status reward-locked">Locked</span>`;
+    } else if (r.winner) {
+      const who = s.paulWins >= s.cristinaWins ? 'paul' : 'cristina';
+      const name = who==='paul'?'Paul':'Cristina';
+      statusHtml = `<span class="reward-status reward-${who}">${name} earns this</span>`;
+    } else {
+      statusHtml = `<span class="reward-status reward-earned">Both earn this!</span>`;
+    }
+    return `<div class="reward-card ${earned?'claimed':''}">
+      <span class="reward-icon">${r.icon}</span>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-trigger">${r.trigger}</div>
+      ${statusHtml}
+    </div>`;
+  }).join('');
+  document.getElementById('rewards-grid').innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// RENDER HISTORY
+// ══════════════════════════════════════════
 function renderHistory() {
   const weeks = filterMonth
-    ? allWeeksFlat.filter(w => `${w.year}-${String(w.month+1).padStart(2,'0')}` === filterMonth)
+    ? allWeeksFlat.filter(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===filterMonth)
     : allWeeksFlat;
- 
-  const months = [...new Set(allWeeksFlat.map(x => `${x.year}-${String(x.month+1).padStart(2,'0')}`))]
-    .map(mk => { const [y,mo] = mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
+  const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
+    .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
   document.getElementById('month-filter-chips').innerHTML =
     `<div class="chip ${!filterMonth?'active':''}" onclick="setHistoryFilter(null)">All</div>` +
-    months.map(m => `<div class="chip ${m.key===filterMonth?'active':''}" onclick="setHistoryFilter('${m.key}')">${m.label}</div>`).join('');
- 
-  const withData = weeks.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina);
-  document.getElementById('history-meta').textContent = `${withData.length} week${withData.length!==1?'s':''} of data`;
- 
-  if (!withData.length) {
-    document.getElementById('history-tbody').innerHTML =
-      '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet</td></tr>';
+    months.map(m=>`<div class="chip ${m.key===filterMonth?'active':''}" onclick="setHistoryFilter('${m.key}')">${m.label}</div>`).join('');
+
+  const wd = weeks.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina);
+  document.getElementById('history-meta').textContent = `${wd.length} week${wd.length!==1?'s':''} of data`;
+
+  if (!wd.length) {
+    document.getElementById('history-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet</td></tr>';
     return;
   }
- 
-  document.getElementById('history-tbody').innerHTML = [...withData].reverse().map(w => {
-    const d = DB[w.key] || {};
-    const p = d.paul, c = d.cristina;
-    const diff = (p && c) ? Math.abs(p - c) : null;
+  document.getElementById('history-tbody').innerHTML = [...wd].reverse().map(w => {
+    const d=DB[w.key]||{}, p=d.paul, c=d.cristina;
+    const diff = (p&&c) ? Math.abs(p-c) : null;
     let winner = '';
-    if (p && c) {
-      if (p > c) winner = `<span class="pill pill-paul">Paul</span>`;
-      else if (c > p) winner = `<span class="pill pill-cristina">Cristina</span>`;
-      else winner = `<span class="pill pill-tie">Tie</span>`;
+    if (p&&c) {
+      if (p>c) winner=`<span class="pill pill-paul">Paul</span>`;
+      else if (c>p) winner=`<span class="pill pill-cristina">Cristina</span>`;
+      else winner=`<span class="pill pill-tie">Tie</span>`;
     }
     return `<tr>
-      <td class="td-week">${MONTHS_S[w.month]} — W${w.num}<br><span style="font-size:11px;color:var(--muted2);">${fmtShort(w.start)}–${fmtShort(w.end)}</span></td>
-      <td class="td-paul">${p ? p.toLocaleString() : '–'}</td>
-      <td class="td-cristina">${c ? c.toLocaleString() : '–'}</td>
-      <td style="color:var(--muted);font-size:13px;">${diff ? diff.toLocaleString() : '–'}</td>
+      <td class="td-week">${MONTHS_S[w.month]} W${w.num}<br><span style="font-size:11px;color:var(--muted2)">${fmtShort(w.start)}–${fmtShort(w.end)}</span></td>
+      <td class="td-paul">${p?p.toLocaleString():'–'}</td>
+      <td class="td-cristina">${c?c.toLocaleString():'–'}</td>
+      <td style="color:var(--muted);font-size:13px;">${diff?diff.toLocaleString():'–'}</td>
       <td>${winner}</td>
     </tr>`;
   }).join('');
 }
- 
-function renderEntrySelect() {
-  const sel = document.getElementById('entry-week-sel');
-  const cur = sel.value;
-  sel.innerHTML = allWeeksFlat.map(w =>
-    `<option value="${w.key}">Week ${w.num} — ${MONTHS_S[w.month]} ${fmtShort(w.start)}–${fmtShort(w.end)}</option>`
-  ).join('');
-  if (cur && sel.querySelector(`option[value="${cur}"]`)) sel.value = cur;
-  else {
-    // default to current week
-    const cw = allWeeksFlat[currentWeekIdx];
-    if (cw) sel.value = cw.key;
-  }
-  onEntryWeekChange();
-}
- 
-function onEntryWeekChange() {
-  const key = document.getElementById('entry-week-sel').value;
-  const d = DB[key] || {};
-  document.getElementById('paul-inp').value = d.paul || '';
-  document.getElementById('cristina-inp').value = d.cristina || '';
-}
- 
+
 // ══════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════
+function renderAll() { renderHero(); renderWeekly(); }
+
 function changeWeek(dir) {
-  currentWeekIdx = Math.max(0, Math.min(allWeeksFlat.length-1, currentWeekIdx+dir));
+  currentWeekIdx = Math.max(0,Math.min(allWeeksFlat.length-1,currentWeekIdx+dir));
   renderWeekly();
 }
- 
 function jumpToMonth(mk) {
-  const idx = allWeeksFlat.findIndex(w => `${w.year}-${String(w.month+1).padStart(2,'0')}` === mk);
-  if (idx >= 0) { currentWeekIdx = idx; renderWeekly(); }
+  const idx = allWeeksFlat.findIndex(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===mk);
+  if (idx>=0) { currentWeekIdx=idx; renderWeekly(); }
 }
- 
-function setHistoryFilter(mk) {
-  filterMonth = mk;
-  renderHistory();
-}
- 
-function saveEntry(person) {
-  const key = document.getElementById('entry-week-sel').value;
-  const val = parseInt(document.getElementById(`${person}-inp`).value);
-  if (!key) return;
-  if (!DB[key]) DB[key] = { paul:null, cristina:null, label:key };
-  DB[key][person] = isNaN(val) ? null : val;
-  saveDB();
-  buildWeeksFlat();
-  renderAll();
-  const name = person === 'paul' ? 'Paul' : 'Cristina';
-  showToast(`${name}'s week saved! ✓`);
-}
- 
+function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
+
 function showSection(name) {
-  ['weekly','history'].forEach(s => {
-    document.getElementById(`section-${s}`).style.display = s===name ? '' : 'none';
+  ['weekly','milestones','rewards','history'].forEach(s => {
+    document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','history'][i] === name);
+    btn.classList.toggle('active', ['weekly','milestones','rewards','history'][i]===name);
   });
-  if (name === 'history') renderHistory();
+  if (name==='milestones') renderMilestones();
+  if (name==='rewards') renderRewards();
+  if (name==='history') renderHistory();
 }
- 
+
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
- 
+
+// ══════════════════════════════════════════
+// AUTH & WRITE-BACK
+// ══════════════════════════════════════════
+const CLIENT_ID = '354177160799-llgit7gq6jalnia8cqih62sf1rc8t7mq.apps.googleusercontent.com';
+const SHEET_ID_WRITE = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+
+let tokenClient = null;
+let accessToken = null;
+let currentUser = null; // 'paul' | 'cristina'
+
+const PAUL_EMAIL = 'turnivorus@gmail.com';
+const CRISTINA_EMAIL = 'cristinamoldovan93@gmail.com';
+
+function initGoogleAuth() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.error) { showToast('Sign-in failed'); return; }
+      accessToken = resp.access_token;
+      // Determine who signed in via userinfo
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }).then(r => r.json()).then(info => {
+        const email = info.email.toLowerCase();
+        if (email === PAUL_EMAIL) {
+          currentUser = 'paul';
+        } else if (email === CRISTINA_EMAIL) {
+          currentUser = 'cristina';
+        } else {
+          showToast('This Google account is not registered for this challenge.');
+          accessToken = null; currentUser = null;
+          renderAuthArea();
+          return;
+        }
+        renderAuthArea();
+        renderWritePanel();
+        showToast(`Signed in as ${currentUser === 'paul' ? 'Paul' : 'Cristina'} ✓`);
+      });
+    }
+  });
+}
+
+function renderAuthArea() {
+  const area = document.getElementById('auth-area');
+  if (!accessToken || !currentUser) {
+    area.innerHTML = `<button class="sync-btn" onclick="signIn()" style="border-color:rgba(255,107,53,0.4);color:var(--paul);">
+      <span style="font-size:14px;">G</span> Sign in to add data
+    </button>`;
+  } else {
+    const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
+    const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
+    area.innerHTML = `<span style="font-size:12px;color:${color};font-weight:600;">${name} signed in</span>
+      <button class="sync-btn" onclick="signOut()" style="font-size:11px;padding:5px 10px;">Sign out</button>`;
+  }
+}
+
+function signIn() {
+  if (tokenClient) tokenClient.requestAccessToken();
+}
+
+function signOut() {
+  if (accessToken) google.accounts.oauth2.revoke(accessToken);
+  accessToken = null; currentUser = null;
+  renderAuthArea();
+  // Hide write panel
+  const wp = document.getElementById('write-panel');
+  if (wp) wp.style.display = 'none';
+}
+
+function renderWritePanel() {
+  let wp = document.getElementById('write-panel');
+  if (!wp) {
+    wp = document.createElement('div');
+    wp.id = 'write-panel';
+    document.querySelector('.wrap').prepend(wp);
+  }
+  if (!currentUser) { wp.style.display='none'; return; }
+
+  const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
+  const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
+  const btnClass = currentUser === 'paul' ? 'btn-paul-write' : 'btn-cristina-write';
+
+  // Build week options
+  const weekOpts = allWeeksFlat.map(w =>
+    `<option value="${w.key}">Week ${w.num} — ${MONTHS_S[w.month]} ${fmtShort(w.start)}–${fmtShort(w.end)}</option>`
+  ).join('');
+
+  const curKey = allWeeksFlat[currentWeekIdx]?.key || '';
+  const curVal = curKey && DB[curKey]?.[currentUser] ? DB[curKey][currentUser] : '';
+
+  wp.style.display = '';
+  wp.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;border-top:3px solid ${color};">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${color};margin-bottom:14px;">
+        Add ${name}'s steps
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:180px;">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:5px;">Week</label>
+          <select id="wp-week-sel" class="week-sel" style="margin-bottom:0;" onchange="onWpWeekChange()">
+            ${weekOpts}
+          </select>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:5px;">Weekly total steps</label>
+          <input id="wp-steps-inp" type="number" min="0" max="999999"
+            class="step-inp ${currentUser === 'cristina' ? 'c-inp' : ''}"
+            style="margin-bottom:0;font-size:20px;padding:10px 12px;"
+            placeholder="e.g. 54000" value="${curVal}" />
+        </div>
+        <button onclick="writeToSheet()" style="
+          padding:11px 24px;border:none;border-radius:var(--radius-sm);
+          font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+          background:${color};color:${currentUser==='paul'?'#fff':'#0A0A0C'};
+          cursor:pointer;white-space:nowrap;transition:opacity 0.15s;
+        " onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+          Save to Sheet
+        </button>
+      </div>
+      <div id="wp-status" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
+    </div>
+  `;
+
+  // Set correct week
+  const sel = document.getElementById('wp-week-sel');
+  if (sel && curKey) sel.value = curKey;
+}
+
+function onWpWeekChange() {
+  const key = document.getElementById('wp-week-sel')?.value;
+  if (!key || !currentUser) return;
+  const val = DB[key]?.[currentUser];
+  const inp = document.getElementById('wp-steps-inp');
+  if (inp) inp.value = val || '';
+}
+
+async function writeToSheet() {
+  if (!accessToken || !currentUser) { showToast('Please sign in first'); return; }
+  const key = document.getElementById('wp-week-sel')?.value;
+  const stepsRaw = document.getElementById('wp-steps-inp')?.value;
+  const steps = parseInt(stepsRaw);
+  if (!key || isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); return; }
+
+  const wpStatus = document.getElementById('wp-status');
+  wpStatus.textContent = '↻ Saving...';
+
+  // Find or create the row in the sheet
+  // First read current sheet data to find the right row
+  try {
+    const readRes = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_WRITE}/values/Sheet1!A:E`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const readData = await readRes.json();
+    const rows = readData.values || [];
+
+    // Find header row to determine column indices
+    const header = (rows[0] || []).map(h => h.toLowerCase().replace(/\s/g,''));
+    const wkCol = header.findIndex(h => h.includes('week'));
+    const paulCol = header.findIndex(h => h.includes('paul'));
+    const cristinaCol = header.findIndex(h => h.includes('cristina'));
+
+    if (wkCol < 0) { wpStatus.textContent = '✗ Sheet format not recognised'; return; }
+
+    // Find existing row with this week_key
+    let rowIdx = -1;
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][wkCol] === key) { rowIdx = i; break; }
+    }
+
+    const colLetter = currentUser === 'paul'
+      ? String.fromCharCode(65 + paulCol)
+      : String.fromCharCode(65 + cristinaCol);
+
+    if (rowIdx >= 0) {
+      // Update existing row
+      const range = `Sheet1!${colLetter}${rowIdx + 1}`;
+      await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_WRITE}/values/${range}?valueInputOption=RAW`,
+        {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ values: [[steps]] })
+        }
+      );
+    } else {
+      // Append new row
+      const newRow = Array(Math.max(paulCol, cristinaCol) + 1).fill('');
+      newRow[wkCol] = key;
+      if (currentUser === 'paul' && paulCol >= 0) newRow[paulCol] = steps;
+      if (currentUser === 'cristina' && cristinaCol >= 0) newRow[cristinaCol] = steps;
+
+      await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_WRITE}/values/Sheet1!A:E:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ values: [newRow] })
+        }
+      );
+    }
+
+    // Update local DB immediately
+    if (!DB[key]) DB[key] = { paul: null, cristina: null };
+    DB[key][currentUser] = steps;
+    saveDB();
+    buildWeeksFlat();
+    renderAll();
+    wpStatus.textContent = `✓ Saved ${steps.toLocaleString()} steps for week ${key}`;
+    wpStatus.style.color = '#5BDE8E';
+    showToast('Saved to Google Sheets ✓');
+
+  } catch(e) {
+    wpStatus.textContent = '✗ Save failed — check connection';
+    wpStatus.style.color = '#E25B5B';
+    showToast('Save failed');
+  }
+}
+
 // ══════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════
@@ -967,6 +1388,16 @@ buildWeeksFlat();
 findCurrentWeek();
 renderAll();
 loadFromSheet(false);
+
+// Init Google Auth after GIS script loads
+window.addEventListener('load', () => {
+  if (typeof google !== 'undefined' && google.accounts) {
+    initGoogleAuth(); renderAuthArea();
+  } else {
+    // Retry once GIS script loads
+    setTimeout(() => { if (typeof google !== 'undefined') { initGoogleAuth(); renderAuthArea(); } }, 2000);
+  }
+});
 </script>
 </body>
 </html>
