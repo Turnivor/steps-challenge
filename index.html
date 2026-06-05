@@ -1212,9 +1212,7 @@ function initGoogleAuth() {
 function renderAuthArea() {
   const area = document.getElementById('auth-area');
   if (!accessToken || !currentUser) {
-    area.innerHTML = `<button class="sync-btn" onclick="signIn()" style="border-color:rgba(255,107,53,0.4);color:var(--paul);">
-      <span style="font-size:14px;">G</span> Sign in to add data
-    </button>`;
+    area.innerHTML = '<button class="sync-btn" onclick="signIn()" style="border-color:rgba(255,107,53,0.4);color:var(--paul);"><span style="font-size:14px;">G</span> Sign in to add data</button>';
   } else {
     const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
     const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
@@ -1224,7 +1222,14 @@ function renderAuthArea() {
 }
 
 function signIn() {
-  if (tokenClient) tokenClient.requestAccessToken();
+  // Must be called synchronously from user click - no async wrapper
+  if (!tokenClient) {
+    // Init on demand if not ready yet
+    initGoogleAuth();
+    setTimeout(() => { if (tokenClient) tokenClient.requestAccessToken(); }, 100);
+    return;
+  }
+  tokenClient.requestAccessToken({ prompt: '' });
 }
 
 function signOut() {
