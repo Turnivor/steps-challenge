@@ -936,15 +936,22 @@ function renderHero() {
   const paulBox = document.getElementById('boxer-paul');
   const cristinaBox = document.getElementById('boxer-cristina');
 
+  // Reset classes and force reflow to restart CSS animations cleanly
+  paulBox.style.animation = 'none';
+  cristinaBox.style.animation = 'none';
   paulBox.className = 'boxer-canvas';
   cristinaBox.className = 'boxer-canvas';
+  paulBox.offsetHeight; // trigger reflow
+  cristinaBox.offsetHeight;
+  paulBox.style.animation = '';
+  cristinaBox.style.animation = '';
 
   if (s.paulTotal > s.cristinaTotal) {
-    leaderEl.innerHTML = `<span style="color:var(--paul)">Paul leads</span>`;
+    leaderEl.innerHTML = '<span style="color:var(--paul)">Paul leads</span>';
     paulBox.classList.add('boxer-winner');
     cristinaBox.classList.add('boxer-loser');
   } else if (s.cristinaTotal > s.paulTotal) {
-    leaderEl.innerHTML = `<span style="color:var(--cristina)">Cristina leads</span>`;
+    leaderEl.innerHTML = '<span style="color:var(--cristina)">Cristina leads</span>';
     cristinaBox.classList.add('boxer-winner-left');
     paulBox.classList.add('boxer-loser');
   } else {
