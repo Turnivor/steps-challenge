@@ -853,7 +853,7 @@ async function loadFromSheet(manual=false) {
   setSyncState(false);
   if (manual) { document.getElementById('status-bar').style.display='flex'; setStatus('loading','↻ Syncing...'); }
   try {
-    const res = await fetch(CSV_URL);
+    const res = await fetch(CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error();
     parseCSV(await res.text());
     setSyncState(true);
@@ -936,29 +936,26 @@ function renderHero() {
   const paulBox = document.getElementById('boxer-paul');
   const cristinaBox = document.getElementById('boxer-cristina');
 
-  // Reset classes and force reflow to restart CSS animations cleanly
-  paulBox.style.animation = 'none';
-  cristinaBox.style.animation = 'none';
-  paulBox.className = 'boxer-canvas';
-  cristinaBox.className = 'boxer-canvas';
-  paulBox.offsetHeight; // trigger reflow
-  cristinaBox.offsetHeight;
-  paulBox.style.animation = '';
-  cristinaBox.style.animation = '';
-
+  // Determine state
+  let paulClass, cristinaClass, leaderHtml;
   if (s.paulTotal > s.cristinaTotal) {
-    leaderEl.innerHTML = '<span style="color:var(--paul)">Paul leads</span>';
-    paulBox.classList.add('boxer-winner');
-    cristinaBox.classList.add('boxer-loser');
+    paulClass = 'boxer-canvas boxer-winner';
+    cristinaClass = 'boxer-canvas boxer-loser';
+    leaderHtml = '<span style="color:var(--paul)">Paul leads</span>';
   } else if (s.cristinaTotal > s.paulTotal) {
-    leaderEl.innerHTML = '<span style="color:var(--cristina)">Cristina leads</span>';
-    cristinaBox.classList.add('boxer-winner-left');
-    paulBox.classList.add('boxer-loser');
+    paulClass = 'boxer-canvas boxer-loser';
+    cristinaClass = 'boxer-canvas boxer-winner-left';
+    leaderHtml = '<span style="color:var(--cristina)">Cristina leads</span>';
   } else {
-    leaderEl.textContent = 'All tied up!';
-    paulBox.classList.add('boxer-tie');
-    cristinaBox.classList.add('boxer-tie');
+    paulClass = 'boxer-canvas boxer-tie';
+    cristinaClass = 'boxer-canvas boxer-tie';
+    leaderHtml = 'All tied up!';
   }
+
+  // Only update if state changed to avoid animation restart flicker
+  if (paulBox.className !== paulClass) paulBox.className = paulClass;
+  if (cristinaBox.className !== cristinaClass) cristinaBox.className = cristinaClass;
+  leaderEl.innerHTML = leaderHtml;
 }
 
 // ══════════════════════════════════════════
