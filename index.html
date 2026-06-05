@@ -1177,28 +1177,34 @@ function initGoogleAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
+    ux_mode: 'popup',
     callback: (resp) => {
-      if (resp.error) { showToast('Sign-in failed'); return; }
+      if (resp.error) { showToast('Sign-in failed: ' + resp.error); return; }
       accessToken = resp.access_token;
-      // Determine who signed in via userinfo
       fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { Authorization: 'Bearer ' + accessToken }
       }).then(r => r.json()).then(info => {
-        const email = info.email.toLowerCase();
+        const email = (info.email || '').toLowerCase();
         if (email === PAUL_EMAIL) {
           currentUser = 'paul';
         } else if (email === CRISTINA_EMAIL) {
           currentUser = 'cristina';
         } else {
-          showToast('This Google account is not registered for this challenge.');
+          showToast('Account not registered: ' + email);
           accessToken = null; currentUser = null;
           renderAuthArea();
           return;
         }
         renderAuthArea();
         renderWritePanel();
-        showToast(`Signed in as ${currentUser === 'paul' ? 'Paul' : 'Cristina'} ✓`);
+        showToast('Signed in as ' + (currentUser === 'paul' ? 'Paul' : 'Cristina') + ' ✓');
+      }).catch(e => {
+        showToast('Could not get user info');
+        accessToken = null; renderAuthArea();
       });
+    },
+    error_callback: (err) => {
+      showToast('Auth error: ' + (err.type || 'unknown'));
     }
   });
 }
@@ -1390,14 +1396,18 @@ renderAll();
 loadFromSheet(false);
 
 // Init Google Auth after GIS script loads
-window.addEventListener('load', () => {
-  if (typeof google !== 'undefined' && google.accounts) {
+function tryInitAuth(attempts) {
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
     initGoogleAuth(); renderAuthArea();
+  } else if (attempts > 0) {
+    setTimeout(() => tryInitAuth(attempts - 1), 500);
   } else {
-    // Retry once GIS script loads
-    setTimeout(() => { if (typeof google !== 'undefined') { initGoogleAuth(); renderAuthArea(); } }, 2000);
+    // GIS failed to load, show manual fallback
+    const area = document.getElementById('auth-area');
+    if (area) area.innerHTML = '<span style="font-size:11px;color:var(--muted);">Auth unavailable</span>';
   }
-});
+}
+window.addEventListener('load', () => tryInitAuth(10));
 </script>
 </body>
 </html>
