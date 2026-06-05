@@ -515,16 +515,19 @@ tr:hover td { background: var(--surface2); }
 
 .boxer-winner {
   animation: winner-dance 1.4s ease-in-out infinite, punch-combo 1.4s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px #FF6B35);
+  filter: drop-shadow(0 0 8px #FF6B35) drop-shadow(0 0 16px #FF6B3560);
+  transform-origin: center bottom;
 }
 .boxer-winner-left {
   animation: winner-dance 1.4s ease-in-out infinite, punch-combo-left 1.4s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px #4ECDC4);
+  filter: drop-shadow(0 0 8px #4ECDC4) drop-shadow(0 0 16px #4ECDC460);
+  transform-origin: center bottom;
 }
 .boxer-loser {
   animation: loser-stagger 1.8s ease-in-out infinite;
   opacity: 0.55;
-  filter: grayscale(0.4);
+  filter: grayscale(0.5) brightness(0.7);
+  transform-origin: center bottom;
 }
 .boxer-tie {
   animation: tie-bounce 0.9s ease-in-out infinite;
@@ -933,8 +936,13 @@ function renderHero() {
   const paulBox = document.getElementById('boxer-paul');
   const cristinaBox = document.getElementById('boxer-cristina');
 
+  paulBox.removeAttribute('class');
+  cristinaBox.removeAttribute('class');
   paulBox.className = 'boxer-canvas';
   cristinaBox.className = 'boxer-canvas';
+  // Force reflow to restart animations
+  void paulBox.offsetWidth;
+  void cristinaBox.offsetWidth;
 
   if (s.paulTotal > s.cristinaTotal) {
     leaderEl.innerHTML = `<span style="color:var(--paul)">Paul leads</span>`;
