@@ -936,13 +936,8 @@ function renderHero() {
   const paulBox = document.getElementById('boxer-paul');
   const cristinaBox = document.getElementById('boxer-cristina');
 
-  paulBox.removeAttribute('class');
-  cristinaBox.removeAttribute('class');
   paulBox.className = 'boxer-canvas';
   cristinaBox.className = 'boxer-canvas';
-  // Force reflow to restart animations
-  void paulBox.offsetWidth;
-  void cristinaBox.offsetWidth;
 
   if (s.paulTotal > s.cristinaTotal) {
     leaderEl.innerHTML = `<span style="color:var(--paul)">Paul leads</span>`;
