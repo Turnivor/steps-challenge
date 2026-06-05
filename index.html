@@ -517,20 +517,24 @@ tr:hover td { background: var(--surface2); }
   animation: winner-dance 1.4s ease-in-out infinite, punch-combo 1.4s ease-in-out infinite;
   filter: drop-shadow(0 0 8px #FF6B35) drop-shadow(0 0 16px #FF6B3560);
   transform-origin: center bottom;
+  display: block;
 }
 .boxer-winner-left {
   animation: winner-dance 1.4s ease-in-out infinite, punch-combo-left 1.4s ease-in-out infinite;
   filter: drop-shadow(0 0 8px #4ECDC4) drop-shadow(0 0 16px #4ECDC460);
   transform-origin: center bottom;
+  display: block;
 }
 .boxer-loser {
   animation: loser-stagger 1.8s ease-in-out infinite;
   opacity: 0.55;
   filter: grayscale(0.5) brightness(0.7);
   transform-origin: center bottom;
+  display: block;
 }
 .boxer-tie {
   animation: tie-bounce 0.9s ease-in-out infinite;
+  display: block;
 }
 </style>
 </head>
@@ -557,7 +561,7 @@ tr:hover td { background: var(--surface2); }
   <div class="arena">
     <!-- PAUL SIDE -->
     <div class="fighter-side">
-      <div class="fighter-wrap">
+      <div class="fighter-wrap" id="boxer-paul-wrap">
         <svg class="boxer-canvas" id="boxer-paul" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
           <!-- head -->
           <rect x="5" y="0" width="6" height="5" fill="#FF9966"/>
@@ -607,7 +611,7 @@ tr:hover td { background: var(--surface2); }
 
     <!-- CRISTINA SIDE -->
     <div class="fighter-side right">
-      <div class="fighter-wrap">
+      <div class="fighter-wrap" id="boxer-cristina-wrap">
         <svg class="boxer-canvas" id="boxer-cristina" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
           <!-- head -->
           <rect x="5" y="0" width="6" height="5" fill="#FFCCAA"/>
@@ -933,8 +937,8 @@ function renderHero() {
   document.getElementById('vs-ring').style.setProperty('--paul-pct', pp+'%');
 
   const leaderEl = document.getElementById('vs-leader');
-  const paulBox = document.getElementById('boxer-paul');
-  const cristinaBox = document.getElementById('boxer-cristina');
+  const paulBox = document.getElementById('boxer-paul-wrap');
+  const cristinaBox = document.getElementById('boxer-cristina-wrap');
 
   // Determine state
   let paulClass, cristinaClass, leaderHtml;
