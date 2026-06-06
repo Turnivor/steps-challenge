@@ -64,11 +64,11 @@ body {
 @keyframes scanline { to { left: 200%; } }
 .crawling-title {
   font-family: 'Creepster', cursive;
-  font-size: 13px;
-  letter-spacing: 4px;
+  font-size: 22px;
+  letter-spacing: 5px;
   text-transform: uppercase;
   color: var(--muted);
-  opacity: 0.7;
+  opacity: 0.85;
 }
 .crawling-title span { color: #8B4513; opacity: 0.9; }
 
@@ -149,7 +149,7 @@ body {
 .fighter-wrap { position: relative; }
 
 /* PIXEL ART BOXER — pure CSS/SVG inline */
-.boxer-canvas { width: 72px; height: 108px; display: block; image-rendering: pixelated; }
+.boxer-canvas { width: 100px; height: 150px; display: block; image-rendering: pixelated; }
 
 /* Fighter info */
 .fighter-info { display: flex; flex-direction: column; }
@@ -451,7 +451,7 @@ tr:hover td { background: var(--surface2); }
   .wrap { padding: 24px 16px; }
   .arena { grid-template-columns: 1fr 70px 1fr; gap: 0; }
   .f-score { font-size: 30px; }
-  .boxer-canvas { width: 44px; height: 66px; }
+  .boxer-canvas { width: 60px; height: 90px; }
   .nav-tab { padding: 11px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
   .champ-card { flex-wrap: wrap; gap: 12px; }
   .champ-scores { width: 100%; justify-content: flex-start; }
@@ -873,9 +873,19 @@ tr:hover td { background: var(--surface2); }
   <div id="section-rewards" style="display:none">
     <div class="sec-head" style="margin-bottom:6px;">
       <div class="sec-title">Reward Board</div>
+      <button onclick="showDebtNotice()" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">📄 Issue Debt Notice</button>
     </div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Win weeks, hit milestones, earn symbolic prizes. Small things, big satisfaction.</div>
     <div class="rewards-grid" id="rewards-grid"></div>
+
+    <!-- Honour Achievements -->
+    <div style="margin-top:36px;">
+      <div class="sec-head" style="margin-bottom:6px;">
+        <div class="sec-title" style="font-size:17px;">🏅 Honour Achievements</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Claim on your honour — whenever it actually happened that week. No proof needed. Just vibes.</div>
+      <div class="rewards-grid" id="achievements-grid"></div>
+    </div>
   </div>
 
   <!-- ══ ALL WEEKS ══ -->
@@ -894,6 +904,15 @@ tr:hover td { background: var(--surface2); }
     </div>
   </div>
 
+</div>
+
+<!-- ══ STEP DEBT NOTICE MODAL ══ -->
+<div id="debt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px;">
+  <div id="debt-receipt" style="background:#fefefe;color:#111;padding:28px 22px;max-width:340px;width:100%;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:1.7;border-radius:2px;white-space:pre;overflow-x:auto;box-shadow:0 0 0 3px #ccc,0 8px 32px rgba(0,0,0,0.5);"></div>
+  <div style="display:flex;gap:12px;">
+    <button onclick="printDebtNotice()" style="padding:10px 20px;border:none;border-radius:8px;background:#fff;color:#111;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">🖨️ Print Receipt</button>
+    <button onclick="document.getElementById('debt-modal').style.display='none'" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:transparent;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Close</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -995,17 +1014,21 @@ async function loadMeta() {
     // Reset to defaults then apply
     const eq = { paul:{ hat:'none', color:'default' }, cristina:{ hat:'none', color:'default' } };
     const cl = {};
+    const ac = {};
     for (let i=1; i<rows.length; i++) {
       const [type, person, key, value] = rows[i];
       if (type==='equip' && eq[person]) eq[person][key] = value;
       else if (type==='claim') cl[key] = value;
+      else if (type==='achievement') { if (!ac[key]) ac[key]={}; ac[key][person]=value; }
     }
     equipped = eq;
     claims = cl;
+    achievementClaims = ac;
     metaLoaded = true;
     // Persist locally as a fallback cache
     localStorage.setItem('steps_equipped', JSON.stringify(equipped));
     localStorage.setItem('steps_claims', JSON.stringify(claims));
+    localStorage.setItem('steps_achievements', JSON.stringify(achievementClaims));
   } catch(e) {
     // Fall back to local cache if available
     try {
@@ -1013,6 +1036,8 @@ async function loadMeta() {
       const clCache = localStorage.getItem('steps_claims');
       if (eqCache) equipped = JSON.parse(eqCache);
       if (clCache) claims = JSON.parse(clCache);
+      const acCache = localStorage.getItem('steps_achievements');
+      if (acCache) achievementClaims = JSON.parse(acCache);
     } catch(_) {}
   }
 }
@@ -1021,8 +1046,10 @@ async function writeMeta(type, person, key, value) {
   // Optimistic local update first
   if (type==='equip') { if (!equipped[person]) equipped[person]={}; equipped[person][key]=value; }
   else if (type==='claim') { claims[key]=value; }
+  else if (type==='achievement') { if (!achievementClaims[key]) achievementClaims[key]={}; achievementClaims[key][person]=value; }
   localStorage.setItem('steps_equipped', JSON.stringify(equipped));
   localStorage.setItem('steps_claims', JSON.stringify(claims));
+  localStorage.setItem('steps_achievements', JSON.stringify(achievementClaims));
   try {
     await fetch(APPS_SCRIPT_URL, {
       method:'POST', mode:'no-cors',
@@ -1133,6 +1160,7 @@ const WARDROBE_HAT_COLORS = [
 // Equipped state, synced via meta tab. Defaults applied if nothing equipped.
 let equipped = { paul:{ hat:'none', color:'default', hatColor:'hc_default' }, cristina:{ hat:'none', color:'default', hatColor:'hc_default' } };
 let claims = {}; // { rewardName: 'paul'|'cristina' }
+let achievementClaims = {}; // { achievementId: { paul: isoTimestamp, cristina: isoTimestamp } }
 let metaLoaded = false;
 
 // ══════════════════════════════════════════
@@ -1141,15 +1169,31 @@ let metaLoaded = false;
 const REWARDS = [
   { icon:'🍕', name:'Pizza Slice', trigger:'Win any week', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
   { icon:'🍣', name:'1 Piece of Sushi', trigger:'Win 2 weeks in a month', condition:(stats)=>stats.paulWins>=2||stats.cristinaWins>=2, winner:true },
-  { icon:'💊', name:'Vitamin Pack', trigger:'Hit 100K total steps', condition:(stats)=>stats.paulTotal>=100000||stats.cristinaTotal>=100000, winner:false },
+  { icon:'🎵', name:'Vinyl / Steam Game', trigger:'First to 500K total steps — Cristina picks a vinyl record, Paul picks a Steam game (~200 RON)', condition:(stats)=>stats.paulTotal>=500000||stats.cristinaTotal>=500000, winner:true },
+  { icon:'📺', name:'Month of Streaming', trigger:'Hit 100K total steps — loser pays a month of winner\'s streaming (Spotify, YouTube Premium, etc.)', condition:(stats)=>stats.paulTotal>=100000||stats.cristinaTotal>=100000, winner:true },
   { icon:'☕', name:'Fancy Coffee', trigger:'Win 3 weeks in a row', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
   { icon:'🧃', name:'Smoothie', trigger:'Both reach 50K total steps', condition:(stats)=>stats.paulTotal>=50000&&stats.cristinaTotal>=50000, winner:false },
-  { icon:'🍫', name:'Dark Chocolate Box', trigger:'First to 250K total steps', condition:(stats)=>stats.paulTotal>=250000||stats.cristinaTotal>=250000, winner:true },
+  { icon:'🍫', name:'Chocolate of Choosing', trigger:'First to 250K total steps — winner picks any chocolate they want', condition:(stats)=>stats.paulTotal>=250000||stats.cristinaTotal>=250000, winner:true },
   { icon:'🧦', name:'1 Sock (just one)', trigger:'Hit 500K total steps', condition:(stats)=>stats.paulTotal>=500000||stats.cristinaTotal>=500000, winner:true },
   { icon:'🥗', name:'Healthy Lunch Out', trigger:'Both complete a full month of data', condition:(stats)=>stats.weeksWithBothData>=4, winner:false },
   { icon:'🍵', name:'Fancy Tea', trigger:'Win 4 weeks total', condition:(stats)=>stats.paulWins>=4||stats.cristinaWins>=4, winner:true },
   { icon:'🗺️', name:'Mystery Route', trigger:'Win any week — winner picks a walking route, loser follows without complaining or knowing the destination in advance', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
   { icon:'🎲', name:'Mystery Gift', trigger:'Win 3 weeks in a row — loser buys something random under 20 RON', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
+  { icon:'🤣', name:'10 Excuse List', trigger:'Win 5 weeks total — loser must write 10 hilariously bad reasons why they didn\'t do enough steps', condition:(stats)=>stats.paulWins>=5||stats.cristinaWins>=5, winner:true },
+  { icon:'🧴', name:'Sunscreen', trigger:'First to 200K total steps — winner picks the sunscreen (no fancy Korean ones)', condition:(stats)=>stats.paulTotal>=200000||stats.cristinaTotal>=200000, winner:true },
+  { icon:'🔋', name:'Pack of Batteries', trigger:'Achieve a 4-week winning streak — winner gifts the loser a pack of batteries with a note: "Hope you have more energy next month"', condition:(stats)=>stats.paulStreak>=4||stats.cristinaStreak>=4, winner:true },
+  { icon:'🎓', name:"Winner's Diploma", trigger:'Win 10 weeks total — loser hand-writes a diploma for the overall champion', condition:(stats)=>stats.paulWins>=10||stats.cristinaWins>=10, winner:true },
+  { icon:'🏆', name:'Tiny Trophy', trigger:'Win 7 weeks total — find the smallest trophy imaginable. Attach a note: "For extraordinary achievements in moving from one place to another"', condition:(stats)=>stats.paulWins>=7||stats.cristinaWins>=7, winner:true },
+  { icon:'🩹', name:'Emergency Anti-Laziness Kit', trigger:'Loser accumulates 5 total losses — winner assembles: 1 band-aid + 1 energy bar. Label it: "Break glass in case of laziness"', condition:(stats)=>(stats.weeksWithBothData-Math.min(stats.paulWins,stats.cristinaWins))>=5, winner:true },
+];
+
+// ══════════════════════════════════════════
+// HONOUR ACHIEVEMENTS (honor system — self-claimed)
+// ══════════════════════════════════════════
+const ACHIEVEMENTS = [
+  { id:'bad_weather',   icon:'🌧️', name:'Defeated Bad Weather',           desc:'Walked outside despite rain, cold, or general meteorological betrayal.' },
+  { id:'didnt_want_to', icon:'😤', name:'Walked Despite Not Wanting To',  desc:'Got up and did it anyway. The bar was on the floor and you cleared it.' },
+  { id:'located_legs',  icon:'🦵', name:'Successfully Located Own Legs',  desc:'A medical miracle. Science is still studying how this happened.' },
 ];
 
 // ══════════════════════════════════════════
@@ -1650,6 +1694,31 @@ function renderRewards() {
     </div>`;
   }).join('');
   document.getElementById('rewards-grid').innerHTML = html;
+
+  // Honour achievements
+  const achHtml = ACHIEVEMENTS.map(a => {
+    const paulClaimed  = achievementClaims[a.id]?.paul;
+    const cristinaClaimed = achievementClaims[a.id]?.cristina;
+    let claimedHtml = '';
+    if (paulClaimed)    claimedHtml += `<span class="reward-status reward-paul" style="display:block;margin-top:4px;">✓ Paul claimed this</span>`;
+    if (cristinaClaimed) claimedHtml += `<span class="reward-status reward-cristina" style="display:block;margin-top:4px;">✓ Cristina claimed this</span>`;
+    if (!claimedHtml) claimedHtml = `<span class="reward-status reward-locked">Not yet claimed</span>`;
+    let claimBtn = '';
+    if (currentUser) {
+      const alreadyMine = achievementClaims[a.id]?.[currentUser];
+      claimBtn = alreadyMine
+        ? `<button disabled style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--muted);font-size:11px;">You claimed this ✓</button>`
+        : `<button onclick="claimAchievement('${a.id}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim this 🏅</button>`;
+    }
+    return `<div class="reward-card claimed">
+      <span class="reward-icon">${a.icon}</span>
+      <div class="reward-name">${a.name}</div>
+      <div class="reward-trigger">${a.desc}</div>
+      ${claimedHtml}
+      ${claimBtn}
+    </div>`;
+  }).join('');
+  document.getElementById('achievements-grid').innerHTML = achHtml;
 }
 
 async function claimReward(name) {
@@ -1658,6 +1727,77 @@ async function claimReward(name) {
   await writeMeta('claim', currentUser, name, currentUser);
   renderRewards();
   showToast('Reward claimed ✓');
+}
+
+function showDebtNotice() {
+  const s = calcStats();
+  const loserIs  = s.paulTotal <= s.cristinaTotal ? 'paul' : 'cristina';
+  const winnerIs = loserIs === 'paul' ? 'cristina' : 'paul';
+  const loserName  = loserIs  === 'paul' ? 'Paul' : 'Cristina';
+  const winnerName = winnerIs === 'paul' ? 'Paul' : 'Cristina';
+  const missing = Math.max(0, loserIs==='paul' ? s.cristinaTotal - s.paulTotal : s.paulTotal - s.cristinaTotal);
+  const loserLosses = Math.max(0, s.weeksWithBothData - (loserIs==='paul' ? s.paulWins : s.cristinaWins));
+  const emotionalDmg = Math.max(1, loserLosses);
+  const today = new Date();
+  const dateStr = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+  const invNum = `SC-${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}`;
+  const R = (s,n=32)=>s+' '.repeat(Math.max(0,n-s.length));
+  const line  = '================================';
+  const dash  = '--------------------------------';
+  const receipt = [
+    line,
+    '      STEP DEBT NOTICE',
+    '   *** OFFICIAL INVOICE ***',
+    line,
+    `Date:       ${dateStr}`,
+    `Invoice #:  ${invNum}`,
+    dash,
+    `To:    ${loserName} (The Accused)`,
+    `From:  ${winnerName} (The Winner)`,
+    line,
+    '     OUTSTANDING BALANCE',
+    line,
+    `Missing steps:`,
+    `  ${missing.toLocaleString()} steps not walked`,
+    '',
+    dash,
+    `Late fee:          1 coffee`,
+    `Processing fee:    1 beer`,
+    `Emotional damages: ${emotionalDmg} compliment${emotionalDmg!==1?'s':''}`,
+    dash,
+    '',
+    'TOTAL DUE IMMEDIATELY:',
+    '  Walk more next month.',
+    '',
+    line,
+    ' ⚠ FAILURE TO COMPLY MAY RESULT',
+    '   IN FURTHER SHAME & MOCKERY ⚠',
+    line,
+    '   Thank you for your laziness.',
+    line,
+  ].join('\n');
+  document.getElementById('debt-receipt').textContent = receipt;
+  document.getElementById('debt-modal').style.display = 'flex';
+}
+
+function printDebtNotice() {
+  const content = document.getElementById('debt-receipt').textContent;
+  const w = window.open('','_blank','width=400,height=600');
+  w.document.write(`<html><head><title>Step Debt Notice</title><style>
+    body{font-family:'Courier New',monospace;font-size:13px;padding:32px;line-height:1.7;white-space:pre;}
+    @media print{body{padding:16px;}}
+  </style></head><body>${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(), 300);
+}
+
+async function claimAchievement(id) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  playClick();
+  await writeMeta('achievement', currentUser, id, new Date().toISOString());
+  renderRewards();
+  showToast('Achievement claimed ✓');
 }
 
 // ══════════════════════════════════════════
@@ -1770,19 +1910,27 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
       hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="2" y="-1" width="4" height="1" fill="${hcDark}"/>`;
       break;
     case 'sunglasses':
-      // Aviator style — dark frames always, hc tints the lens
+      // Comically oversized aviators — dark frames, hc tinted lenses, arms fly out past the face
       hatSvg =
-        `<rect x="3" y="1" width="4" height="3" fill="#111"/>` +
-        `<rect x="4" y="4" width="2" height="1" fill="#111"/>` +
-        `<rect x="7" y="2" width="2" height="1" fill="#111"/>` +
-        `<rect x="9" y="1" width="4" height="3" fill="#111"/>` +
-        `<rect x="10" y="4" width="2" height="1" fill="#111"/>` +
-        `<rect x="2" y="2" width="1" height="1" fill="#444"/>` +
-        `<rect x="13" y="2" width="1" height="1" fill="#444"/>` +
-        `<rect x="3" y="1" width="4" height="3" fill="${hc}" opacity="0.55"/>` +
-        `<rect x="4" y="4" width="2" height="1" fill="${hc}" opacity="0.55"/>` +
-        `<rect x="9" y="1" width="4" height="3" fill="${hc}" opacity="0.55"/>` +
-        `<rect x="10" y="4" width="2" height="1" fill="${hc}" opacity="0.55"/>`;
+        // Side arms
+        `<rect x="-4" y="1" width="5" height="1" fill="#444"/>` +
+        `<rect x="15" y="1" width="5" height="1" fill="#444"/>` +
+        // Left lens frame
+        `<rect x="0" y="0" width="7" height="5" fill="#111"/>` +
+        `<rect x="2" y="5" width="3" height="1" fill="#111"/>` +
+        // Right lens frame
+        `<rect x="9" y="0" width="7" height="5" fill="#111"/>` +
+        `<rect x="11" y="5" width="3" height="1" fill="#111"/>` +
+        // Bridge
+        `<rect x="7" y="1" width="2" height="2" fill="#111"/>` +
+        // Left lens tint (inset)
+        `<rect x="1" y="1" width="5" height="3" fill="${hc}" opacity="0.55"/>` +
+        `<rect x="2" y="4" width="3" height="1" fill="${hc}" opacity="0.45"/>` +
+        `<rect x="2" y="5" width="3" height="1" fill="${hc}" opacity="0.3"/>` +
+        // Right lens tint (inset)
+        `<rect x="10" y="1" width="5" height="3" fill="${hc}" opacity="0.55"/>` +
+        `<rect x="11" y="4" width="3" height="1" fill="${hc}" opacity="0.45"/>` +
+        `<rect x="11" y="5" width="3" height="1" fill="${hc}" opacity="0.3"/>`;
       break;
     case 'crown':
       hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="4" y="-5" width="1" height="2" fill="${hc}"/><rect x="7" y="-6" width="2" height="3" fill="${hc}"/><rect x="11" y="-5" width="1" height="2" fill="${hc}"/>`;
@@ -1880,16 +2028,24 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
         `<rect x="16" y="1" width="3" height="1" fill="#94A3B8" opacity="0.4"/>`;
       break;
     case 'hermesshoes':
-      // Wing tabs on sides of shoes
+      // Hermes sandals — straps wrapping the ankle + small compact wings on the outer side
       hatSvg =
-        `<rect x="2" y="13" width="3" height="3" fill="${hc}"/>` +
-        `<rect x="1" y="14" width="2" height="2" fill="${hcDark}" opacity="0.7"/>` +
-        `<rect x="3" y="11" width="2" height="2" fill="${hc}" opacity="0.8"/>` +
-        `<rect x="3" y="10" width="1" height="1" fill="${hc}" opacity="0.5"/>` +
-        `<rect x="11" y="13" width="3" height="3" fill="${hc}"/>` +
-        `<rect x="13" y="14" width="2" height="2" fill="${hcDark}" opacity="0.7"/>` +
-        `<rect x="11" y="11" width="2" height="2" fill="${hc}" opacity="0.8"/>` +
-        `<rect x="12" y="10" width="1" height="1" fill="${hc}" opacity="0.5"/>`;
+        // Left sandal straps (peek out from sides of leg)
+        `<rect x="3" y="16" width="4" height="1" fill="${hc}" opacity="0.85"/>` +
+        `<rect x="3" y="14" width="4" height="1" fill="${hc}" opacity="0.6"/>` +
+        // Left wing — 4 compact feathers fanning up-left from ankle
+        `<rect x="2" y="17" width="2" height="1" fill="${hc}"/>` +
+        `<rect x="1" y="16" width="2" height="1" fill="${hc}"/>` +
+        `<rect x="0" y="15" width="2" height="1" fill="${hc}" opacity="0.85"/>` +
+        `<rect x="-1" y="14" width="2" height="1" fill="${hc}" opacity="0.6"/>` +
+        // Right sandal straps
+        `<rect x="9" y="16" width="4" height="1" fill="${hc}" opacity="0.85"/>` +
+        `<rect x="9" y="14" width="4" height="1" fill="${hc}" opacity="0.6"/>` +
+        // Right wing — mirror
+        `<rect x="12" y="17" width="2" height="1" fill="${hc}"/>` +
+        `<rect x="13" y="16" width="2" height="1" fill="${hc}"/>` +
+        `<rect x="14" y="15" width="2" height="1" fill="${hc}" opacity="0.85"/>` +
+        `<rect x="15" y="14" width="2" height="1" fill="${hc}" opacity="0.6"/>`;
       break;
     case 'putregai':
       // Green mold patch on shoulder with rising spores — always green, forced shame item
