@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Creepster&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <style>
 :root {
   --paul: #FF6B35;
@@ -148,7 +149,7 @@ body {
 .fighter-wrap { position: relative; }
 
 /* PIXEL ART BOXER — pure CSS/SVG inline */
-.boxer-canvas { width: 64px; height: 80px; display: block; image-rendering: pixelated; }
+.boxer-canvas { width: 64px; height: 96px; display: block; image-rendering: pixelated; }
 
 /* Fighter info */
 .fighter-info { display: flex; flex-direction: column; }
@@ -445,12 +446,18 @@ tr:hover td { background: var(--surface2); }
 /* ── RESPONSIVE ── */
 @media(max-width:680px){
   .hero, .vs-bar-row { padding-left: 20px; padding-right: 20px; }
-  nav.main-nav { padding: 0 20px; }
-  .wrap { padding: 24px 20px; }
-  .arena { grid-template-columns: 1fr 80px 1fr; gap: 0; }
-  .f-score { font-size: 34px; }
-  .boxer-canvas { width: 44px; height: 56px; }
-  .nav-tab { padding: 11px 12px; font-size: 12px; }
+  nav.main-nav { padding: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  nav.main-nav::-webkit-scrollbar { display: none; }
+  .wrap { padding: 24px 16px; }
+  .arena { grid-template-columns: 1fr 70px 1fr; gap: 0; }
+  .f-score { font-size: 30px; }
+  .boxer-canvas { width: 40px; height: 60px; }
+  .nav-tab { padding: 11px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  .champ-card { flex-wrap: wrap; gap: 12px; }
+  .champ-scores { width: 100%; justify-content: flex-start; }
+  .celebrate-banner { padding: 24px 28px; width: 85vw; }
+  .celebrate-title { font-size: 32px; }
+  .record-value { font-size: 22px; }
 }
 
 /* ── PIXEL BOXER ANIMATIONS ── */
@@ -536,13 +543,115 @@ tr:hover td { background: var(--surface2); }
   animation: tie-bounce 0.9s ease-in-out infinite;
   display: block;
 }
+
+/* ── RECORDS ── */
+.record-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.record-icon { font-size: 26px; flex-shrink: 0; }
+.record-body { flex: 1; min-width: 0; }
+.record-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+.record-value { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; line-height: 1; }
+.record-holder { font-size: 11px; margin-top: 3px; font-weight: 600; }
+
+/* ── CHAMPIONS ── */
+.champ-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.champ-card.paul-champ { border-left: 4px solid var(--paul); }
+.champ-card.cristina-champ { border-left: 4px solid var(--cristina); }
+.champ-card.tie-champ { border-left: 4px solid var(--muted2); }
+.champ-trophy { font-size: 36px; flex-shrink: 0; }
+.champ-body { flex: 1; }
+.champ-month { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.champ-winner-name { font-size: 13px; font-weight: 600; }
+.champ-scores { display: flex; gap: 20px; font-size: 13px; }
+.champ-score-p { color: var(--paul); font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+.champ-score-c { color: var(--cristina); font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
+
+/* ── WARDROBE ── */
+.wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+.wardrobe-item {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.wardrobe-item.owned:hover { border-color: var(--border2); transform: translateY(-2px); }
+.wardrobe-item.locked { opacity: 0.45; cursor: not-allowed; }
+.wardrobe-item.equipped { border-color: var(--paul); background: var(--paul-soft); }
+.wardrobe-item.equipped.cristina-eq { border-color: var(--cristina); background: var(--cristina-soft); }
+.wi-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+.wi-swatch { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 8px; border: 2px solid var(--border2); }
+.wi-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.wi-unlock { font-size: 10px; color: var(--muted2); line-height: 1.3; }
+.wi-badge {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.wi-badge.equipped-badge { background: var(--paul); color: #fff; }
+.wi-badge.equipped-badge.cristina-b { background: var(--cristina); color: #0A0A0C; }
+.wi-badge.locked-badge { background: var(--surface3); color: var(--muted2); }
+
+/* ── SKELETON LOADER ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── CELEBRATION BANNER ── */
+.celebrate-banner {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0.8);
+  background: var(--surface);
+  border: 2px solid var(--paul);
+  border-radius: var(--radius);
+  padding: 32px 48px;
+  text-align: center;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.celebrate-banner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+.celebrate-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; margin-bottom: 8px; }
+.celebrate-sub { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <!-- ── CRAWLING MONTH BANNER ── -->
 <div class="crawling-banner">
-  <div class="crawling-title">☠ <span>Crawling Month</span> — June 2026 ☠</div>
+  <div class="crawling-title" id="crawling-banner-text">☠ <span>Crawling Month</span> — June 2026 ☠</div>
 </div>
 
 <!-- ── HERO ── -->
@@ -552,10 +661,15 @@ tr:hover td { background: var(--surface2); }
       <span class="p">Paul</span><span class="vs">vs</span><span class="c">Cristina</span>
       <span class="sub">Step Challenge · 2026</span>
     </div>
-    <button class="sync-btn" onclick="loadFromSheet(true)">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-label">Sync</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="sync-btn" id="sound-toggle" onclick="toggleSound()" title="Toggle sound effects" style="padding:7px 10px;">
+        <span id="sound-icon">🔊</span>
+      </button>
+      <button class="sync-btn" onclick="loadFromSheet(true)">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-label">Sync</span>
+      </button>
+    </div>
   </div>
 
   <div class="arena">
@@ -672,6 +786,9 @@ tr:hover td { background: var(--surface2); }
 <!-- ── NAV ── -->
 <nav class="main-nav">
   <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
+  <button class="nav-tab" onclick="showSection('records')">Records</button>
+  <button class="nav-tab" onclick="showSection('champions')">Champions</button>
+  <button class="nav-tab" onclick="showSection('wardrobe')">Wardrobe</button>
   <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
   <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
@@ -704,6 +821,39 @@ tr:hover td { background: var(--surface2); }
       </div>
       <div style="position:relative;height:260px;"><canvas id="wowChart"></canvas></div>
     </div>
+  </div>
+
+  <!-- ══ RECORDS ══ -->
+  <div id="section-records" style="display:none">
+    <div class="sec-head" style="margin-bottom:20px;">
+      <div class="sec-title">Personal Records</div>
+      <div class="sec-meta">All-time bests</div>
+    </div>
+    <div id="records-grid" class="milestones-grid"></div>
+  </div>
+
+  <!-- ══ CHAMPIONS ══ -->
+  <div id="section-champions" style="display:none">
+    <div class="sec-head" style="margin-bottom:20px;">
+      <div class="sec-title">Trophy Cabinet</div>
+      <div class="sec-meta">Monthly champions</div>
+    </div>
+    <div id="champions-grid"></div>
+  </div>
+
+  <!-- ══ WARDROBE ══ -->
+  <div id="section-wardrobe" style="display:none">
+    <div class="sec-head" style="margin-bottom:6px;">
+      <div class="sec-title">Wardrobe</div>
+      <div class="sec-meta" id="wardrobe-who-label">–</div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Earn hats by hitting milestones and unlock a new colour every 20,000 steps. Tap an owned item to wear it. Your look syncs so the other player sees it too.</div>
+    <div id="wardrobe-signin-note" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:13px;color:var(--muted);margin-bottom:18px;">Sign in (top right) to choose and save your boxer's look.</div>
+    <div id="wardrobe-preview" style="text-align:center;margin-bottom:24px;"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Hats & Accessories</div>
+    <div id="wardrobe-hats" class="wardrobe-grid" style="margin-bottom:28px;"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Colours</div>
+    <div id="wardrobe-colors" class="wardrobe-grid"></div>
   </div>
 
   <!-- ══ MILESTONES ══ -->
@@ -743,12 +893,163 @@ tr:hover td { background: var(--surface2); }
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="celebrate-banner" id="celebrate-banner">
+  <div class="celebrate-title" id="celebrate-title">WINNER!</div>
+  <div class="celebrate-sub" id="celebrate-sub"></div>
+</div>
 
 <script>
-// ══════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpyle4KnajpmMU2KSeUCW-llzJ-7jSSBgqJqRRqZldNm0VOzkq0tDbaaH73jDU2-wx74jXoYjxHse6/pub?gid=0&single=true&output=csv';
+// ══════════════════════════════════════════════════════════════
+//  CONFIG — everything you might want to edit lives here
+// ══════════════════════════════════════════════════════════════
+const CONFIG = {
+  // Google Sheet published CSV (for reading data)
+  CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRpyle4KnajpmMU2KSeUCW-llzJ-7jSSBgqJqRRqZldNm0VOzkq0tDbaaH73jDU2-wx74jXoYjxHse6/pub?gid=0&single=true&output=csv',
+  // Google Sheet ID (for writing data via Apps Script)
+  SHEET_ID_WRITE: '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg',
+  // Apps Script web app endpoint (handles writes)
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw9R7YGa_FmeZhBiQf6LkzDmc5lj1J4ogl6qabn9E-a7M9VVM9JFqQowKD4LGheBI6qdg/exec',
+  // Sign-in PINs — change these to whatever you both agree on.
+  // NOTE: these are visible in page source. Fine for a friendly 2-person challenge,
+  // they only gate who can edit which column in the UI, not real security.
+  PINS: { paul: '1987', cristina: '1993' },
+  // How often to auto-refresh from the sheet (milliseconds)
+  AUTO_SYNC_MS: 60000,
+};
+// Backwards-compatible aliases (used throughout the code)
+const CSV_URL = CONFIG.CSV_URL;
+const SHEET_ID_WRITE = CONFIG.SHEET_ID_WRITE;
+const APPS_SCRIPT_URL = CONFIG.APPS_SCRIPT_URL;
+const PINS = CONFIG.PINS;
+
+// ══════════════════════════════════════════════════════════════
+//  SOUND ENGINE (Web Audio API — no external files)
+// ══════════════════════════════════════════════════════════════
+let soundEnabled = localStorage.getItem('steps_sound') !== 'off';
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  return audioCtx;
+}
+
+function playTone(freq, duration, type='sine', vol=0.15, delay=0) {
+  if (!soundEnabled) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t = ctx.currentTime + delay;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol, t + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(t); osc.stop(t + duration);
+}
+
+function playPunch() {
+  if (!soundEnabled) return;
+  // Low thud + quick noise burst feel
+  playTone(120, 0.12, 'square', 0.18);
+  playTone(80, 0.18, 'triangle', 0.15, 0.02);
+}
+
+function playVictoryFanfare() {
+  if (!soundEnabled) return;
+  // Rising triad
+  playTone(523, 0.15, 'square', 0.12, 0);     // C5
+  playTone(659, 0.15, 'square', 0.12, 0.12);  // E5
+  playTone(784, 0.15, 'square', 0.12, 0.24);  // G5
+  playTone(1047, 0.35, 'square', 0.14, 0.36); // C6
+}
+
+function playClick() {
+  playTone(660, 0.06, 'sine', 0.08);
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('steps_sound', soundEnabled ? 'on' : 'off');
+  document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+  if (soundEnabled) { getAudioCtx(); playClick(); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  META SYNC (wardrobe equipped items + reward claims)
+// ══════════════════════════════════════════════════════════════
+async function loadMeta() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now(), { cache:'no-store' });
+    if (!res.ok) throw new Error();
+    const json = await res.json();
+    const rows = json.rows || [];
+    // Reset to defaults then apply
+    const eq = { paul:{ hat:'none', color:'default' }, cristina:{ hat:'none', color:'default' } };
+    const cl = {};
+    for (let i=1; i<rows.length; i++) {
+      const [type, person, key, value] = rows[i];
+      if (type==='equip' && eq[person]) eq[person][key] = value;
+      else if (type==='claim') cl[key] = value;
+    }
+    equipped = eq;
+    claims = cl;
+    metaLoaded = true;
+    // Persist locally as a fallback cache
+    localStorage.setItem('steps_equipped', JSON.stringify(equipped));
+    localStorage.setItem('steps_claims', JSON.stringify(claims));
+  } catch(e) {
+    // Fall back to local cache if available
+    try {
+      const eqCache = localStorage.getItem('steps_equipped');
+      const clCache = localStorage.getItem('steps_claims');
+      if (eqCache) equipped = JSON.parse(eqCache);
+      if (clCache) claims = JSON.parse(clCache);
+    } catch(_) {}
+  }
+}
+
+async function writeMeta(type, person, key, value) {
+  // Optimistic local update first
+  if (type==='equip') { if (!equipped[person]) equipped[person]={}; equipped[person][key]=value; }
+  else if (type==='claim') { claims[key]=value; }
+  localStorage.setItem('steps_equipped', JSON.stringify(equipped));
+  localStorage.setItem('steps_claims', JSON.stringify(claims));
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ kind:'meta', type, person, key, value })
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+// Build "me" object for wardrobe unlock checks
+function buildMe(who) {
+  const s = calcStats();
+  const total = who==='paul' ? s.paulTotal : s.cristinaTotal;
+  const wins = who==='paul' ? s.paulWins : s.cristinaWins;
+  const streak = who==='paul' ? s.paulStreak : s.cristinaStreak;
+  // big win = ever won a week by 10k+
+  let bigWin = false;
+  allWeeksFlat.forEach(w => {
+    const d = DB[w.key]||{};
+    if (d.paul && d.cristina) {
+      const diff = d.paul - d.cristina;
+      if (who==='paul' && diff>=10000) bigWin=true;
+      if (who==='cristina' && -diff>=10000) bigWin=true;
+    }
+  });
+  return { total, wins, streak, bigWin };
+}
+
+function ownedHats(who) { const me=buildMe(who); return WARDROBE_HATS.filter(h=>h.check(me)); }
+function ownedColors(who) { const me=buildMe(who); return WARDROBE_COLORS.filter(c=>me.total>=c.threshold); }
 
 // ══════════════════════════════════════════
 // MILESTONES DEFINITION
@@ -769,6 +1070,38 @@ const MILESTONES = [
   { id:'comeback', icon:'💥', name:'Comeback Kid', desc:'Win a week after losing the previous one', check:null, type:'both', special:true },
   { id:'three_streak', icon:'🔱', name:'Hat Trick', desc:'Win 3 weeks in a row', check:null, type:'both', special:true },
 ];
+
+// ══════════════════════════════════════════
+// WARDROBE DEFINITION
+// ══════════════════════════════════════════
+// Hats/accessories unlock via milestones. "me" = { total, wins, streak, bigWin }
+const WARDROBE_HATS = [
+  { id:'none', icon:'🚫', name:'No Hat', unlock:'Always available', check:()=>true },
+  { id:'tophat', icon:'🎩', name:'Top Hat', unlock:'Win your first week', check:(me)=>me.wins>=1 },
+  { id:'cap', icon:'🧢', name:'Cap', unlock:'Reach 50K total steps', check:(me)=>me.total>=50000 },
+  { id:'sunglasses', icon:'🕶️', name:'Shades', unlock:'Win a week by 10,000+ steps', check:(me)=>me.bigWin },
+  { id:'crown', icon:'👑', name:'Crown', unlock:'Win 3 weeks in a row', check:(me)=>me.streak>=3 },
+  { id:'goldgloves', icon:'🥊', name:'Golden Gloves', unlock:'Reach 250K total steps', check:(me)=>me.total>=250000 },
+  { id:'halo', icon:'😇', name:'Halo', unlock:'Reach 500K total steps', check:(me)=>me.total>=500000 },
+];
+// Colours unlock every 20,000 total steps
+const WARDROBE_COLORS = [
+  { id:'default', name:'Classic', hex:'#FF6B35', hexC:'#4ECDC4', threshold:0 },
+  { id:'crimson', name:'Crimson', hex:'#DC2626', hexC:'#DC2626', threshold:20000 },
+  { id:'gold', name:'Gold', hex:'#F59E0B', hexC:'#F59E0B', threshold:40000 },
+  { id:'purple', name:'Purple', hex:'#9333EA', hexC:'#9333EA', threshold:60000 },
+  { id:'blue', name:'Electric Blue', hex:'#2563EB', hexC:'#2563EB', threshold:80000 },
+  { id:'pink', name:'Hot Pink', hex:'#EC4899', hexC:'#EC4899', threshold:100000 },
+  { id:'green', name:'Toxic Green', hex:'#16A34A', hexC:'#16A34A', threshold:120000 },
+  { id:'cyan', name:'Ice', hex:'#06B6D4', hexC:'#06B6D4', threshold:140000 },
+  { id:'silver', name:'Silver', hex:'#94A3B8', hexC:'#94A3B8', threshold:160000 },
+  { id:'rainbow', name:'Rainbow', hex:'#FF6B35', hexC:'#4ECDC4', threshold:200000, special:true },
+];
+
+// Equipped state, synced via meta tab. Defaults applied if nothing equipped.
+let equipped = { paul:{ hat:'none', color:'default' }, cristina:{ hat:'none', color:'default' } };
+let claims = {}; // { rewardName: 'paul'|'cristina' }
+let metaLoaded = false;
 
 // ══════════════════════════════════════════
 // REWARDS DEFINITION
@@ -835,41 +1168,78 @@ function buildWeeksFlat() {
 }
 
 function parseCSV(text) {
-  const lines = text.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
-  if (lines.length < 2) return;
-  const hdr = lines[0].map(h => h.toLowerCase().replace(/\s/g,''));
-  const wkI = hdr.findIndex(h => h.includes('week'));
-  const plI = hdr.findIndex(h => h.includes('paul'));
-  const crI = hdr.findIndex(h => h.includes('cristina'));
-  if (wkI < 0) return;
-  for (let i = 1; i < lines.length; i++) {
-    const row = lines[i];
-    const key = row[wkI];
-    if (!key || !key.match(/\d{4}-\d{2}-W\d/)) continue;
-    const paul = plI >= 0 && row[plI] !== '' ? parseInt(row[plI]) : null;
-    const cristina = crI >= 0 && row[crI] !== '' ? parseInt(row[crI]) : null;
-    DB[key] = { paul: isNaN(paul)?null:paul, cristina: isNaN(cristina)?null:cristina };
+  try {
+    const lines = text.trim().split('\n').map(l => l.split(',').map(c => c.trim().replace(/^"|"$/g,'')));
+    if (lines.length < 2) return;
+    const hdr = lines[0].map(h => h.toLowerCase().replace(/\s/g,''));
+    const wkI = hdr.findIndex(h => h.includes('week'));
+    const plI = hdr.findIndex(h => h.includes('paul'));
+    const crI = hdr.findIndex(h => h.includes('cristina'));
+    if (wkI < 0) return; // no week column, can't parse
+    let parsedAny = false;
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i];
+      if (!row || row.length === 0) continue;
+      const key = row[wkI];
+      if (!key || !key.match(/^\d{4}-\d{2}-W\d+$/)) continue; // strict key validation
+      // Sanitise step values: strip non-digits, cap at sane max, reject negatives
+      function clean(raw) {
+        if (raw === undefined || raw === null || raw === '') return null;
+        const n = parseInt(String(raw).replace(/[^0-9]/g, ''), 10);
+        if (isNaN(n) || n < 0 || n > 9999999) return null;
+        return n;
+      }
+      const paul = plI >= 0 ? clean(row[plI]) : null;
+      const cristina = crI >= 0 ? clean(row[crI]) : null;
+      DB[key] = { paul, cristina };
+      parsedAny = true;
+    }
+    if (parsedAny) saveDB();
+  } catch(e) {
+    // Malformed CSV — keep existing local data, don't crash
+    console.warn('CSV parse issue, keeping local data:', e.message);
   }
-  saveDB();
 }
 
-async function loadFromSheet(manual=false) {
+async function loadFromSheet(manual=false, retries=2) {
   setSyncState(false);
   if (manual) { document.getElementById('status-bar').style.display='flex'; setStatus('loading','↻ Syncing...'); }
-  try {
-    const res = await fetch(CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error();
-    parseCSV(await res.text());
-    setSyncState(true);
-    if (manual) { showToast('✓ Synced!'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 1500); }
-  } catch(e) {
-    setSyncState(false);
-    if (manual) { setStatus('err','✗ Could not reach Google Sheets'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 3000); showToast('Sync failed'); }
+  let success = false;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(CSV_URL + '&t=' + Date.now(), { cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeout);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      if (!text || text.trim().length === 0) throw new Error('Empty response');
+      parseCSV(text);
+      setSyncState(true);
+      success = true;
+      if (manual) { showToast('✓ Synced!'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 1500); }
+      break;
+    } catch(e) {
+      if (attempt < retries) {
+        // Wait briefly before retrying (exponential backoff)
+        await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+        continue;
+      }
+      // All retries exhausted
+      setSyncState(false);
+      if (manual) {
+        const msg = e.name === 'AbortError' ? '✗ Sync timed out — check connection' : '✗ Could not reach Google Sheets';
+        setStatus('err', msg);
+        setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 3000);
+        showToast('Sync failed');
+      }
+    }
   }
   ensureCurrentMonthWeeks();
   buildWeeksFlat();
   findCurrentWeek();
   renderAll();
+  return success;
 }
 
 function setStatus(type, msg) {
@@ -898,21 +1268,57 @@ function calcStats() {
   let paulTotal=0, cristinaTotal=0, paulWins=0, cristinaWins=0, ties=0;
   let paulStreak=0, cristinaStreak=0, paulCurStreak=0, cristinaCurStreak=0;
   let weeksWithBothData=0;
+  let paulBestWeek=0, cristinaBestWeek=0, biggestMargin=0, biggestMarginWho='';
+  // Running current streak (most recent consecutive wins, ends at last completed week)
+  let liveCurStreakWho='', liveCurStreak=0;
   const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul||DB[w.key]?.cristina);
   weeks.forEach(w => {
     const d = DB[w.key]||{};
     const p = d.paul||0, c = d.cristina||0;
     paulTotal += p; cristinaTotal += c;
+    if (p > paulBestWeek) paulBestWeek = p;
+    if (c > cristinaBestWeek) cristinaBestWeek = c;
     if (p>0&&c>0) {
       weeksWithBothData++;
-      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; }
-      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; }
-      else { ties++; paulCurStreak=0; cristinaCurStreak=0; }
+      const margin = Math.abs(p-c);
+      if (margin > biggestMargin) { biggestMargin = margin; biggestMarginWho = p>c?'paul':c>p?'cristina':''; }
+      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; liveCurStreakWho='paul'; liveCurStreak=paulCurStreak; }
+      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; liveCurStreakWho='cristina'; liveCurStreak=cristinaCurStreak; }
+      else { ties++; paulCurStreak=0; cristinaCurStreak=0; liveCurStreakWho=''; liveCurStreak=0; }
       paulStreak = Math.max(paulStreak, paulCurStreak);
       cristinaStreak = Math.max(cristinaStreak, cristinaCurStreak);
     }
   });
-  return { paulTotal, cristinaTotal, paulWins, cristinaWins, ties, paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length };
+  // Distance equivalent (avg 0.75m per step → km)
+  const paulKm = Math.round(paulTotal * 0.00075);
+  const cristinaKm = Math.round(cristinaTotal * 0.00075);
+  return { paulTotal, cristinaTotal, paulWins, cristinaWins, ties, paulStreak, cristinaStreak,
+    weeksWithBothData, weeksWithData: weeks.length, paulBestWeek, cristinaBestWeek,
+    biggestMargin, biggestMarginWho, liveCurStreakWho, liveCurStreak, paulKm, cristinaKm };
+}
+
+// Per-month champion calculator
+function calcMonthlyChampions() {
+  const champions = {};
+  const monthKeys = [...new Set(allWeeksFlat.map(w => `${w.year}-${String(w.month+1).padStart(2,'0')}`))];
+  monthKeys.forEach(mk => {
+    const [y, mo] = mk.split('-');
+    const monthWeeks = allWeeksFlat.filter(w => w.year===parseInt(y) && w.month===parseInt(mo)-1);
+    let pTotal=0, cTotal=0, complete=false;
+    monthWeeks.forEach(w => {
+      const d = DB[w.key]||{};
+      pTotal += d.paul||0; cTotal += d.cristina||0;
+      if (d.paul && d.cristina) complete = true;
+    });
+    if (pTotal>0 || cTotal>0) {
+      champions[mk] = {
+        label: `${MONTHS_F[parseInt(mo)-1]} ${y}`,
+        paul: pTotal, cristina: cTotal,
+        winner: pTotal>cTotal ? 'paul' : cTotal>pTotal ? 'cristina' : 'tie'
+      };
+    }
+  });
+  return champions;
 }
 
 // ══════════════════════════════════════════
@@ -936,20 +1342,35 @@ function renderHero() {
   // VS ring conic gradient via style
   document.getElementById('vs-ring').style.setProperty('--paul-pct', pp+'%');
 
+  // Head-to-head record in the VS ring
+  const vsRing = document.getElementById('vs-ring');
+  if (s.weeksWithBothData > 0) {
+    vsRing.innerHTML = `<div style="font-size:15px;line-height:1;"><span style="color:var(--paul)">${s.paulWins}</span><span style="color:var(--muted2);font-size:11px;margin:0 2px;">-</span><span style="color:var(--cristina)">${s.cristinaWins}</span></div>`;
+  } else {
+    vsRing.textContent = 'VS';
+  }
+
   const leaderEl = document.getElementById('vs-leader');
   const paulBox = document.getElementById('boxer-paul-wrap');
   const cristinaBox = document.getElementById('boxer-cristina-wrap');
+
+  // Streak indicator
+  let streakBadge = '';
+  if (s.liveCurStreak >= 2) {
+    const sColor = s.liveCurStreakWho === 'paul' ? 'var(--paul)' : 'var(--cristina)';
+    streakBadge = ` <span style="color:${sColor};font-weight:700;">🔥${s.liveCurStreak}</span>`;
+  }
 
   // Determine state
   let paulClass, cristinaClass, leaderHtml;
   if (s.paulTotal > s.cristinaTotal) {
     paulClass = 'boxer-canvas boxer-winner';
     cristinaClass = 'boxer-canvas boxer-loser';
-    leaderHtml = '<span style="color:var(--paul)">Paul leads</span>';
+    leaderHtml = '<span style="color:var(--paul)">Paul leads</span>' + streakBadge;
   } else if (s.cristinaTotal > s.paulTotal) {
     paulClass = 'boxer-canvas boxer-loser';
     cristinaClass = 'boxer-canvas boxer-winner-left';
-    leaderHtml = '<span style="color:var(--cristina)">Cristina leads</span>';
+    leaderHtml = '<span style="color:var(--cristina)">Cristina leads</span>' + streakBadge;
   } else {
     paulClass = 'boxer-canvas boxer-tie';
     cristinaClass = 'boxer-canvas boxer-tie';
@@ -960,6 +1381,18 @@ function renderHero() {
   if (paulBox.className !== paulClass) paulBox.className = paulClass;
   if (cristinaBox.className !== cristinaClass) cristinaBox.className = cristinaClass;
   leaderEl.innerHTML = leaderHtml;
+
+  // Inject equipped boxer looks (only re-render if the look changed, to avoid flicker)
+  const pLook = (equipped.paul?.hat||'none') + '|' + (equipped.paul?.color||'default');
+  const cLook = (equipped.cristina?.hat||'none') + '|' + (equipped.cristina?.color||'default');
+  if (paulBox.dataset.look !== pLook) {
+    paulBox.innerHTML = getBoxerSVG('paul', equipped.paul?.hat||'none', equipped.paul?.color||'default');
+    paulBox.dataset.look = pLook;
+  }
+  if (cristinaBox.dataset.look !== cLook) {
+    cristinaBox.innerHTML = getBoxerSVG('cristina', equipped.cristina?.hat||'none', equipped.cristina?.color||'default');
+    cristinaBox.dataset.look = cLook;
+  }
 }
 
 // ══════════════════════════════════════════
@@ -978,6 +1411,9 @@ function renderWeekly() {
   const d = DB[w.key]||{};
   document.getElementById('week-title').textContent = `Week ${w.num}`;
   document.getElementById('week-dates').textContent = `${MONTHS_F[w.month]} — ${fmtShort(w.start)} to ${fmtShort(w.end)}`;
+  // Update the gritty banner to the viewed month
+  const bannerEl = document.getElementById('crawling-banner-text');
+  if (bannerEl) bannerEl.innerHTML = `☠ <span>Crawling Month</span> — ${MONTHS_F[w.month]} ${w.year} ☠`;
 
   const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
     .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
@@ -1143,24 +1579,239 @@ function renderRewards() {
   const s = calcStats();
   const html = REWARDS.map(r => {
     const earned = r.condition(s);
+    const claimedBy = claims[r.name]; // 'paul' | 'cristina' | undefined
     let statusHtml = '';
+    let claimBtn = '';
+
     if (!earned) {
       statusHtml = `<span class="reward-status reward-locked">Locked</span>`;
+    } else if (claimedBy) {
+      const cName = claimedBy==='paul'?'Paul':'Cristina';
+      statusHtml = `<span class="reward-status reward-${claimedBy}">✓ Claimed by ${cName}</span>`;
     } else if (r.winner) {
       const who = s.paulWins >= s.cristinaWins ? 'paul' : 'cristina';
       const name = who==='paul'?'Paul':'Cristina';
       statusHtml = `<span class="reward-status reward-${who}">${name} earns this</span>`;
+      // Show claim button only to the signed-in person if they're the earner
+      if (currentUser === who) {
+        claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as claimed</button>`;
+      }
     } else {
       statusHtml = `<span class="reward-status reward-earned">Both earn this!</span>`;
+      if (currentUser) {
+        claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as claimed</button>`;
+      }
     }
     return `<div class="reward-card ${earned?'claimed':''}">
       <span class="reward-icon">${r.icon}</span>
       <div class="reward-name">${r.name}</div>
       <div class="reward-trigger">${r.trigger}</div>
       ${statusHtml}
+      ${claimBtn}
     </div>`;
   }).join('');
   document.getElementById('rewards-grid').innerHTML = html;
+}
+
+async function claimReward(name) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  playClick();
+  await writeMeta('claim', currentUser, name, currentUser);
+  renderRewards();
+  showToast('Reward claimed ✓');
+}
+
+// ══════════════════════════════════════════
+// RENDER RECORDS
+// ══════════════════════════════════════════
+function renderRecords() {
+  const s = calcStats();
+
+  // Pace projection: avg steps/week → when do they hit the next big milestone
+  const paulAvg = s.weeksWithData > 0 ? s.paulTotal / s.weeksWithData : 0;
+  const cristinaAvg = s.weeksWithData > 0 ? s.cristinaTotal / s.weeksWithData : 0;
+  function projectMilestone(total, avg) {
+    if (avg <= 0) return null;
+    const targets = [100000, 250000, 500000, 1000000];
+    const next = targets.find(t => t > total);
+    if (!next) return null;
+    const weeksNeeded = Math.ceil((next - total) / avg);
+    const d = new Date();
+    d.setDate(d.getDate() + weeksNeeded * 7);
+    return { target: next, date: `${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`, weeks: weeksNeeded };
+  }
+  const paulProj = projectMilestone(s.paulTotal, paulAvg);
+  const cristinaProj = projectMilestone(s.cristinaTotal, cristinaAvg);
+
+  const records = [
+    { icon:'🏃', label:'Most steps in a week — Paul', value:s.paulBestWeek.toLocaleString(), color:'var(--paul)' },
+    { icon:'🏃', label:'Most steps in a week — Cristina', value:s.cristinaBestWeek.toLocaleString(), color:'var(--cristina)' },
+    { icon:'🔥', label:'Longest win streak — Paul', value:s.paulStreak + (s.paulStreak===1?' week':' weeks'), color:'var(--paul)' },
+    { icon:'🔥', label:'Longest win streak — Cristina', value:s.cristinaStreak + (s.cristinaStreak===1?' week':' weeks'), color:'var(--cristina)' },
+    { icon:'💥', label:'Biggest single-week margin', value:s.biggestMargin.toLocaleString(), color:s.biggestMarginWho==='paul'?'var(--paul)':s.biggestMarginWho==='cristina'?'var(--cristina)':'var(--muted)' },
+    { icon:'🛣️', label:'Distance walked — Paul', value:s.paulKm.toLocaleString()+' km', color:'var(--paul)' },
+    { icon:'🛣️', label:'Distance walked — Cristina', value:s.cristinaKm.toLocaleString()+' km', color:'var(--cristina)' },
+    { icon:'⚔️', label:'Weeks fought head-to-head', value:s.weeksWithBothData.toString(), color:'var(--muted)' },
+  ];
+
+  // Add projections if we have enough data
+  if (paulProj) records.push({ icon:'📈', label:`Paul → ${(paulProj.target/1000)}K steps`, value:paulProj.date, color:'var(--paul)', small:true });
+  if (cristinaProj) records.push({ icon:'📈', label:`Cristina → ${(cristinaProj.target/1000)}K steps`, value:cristinaProj.date, color:'var(--cristina)', small:true });
+
+  document.getElementById('records-grid').innerHTML = records.map(r => `
+    <div class="record-card">
+      <div class="record-icon">${r.icon}</div>
+      <div class="record-body">
+        <div class="record-label">${r.label}</div>
+        <div class="record-value" style="color:${r.color};${r.small?'font-size:18px;':''}">${r.value}</div>
+        ${r.small?'<div style="font-size:10px;color:var(--muted2);margin-top:2px;">projected at current pace</div>':''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// RENDER CHAMPIONS
+// ══════════════════════════════════════════
+function renderChampions() {
+  const champs = calcMonthlyChampions();
+  const keys = Object.keys(champs).sort().reverse();
+  if (!keys.length) {
+    document.getElementById('champions-grid').innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;">No completed months yet. The first monthly champion will be crowned at the end of the month.</div>';
+    return;
+  }
+  document.getElementById('champions-grid').innerHTML = keys.map(k => {
+    const c = champs[k];
+    const trophy = c.winner==='tie' ? '🤝' : '🏆';
+    const winnerName = c.winner==='paul' ? 'Paul' : c.winner==='cristina' ? 'Cristina' : 'Tie';
+    const winnerColor = c.winner==='paul' ? 'var(--paul)' : c.winner==='cristina' ? 'var(--cristina)' : 'var(--muted)';
+    return `
+      <div class="champ-card ${c.winner}-champ">
+        <div class="champ-trophy">${trophy}</div>
+        <div class="champ-body">
+          <div class="champ-month">${c.label}</div>
+          <div class="champ-winner-name" style="color:${winnerColor}">${c.winner==='tie'?'Dead heat':winnerName+' takes the crown'}</div>
+        </div>
+        <div class="champ-scores">
+          <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Paul</div><div class="champ-score-p">${c.paul.toLocaleString()}</div></div>
+          <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Cristina</div><div class="champ-score-c">${c.cristina.toLocaleString()}</div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// RENDER WARDROBE
+// ══════════════════════════════════════════
+function getBoxerSVG(who, hatId, colorId) {
+  // Returns an SVG string for a boxer with the given color and hat accessory
+  const colorDef = WARDROBE_COLORS.find(c=>c.id===colorId) || WARDROBE_COLORS[0];
+  const bodyColor = colorDef.hex;
+  const isC = who==='cristina';
+  const skin = isC ? '#FFCCAA' : '#FF9966';
+  const hair = isC ? '#4a1a00' : '#663300';
+
+  // Hat overlay SVG (positioned above head, y<0 area uses negative via viewBox shift)
+  let hatSvg = '';
+  switch(hatId) {
+    case 'tophat': hatSvg = '<rect x="4" y="-4" width="8" height="1" fill="#1a1a1a"/><rect x="5" y="-9" width="6" height="5" fill="#1a1a1a"/><rect x="5" y="-5" width="6" height="1" fill="#8B0000"/>'; break;
+    case 'cap': hatSvg = '<rect x="4" y="-3" width="8" height="2" fill="#2563EB"/><rect x="2" y="-1" width="4" height="1" fill="#1e40af"/>'; break;
+    case 'sunglasses': hatSvg = '<rect x="5" y="2" width="2" height="2" fill="#111"/><rect x="9" y="2" width="2" height="2" fill="#111"/><rect x="7" y="2" width="2" height="1" fill="#111"/>'; break;
+    case 'crown': hatSvg = '<rect x="4" y="-3" width="8" height="2" fill="#FFD700"/><rect x="4" y="-5" width="1" height="2" fill="#FFD700"/><rect x="7" y="-6" width="2" height="3" fill="#FFD700"/><rect x="11" y="-5" width="1" height="2" fill="#FFD700"/>'; break;
+    case 'goldgloves': hatSvg = ''; break; // handled via glove recolor below
+    case 'halo': hatSvg = '<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="#FFD700" stroke-width="0.8"/>'; break;
+  }
+  const gloveColor = hatId==='goldgloves' ? '#FFD700' : bodyColor;
+
+  return `<svg class="boxer-svg-inner" viewBox="-2 -10 20 30" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%;display:block;">
+    ${hatSvg}
+    <rect x="5" y="0" width="6" height="5" fill="${skin}"/>
+    <rect x="4" y="1" width="1" height="3" fill="${skin}"/><rect x="11" y="1" width="1" height="3" fill="${skin}"/>
+    ${isC ? `<rect x="4" y="0" width="8" height="1" fill="${hair}"/><rect x="3" y="1" width="2" height="5" fill="${hair}"/><rect x="11" y="1" width="2" height="5" fill="${hair}"/>` : `<rect x="5" y="0" width="6" height="1" fill="${hair}"/><rect x="4" y="1" width="2" height="1" fill="${hair}"/>`}
+    ${hatId!=='sunglasses' ? '<rect x="6" y="2" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="2" width="1" height="1" fill="#1a1a2e"/>' : ''}
+    <rect x="7" y="4" width="2" height="1" fill="${isC?'#ff6688':'#cc4400'}"/>
+    <rect x="5" y="5" width="6" height="6" fill="${bodyColor}"/>
+    <rect x="5" y="11" width="6" height="3" fill="${bodyColor}" opacity="0.7"/>
+    <rect x="2" y="6" width="3" height="3" fill="${gloveColor}"/><rect x="11" y="6" width="3" height="3" fill="${gloveColor}"/>
+    <rect x="1" y="7" width="2" height="2" fill="${skin}"/><rect x="13" y="7" width="2" height="2" fill="${skin}"/>
+    <rect x="5" y="14" width="2" height="4" fill="${skin}"/><rect x="9" y="14" width="2" height="4" fill="${skin}"/>
+    <rect x="4" y="17" width="4" height="2" fill="#333"/><rect x="8" y="17" width="4" height="2" fill="#333"/>
+    <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
+  </svg>`;
+}
+
+function renderWardrobe() {
+  const who = currentUser;
+  const noteEl = document.getElementById('wardrobe-signin-note');
+  const labelEl = document.getElementById('wardrobe-who-label');
+
+  if (!who) {
+    noteEl.style.display = 'block';
+    labelEl.textContent = 'Not signed in';
+    document.getElementById('wardrobe-preview').innerHTML = '';
+    document.getElementById('wardrobe-hats').innerHTML = '';
+    document.getElementById('wardrobe-colors').innerHTML = '';
+    return;
+  }
+  noteEl.style.display = 'none';
+  const name = who==='paul' ? 'Paul' : 'Cristina';
+  labelEl.textContent = name + "'s closet";
+
+  const eq = equipped[who] || { hat:'none', color:'default' };
+  const ownedH = ownedHats(who).map(h=>h.id);
+  const ownedC = ownedColors(who).map(c=>c.id);
+  const eqClass = who==='cristina' ? 'cristina-eq' : '';
+  const badgeClass = who==='cristina' ? 'cristina-b' : '';
+
+  // Preview
+  document.getElementById('wardrobe-preview').innerHTML =
+    `<div style="display:inline-block;padding:20px 40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
+      <div style="width:90px;height:135px;margin:0 auto;">${getBoxerSVG(who, eq.hat, eq.color)}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;">Your current look</div>
+    </div>`;
+
+  // Hats
+  document.getElementById('wardrobe-hats').innerHTML = WARDROBE_HATS.map(h => {
+    const owned = ownedH.includes(h.id);
+    const isEq = eq.hat===h.id;
+    let badge = '';
+    if (isEq) badge = `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>`;
+    else if (!owned) badge = `<span class="wi-badge locked-badge">🔒</span>`;
+    return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}" ${owned?`onclick="equipItem('hat','${h.id}')"`:''}>
+      ${badge}
+      <span class="wi-icon">${h.icon}</span>
+      <div class="wi-name">${h.name}</div>
+      <div class="wi-unlock">${owned?'Owned':h.unlock}</div>
+    </div>`;
+  }).join('');
+
+  // Colors
+  document.getElementById('wardrobe-colors').innerHTML = WARDROBE_COLORS.map(c => {
+    const owned = ownedC.includes(c.id);
+    const isEq = eq.color===c.id;
+    let badge = '';
+    if (isEq) badge = `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>`;
+    else if (!owned) badge = `<span class="wi-badge locked-badge">🔒</span>`;
+    const swatch = c.special
+      ? `background:linear-gradient(135deg,#FF6B35,#F59E0B,#16A34A,#2563EB,#9333EA);`
+      : `background:${c.hex};`;
+    return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}" ${owned?`onclick="equipItem('color','${c.id}')"`:''}>
+      ${badge}
+      <div class="wi-swatch" style="${swatch}"></div>
+      <div class="wi-name">${c.name}</div>
+      <div class="wi-unlock">${owned?'Owned':c.threshold.toLocaleString()+' steps'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function equipItem(slot, id) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  playClick();
+  await writeMeta('equip', currentUser, slot, id);
+  renderWardrobe();
+  renderHero(); // update the boxer in the arena
+  showToast('Look updated ✓');
 }
 
 // ══════════════════════════════════════════
@@ -1205,7 +1856,7 @@ function renderHistory() {
 // ══════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════
-function renderAll() { renderHero(); renderWeekly(); }
+function renderAll() { renderHero(); renderWeekly(); checkForNewWins(); }
 
 function changeWeek(dir) {
   currentWeekIdx = Math.max(0,Math.min(allWeeksFlat.length-1,currentWeekIdx+dir));
@@ -1218,12 +1869,16 @@ function jumpToMonth(mk) {
 function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
 
 function showSection(name) {
-  ['weekly','milestones','rewards','history'].forEach(s => {
+  playClick();
+  ['weekly','records','champions','wardrobe','milestones','rewards','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','milestones','rewards','history'][i]===name);
+    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','milestones','rewards','history'][i]===name);
   });
+  if (name==='records') renderRecords();
+  if (name==='champions') renderChampions();
+  if (name==='wardrobe') renderWardrobe();
   if (name==='milestones') renderMilestones();
   if (name==='rewards') renderRewards();
   if (name==='history') renderHistory();
@@ -1236,11 +1891,70 @@ function showToast(msg) {
 }
 
 // ══════════════════════════════════════════
+// CELEBRATION (confetti + banner, fires once per new result)
+// ══════════════════════════════════════════
+function checkForNewWins() {
+  // Build a signature of all completed weeks and their winners
+  const completed = {};
+  allWeeksFlat.forEach(w => {
+    const d = DB[w.key] || {};
+    if (d.paul && d.cristina) {
+      completed[w.key] = d.paul > d.cristina ? 'paul' : d.cristina > d.paul ? 'cristina' : 'tie';
+    }
+  });
+
+  const seen = JSON.parse(localStorage.getItem('steps_seen_wins') || '{}');
+  let newWin = null, newWinKey = null;
+  for (const key in completed) {
+    if (seen[key] !== completed[key] && completed[key] !== 'tie') {
+      // Only celebrate if we've seen data before (not first ever load) OR it's genuinely new
+      if (Object.keys(seen).length > 0) {
+        newWin = completed[key];
+        newWinKey = key;
+      }
+    }
+  }
+
+  // Update seen state
+  localStorage.setItem('steps_seen_wins', JSON.stringify(completed));
+
+  if (newWin) fireCelebration(newWin, newWinKey);
+}
+
+function fireCelebration(who, weekKey) {
+  const color = who === 'paul' ? '#FF6B35' : '#4ECDC4';
+  const name = who === 'paul' ? 'Paul' : 'Cristina';
+  const w = allWeeksFlat.find(x => x.key === weekKey);
+  const weekLabel = w ? `Week ${w.num} — ${MONTHS_S[w.month]}` : '';
+
+  // Victory sound
+  playVictoryFanfare();
+
+  // Confetti burst
+  if (typeof confetti === 'function') {
+    const end = Date.now() + 1500;
+    const colors = [color, '#ffffff', color];
+    (function frame() {
+      confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors });
+      confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    })();
+    confetti({ particleCount: 80, spread: 90, origin: { y: 0.5 }, colors });
+  }
+
+  // Banner
+  const banner = document.getElementById('celebrate-banner');
+  banner.style.borderColor = color;
+  document.getElementById('celebrate-title').textContent = name + ' wins! 🥊';
+  document.getElementById('celebrate-title').style.color = color;
+  document.getElementById('celebrate-sub').textContent = weekLabel + ' goes to ' + name;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════════
 // AUTH & WRITE-BACK (PIN-based)
 // ══════════════════════════════════════════
-const SHEET_ID_WRITE = '1ehsBKhGmQEGKMPnHiffbQiBNrw2rfYRlNyFI7eKTAVg';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9R7YGa_FmeZhBiQf6LkzDmc5lj1J4ogl6qabn9E-a7M9VVM9JFqQowKD4LGheBI6qdg/exec';
-const PINS = { paul: '1987', cristina: '1993' }; // change these to whatever you want
 let currentUser = localStorage.getItem('steps_user') || null;
 
 function renderAuthArea() {
@@ -1303,6 +2017,9 @@ function submitPin() {
   localStorage.setItem('steps_user', currentUser);
   closePinModal();
   renderAuthArea();
+  // Refresh sections that depend on who's signed in
+  if (document.getElementById('section-wardrobe').style.display !== 'none') renderWardrobe();
+  if (document.getElementById('section-rewards').style.display !== 'none') renderRewards();
   showToast('Signed in as ' + (currentUser === 'paul' ? 'Paul' : 'Cristina') + ' ✓');
 }
 
@@ -1317,6 +2034,8 @@ function signOut() {
   renderAuthArea();
   const wp = document.getElementById('write-panel');
   if (wp) wp.style.display = 'none';
+  if (document.getElementById('section-wardrobe').style.display !== 'none') renderWardrobe();
+  if (document.getElementById('section-rewards').style.display !== 'none') renderRewards();
 }
 
 function renderWritePanel() {
@@ -1376,6 +2095,7 @@ async function writeToSheet() {
   const steps = parseInt(document.getElementById('wp-steps-inp')?.value);
   if (!key || isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); return; }
 
+  playPunch();
   const wpStatus = document.getElementById('wp-status');
   wpStatus.textContent = '↻ Saving to Sheet...';
   wpStatus.style.color = 'var(--muted)';
@@ -1419,11 +2139,29 @@ async function writeToSheet() {
 ensureCurrentMonthWeeks();
 buildWeeksFlat();
 findCurrentWeek();
-renderAll();
-loadFromSheet(false);
-
-// Init Google Auth after GIS script loads
 renderAuthArea();
+document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+
+// Load cached meta immediately for instant boxer looks
+try {
+  const eqCache = localStorage.getItem('steps_equipped');
+  const clCache = localStorage.getItem('steps_claims');
+  if (eqCache) equipped = JSON.parse(eqCache);
+  if (clCache) claims = JSON.parse(clCache);
+} catch(_) {}
+
+renderAll();
+
+// Auto-sync steps + meta on load, then on the configured interval
+async function fullSync() {
+  await Promise.all([ loadFromSheet(false), loadMeta() ]);
+  renderHero(); // refresh boxer looks after meta loads
+  // Refresh whichever section is open
+  if (document.getElementById('section-wardrobe').style.display !== 'none') renderWardrobe();
+  if (document.getElementById('section-rewards').style.display !== 'none') renderRewards();
+}
+fullSync();
+setInterval(fullSync, CONFIG.AUTO_SYNC_MS);
 </script>
 </body>
 </html>
