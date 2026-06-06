@@ -800,7 +800,6 @@ tr:hover td { background: var(--surface2); }
   <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
   <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" onclick="showSection('leaderboard')">Leaderboard</button>
-  <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
 </nav>
 
 <div class="wrap">
@@ -897,7 +896,8 @@ tr:hover td { background: var(--surface2); }
       <div class="sec-title">Step Shop</div>
       <div class="sec-meta" id="shop-balance-label">Sign in to see your balance</div>
     </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Spend your accumulated steps on cosmetics. Balance = total steps minus already-spent steps. Milestone unlocks (Wardrobe) and shop purchases are two separate paths.</div>
+    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;color:#FCA5A5;">⚠️ <strong>Buying a cosmetic permanently spends real steps from your competition total.</strong> Looking good costs you ground in the race. Choose wisely.</div>
+    <div id="shop-breakdown" style="font-size:12px;color:var(--muted);margin-bottom:18px;padding:8px 2px;"></div>
     <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">🥊 Gloves</div>
     <div id="shop-gloves-grid" class="wardrobe-grid" style="margin-bottom:28px;"></div>
     <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">✨ Boxer Aura</div>
@@ -947,20 +947,6 @@ tr:hover td { background: var(--surface2); }
     <div id="lb-monthly-view" style="display:none"></div>
   </div>
 
-  <div id="section-history" style="display:none">
-    <div class="sec-head" style="margin-bottom:16px;">
-      <div class="sec-title">All Weeks</div>
-      <div class="sec-meta" id="history-meta">–</div>
-    </div>
-    <div class="month-chips" id="month-filter-chips" style="margin-bottom:16px;"></div>
-    <div class="table-card">
-      <div class="table-head-bar">Week by week</div>
-      <table>
-        <thead><tr><th>Week</th><th>Paul</th><th>Cristina</th><th>Gap</th><th>Winner</th></tr></thead>
-        <tbody id="history-tbody"></tbody>
-      </table>
-    </div>
-  </div>
 
 </div>
 
@@ -1075,6 +1061,7 @@ async function loadMeta() {
     const bk = { paul:0, cristina:0, myVote:null };
     const sp = { paul:0, cristina:0 };
     const so = { paul:[], cristina:[] };
+    const sc = {};
     const myId = getVoterId();
     for (let i=1; i<rows.length; i++) {
       const [type, person, key, value] = rows[i];
@@ -1089,8 +1076,9 @@ async function loadMeta() {
       }
       else if (type==='spent' && (person==='paul'||person==='cristina')) { sp[person] = parseInt(value)||0; }
       else if (type==='owns' && (person==='paul'||person==='cristina')) { if (!so[person].includes(key)) so[person].push(key); }
+      else if (type==='shame') { sc[key] = person; } // key = 'achId__YYYY-MM'
     }
-    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk; spent = sp; shopOwned = so;
+    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk; spent = sp; shopOwned = so; shameClaims = sc;
     metaLoaded = true;
     // Persist locally as a fallback cache
     localStorage.setItem('steps_equipped', JSON.stringify(equipped));
@@ -1118,6 +1106,7 @@ async function writeMeta(type, person, key, value) {
   else if (type==='claim') { claims[key]=value; }
   else if (type==='achievement') { if (!achievementClaims[key]) achievementClaims[key]={}; achievementClaims[key][person]=value; }
   else if (type==='updated') { lastUpdated[key]={ person, iso:value }; localStorage.setItem('steps_lastUpdated', JSON.stringify(lastUpdated)); }
+  else if (type==='shame') { shameClaims[key] = person; }
   else if (type==='backer') {
     // backers are recounted from meta on next sync — no local state to update beyond myVote
     backers.myVote = value;
@@ -1138,7 +1127,7 @@ async function writeMeta(type, person, key, value) {
 // Build "me" object for wardrobe unlock checks
 function buildMe(who) {
   const s = calcStats();
-  const total = who==='paul' ? s.paulTotal : s.cristinaTotal;
+  const total = who==='paul' ? s.paulRawSteps : s.cristinaRawSteps; // raw: spend doesn't lose earned hats
   const wins = who==='paul' ? s.paulWins : s.cristinaWins;
   const streak = who==='paul' ? s.paulStreak : s.cristinaStreak;
   let bigWin = false, bigVillainWin = false, bestWeek = 0;
@@ -1155,7 +1144,7 @@ function buildMe(who) {
       else curLoseStreak = 0;
     }
   });
-  const bothAt100k = s.paulTotal >= 100000 && s.cristinaTotal >= 100000;
+  const bothAt100k = s.paulRawSteps >= 100000 && s.cristinaRawSteps >= 100000;
   const myWeeks = allWeeksFlat.filter(w => DB[w.key] && DB[w.key][who] != null);
   const lastWeek = myWeeks[myWeeks.length - 1];
   const shameWeek = !!(lastWeek && (DB[lastWeek.key][who]||0) > 0 && (DB[lastWeek.key][who]||0) < 20000);
@@ -1274,6 +1263,7 @@ let lastUpdated = {}; // { week_key: { person, iso } }
 let backers = { paul:0, cristina:0, myVote:null }; // public supporter tally
 let spent = { paul:0, cristina:0 }; // steps spent in cosmetic shop
 let shopOwned = { paul:[], cristina:[] }; // item ids owned (shop + seasonal)
+let shameClaims = {}; // { 'achId__YYYY-MM': 'paul'|'cristina' } — monthly-scoped, resets each month
 let metaLoaded = false;
 
 function getVoterId() {
@@ -1310,9 +1300,9 @@ const REWARDS = [
 // HONOUR ACHIEVEMENTS (honor system — self-claimed)
 // ══════════════════════════════════════════
 const ACHIEVEMENTS = [
-  { id:'bad_weather',   icon:'🌧️', name:'Defeated Bad Weather',           desc:'Walked outside despite rain, cold, or general meteorological betrayal.' },
-  { id:'didnt_want_to', icon:'😤', name:'Walked Despite Not Wanting To',  desc:'Got up and did it anyway. The bar was on the floor and you cleared it.' },
-  { id:'located_legs',  icon:'🦵', name:'Successfully Located Own Legs',  desc:'A medical miracle. Science is still studying how this happened.' },
+  { id:'bad_weather',   icon:'🌧️', name:'Defeated Bad Weather',           desc:'Walked outside despite rain, cold, or general meteorological betrayal.',  shameful:true, penalty:2000 },
+  { id:'didnt_want_to', icon:'😤', name:'Walked Despite Not Wanting To',  desc:'Got up and did it anyway. The bar was on the floor and you cleared it.', shameful:true, penalty:2000 },
+  { id:'located_legs',  icon:'🦵', name:'Successfully Located Own Legs',  desc:'A medical miracle. Science is still studying how this happened.',          shameful:true, penalty:2000 },
 ];
 
 // ══════════════════════════════════════════
@@ -1484,12 +1474,27 @@ function calcStats() {
       cristinaStreak = Math.max(cristinaStreak, cristinaCurStreak);
     }
   });
-  // Distance equivalent (avg 0.75m per step → km)
-  const paulKm = Math.round(paulTotal * 0.00075);
-  const cristinaKm = Math.round(cristinaTotal * 0.00075);
-  return { paulTotal, cristinaTotal, paulWins, cristinaWins, ties, paulStreak, cristinaStreak,
-    weeksWithBothData, weeksWithData: weeks.length, paulBestWeek, cristinaBestWeek,
-    biggestMargin, biggestMarginWho, liveCurStreakWho, liveCurStreak, paulKm, cristinaKm };
+  // Raw totals (pre-spend) — used for wardrobe/milestone unlocks and shop balance
+  const paulRawSteps = paulTotal;
+  const cristinaRawSteps = cristinaTotal;
+  // Shame penalty — active shameful achievement claims this month (−2k each)
+  const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  let paulShame = 0, cristinaShame = 0;
+  Object.entries(shameClaims).forEach(([k,v]) => {
+    if (!k.endsWith('__'+curMK)) return;
+    if (v==='paul') paulShame++;
+    else if (v==='cristina') cristinaShame++;
+  });
+  // Net totals (competition standing) = raw − spent − shame penalty, floored at 0
+  paulTotal = Math.max(0, paulRawSteps - (spent.paul||0) - paulShame*2000);
+  cristinaTotal = Math.max(0, cristinaRawSteps - (spent.cristina||0) - cristinaShame*2000);
+  // Distance equivalent (avg 0.75m per step → km, based on raw)
+  const paulKm = Math.round(paulRawSteps * 0.00075);
+  const cristinaKm = Math.round(cristinaRawSteps * 0.00075);
+  return { paulTotal, cristinaTotal, paulRawSteps, cristinaRawSteps, paulWins, cristinaWins, ties,
+    paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length,
+    paulBestWeek, cristinaBestWeek, biggestMargin, biggestMarginWho,
+    liveCurStreakWho, liveCurStreak, paulKm, cristinaKm };
 }
 
 // Per-month champion calculator
@@ -1746,7 +1751,7 @@ function renderMilestones() {
         else if (cristinaHatTrick) { isUnlocked=true; whoUnlocked='cristina'; }
       }
     } else {
-      isUnlocked = ms.check(s.paulTotal, s.cristinaTotal,
+      isUnlocked = ms.check(s.paulRawSteps, s.cristinaRawSteps,
         allWeeksFlat.reduce((mx,w)=>Math.max(mx,DB[w.key]?.paul||0),0),
         allWeeksFlat.reduce((mx,w)=>Math.max(mx,DB[w.key]?.cristina||0),0)
       );
@@ -1755,18 +1760,18 @@ function renderMilestones() {
 
     if (isUnlocked) unlocked++;
 
-    // Progress bar for total milestones
+    // Progress bar for total milestones (use raw so spending doesn't show regress)
     let progressHtml = '';
     const totalMilestones = [100000,250000,500000,1000000];
     if (['p_100k','p_250k','p_500k','p_1m'].includes(ms.id)) {
       const target = totalMilestones[['p_100k','p_250k','p_500k','p_1m'].indexOf(ms.id)];
-      const pct = Math.min(100, Math.round((s.paulTotal/target)*100));
-      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--paul)"></div></div><div class="ms-prog-label">${s.paulTotal.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
+      const pct = Math.min(100, Math.round((s.paulRawSteps/target)*100));
+      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--paul)"></div></div><div class="ms-prog-label">${s.paulRawSteps.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
     }
     if (['c_100k','c_250k','c_500k','c_1m'].includes(ms.id)) {
       const target = totalMilestones[['c_100k','c_250k','c_500k','c_1m'].indexOf(ms.id)];
-      const pct = Math.min(100, Math.round((s.cristinaTotal/target)*100));
-      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--cristina)"></div></div><div class="ms-prog-label">${s.cristinaTotal.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
+      const pct = Math.min(100, Math.round((s.cristinaRawSteps/target)*100));
+      if (!isUnlocked) progressHtml = `<div class="ms-progress"><div class="ms-prog-bar"><div class="ms-prog-fill" style="width:${pct}%;background:var(--cristina)"></div></div><div class="ms-prog-label">${s.cristinaRawSteps.toLocaleString()} / ${target.toLocaleString()}</div></div>`;
     }
 
     let whoLabel = '';
@@ -1798,8 +1803,10 @@ function renderMilestones() {
 // ══════════════════════════════════════════
 function renderRewards() {
   const s = calcStats();
+  // Rewards use raw steps so spending cosmetics doesn't revoke earned rewards
+  const sRaw = { ...s, paulTotal: s.paulRawSteps, cristinaTotal: s.cristinaRawSteps };
   const html = REWARDS.map(r => {
-    const earned = r.condition(s);
+    const earned = r.condition(sRaw);
     const claimedBy = claims[r.name]; // 'paul' | 'cristina' | undefined
     let statusHtml = '';
     let claimBtn = '';
@@ -1833,30 +1840,42 @@ function renderRewards() {
   }).join('');
   document.getElementById('rewards-grid').innerHTML = html;
 
-  // Honour achievements
+  // Shameful honour achievements — monthly-scoped, penalty-bearing
+  const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
   const achHtml = ACHIEVEMENTS.map(a => {
-    const paulClaimed  = achievementClaims[a.id]?.paul;
-    const cristinaClaimed = achievementClaims[a.id]?.cristina;
-    let claimedHtml = '';
-    if (paulClaimed)    claimedHtml += `<span class="reward-status reward-paul" style="display:block;margin-top:4px;">✓ Paul claimed this</span>`;
-    if (cristinaClaimed) claimedHtml += `<span class="reward-status reward-cristina" style="display:block;margin-top:4px;">✓ Cristina claimed this</span>`;
-    if (!claimedHtml) claimedHtml = `<span class="reward-status reward-locked">Not yet claimed</span>`;
-    let claimBtn = '';
-    if (currentUser) {
-      const alreadyMine = achievementClaims[a.id]?.[currentUser];
-      claimBtn = alreadyMine
-        ? `<button disabled style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--muted);font-size:11px;">You claimed this ✓</button>`
-        : `<button onclick="claimAchievement('${a.id}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim this 🏅</button>`;
+    const shameKey = `${a.id}__${curMK}`;
+    const holder = shameClaims[shameKey]; // 'paul' | 'cristina' | undefined
+    const isMine = holder === currentUser;
+    const takenByOther = holder && holder !== currentUser;
+
+    // If taken by the other person and I'm logged in, hide it from me
+    if (takenByOther && currentUser) return '';
+
+    const holderName = holder === 'paul' ? 'Paul' : holder === 'cristina' ? 'Cristina' : null;
+    let statusHtml = '';
+    if (isMine) {
+      statusHtml = `<div style="margin-top:6px;padding:6px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:11px;color:#FCA5A5;">🤢 You're carrying this — <strong>−${a.penalty.toLocaleString()} steps penalty</strong></div>`;
+    } else if (holderName) {
+      statusHtml = `<span class="reward-status reward-${holder}" style="display:block;margin-top:4px;">🤢 ${holderName} is carrying this (−${a.penalty.toLocaleString()} steps)</span>`;
+    } else {
+      statusHtml = `<span class="reward-status reward-locked">Not claimed this month</span>`;
     }
-    return `<div class="reward-card claimed">
+
+    let claimBtn = '';
+    if (currentUser && !holder) {
+      claimBtn = `<button onclick="claimAchievement('${a.id}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#FCA5A5;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim (−${a.penalty.toLocaleString()} penalty) 🤢</button>`;
+    }
+
+    const cardStyle = isMine ? 'border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.05);' : '';
+    return `<div class="reward-card claimed" style="${cardStyle}">
       <span class="reward-icon">${a.icon}</span>
       <div class="reward-name">${a.name}</div>
       <div class="reward-trigger">${a.desc}</div>
-      ${claimedHtml}
+      ${statusHtml}
       ${claimBtn}
     </div>`;
-  }).join('');
-  document.getElementById('achievements-grid').innerHTML = achHtml;
+  }).filter(Boolean).join('');
+  document.getElementById('achievements-grid').innerHTML = achHtml || '<div style="color:var(--muted);font-size:13px;padding:12px 0;">No shameful achievements available this month.</div>';
 }
 
 async function claimReward(name) {
@@ -1932,10 +1951,25 @@ function printDebtNotice() {
 
 async function claimAchievement(id) {
   if (!currentUser) { showToast('Sign in first'); return; }
-  playClick();
-  await writeMeta('achievement', currentUser, id, new Date().toISOString());
-  renderRewards();
-  showToast('Achievement claimed ✓');
+  const a = ACHIEVEMENTS.find(x=>x.id===id);
+  if (!a) return;
+  if (a.shameful) {
+    const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+    const shameKey = `${id}__${curMK}`;
+    if (shameClaims[shameKey]) { showToast('Already claimed this month!'); return; }
+    const ok = confirm(`⚠️ This is a shameful achievement. Claiming it will cost you ${a.penalty.toLocaleString()} steps from your competition total this month. Claim "${a.name}"?`);
+    if (!ok) return;
+    playClick();
+    await writeMeta('shame', currentUser, shameKey, new Date().toISOString());
+    renderAll();
+    renderRewards();
+    showToast('Achievement claimed — you\'re carrying the shame 🤢');
+  } else {
+    playClick();
+    await writeMeta('achievement', currentUser, id, new Date().toISOString());
+    renderRewards();
+    showToast('Achievement claimed ✓');
+  }
 }
 
 // ══════════════════════════════════════════
@@ -1944,14 +1978,24 @@ async function claimAchievement(id) {
 function renderShop() {
   const s = calcStats();
   const who = currentUser;
-  const myTotal = who ? (who==='paul' ? s.paulTotal : s.cristinaTotal) : 0;
+  const myRaw = who ? (who==='paul' ? s.paulRawSteps : s.cristinaRawSteps) : 0;
   const mySpent = who ? (spent[who] || 0) : 0;
-  const balance = myTotal - mySpent;
+  const balance = myRaw - mySpent;
   const myOwned = who ? (shopOwned[who] || []) : [];
   const eq = who ? (equipped[who] || {}) : {};
 
   const balEl = document.getElementById('shop-balance-label');
   if (balEl) balEl.textContent = who ? `Balance: ${balance.toLocaleString()} steps` : 'Sign in to see your balance';
+
+  const breakEl = document.getElementById('shop-breakdown');
+  if (breakEl) {
+    if (who) {
+      const net = Math.max(0, myRaw - mySpent);
+      breakEl.innerHTML = `Raw steps: <strong style="color:var(--text)">${myRaw.toLocaleString()}</strong> &nbsp;·&nbsp; Spent: <strong style="color:#F87171">${mySpent.toLocaleString()}</strong> &nbsp;·&nbsp; Competition total: <strong style="color:var(--${who})">${net.toLocaleString()}</strong>`;
+    } else {
+      breakEl.textContent = 'Sign in to see your breakdown.';
+    }
+  }
 
   function renderSlot(slotId, gridId) {
     const grid = document.getElementById(gridId);
@@ -1962,20 +2006,26 @@ function renderShop() {
       const owned = myOwned.includes(item.id);
       const isEq = eq[slotId] === item.id;
       const canAfford = balance >= item.price;
-      const swatch = `<div style="width:28px;height:28px;border-radius:50%;background:${item.hex};border:2px solid rgba(255,255,255,0.15);margin:0 auto 6px;"></div>`;
+      const r=parseInt(item.hex.slice(1,3),16), g=parseInt(item.hex.slice(3,5),16), b=parseInt(item.hex.slice(5,7),16);
+      const isDark = (r+g+b) < 200;
+      const swatch = `<div style="width:40px;height:40px;border-radius:50%;background:${item.hex};
+        border:2px solid rgba(255,255,255,${isDark?'0.55':'0.3'});
+        box-shadow:0 0 0 1px rgba(0,0,0,0.4), 0 0 12px ${item.hex}88;
+        margin:0 auto 8px;
+        ${isDark?'outline:1px solid rgba(255,255,255,0.12);outline-offset:3px;':''}"></div>`;
       let badge = '', action = '';
       if (isEq) { badge = `<span class="wi-badge equipped-badge ${eqClass}">Worn</span>`; }
       else if (!owned) { badge = `<span class="wi-badge locked-badge">${item.price.toLocaleString()} steps</span>`; }
       if (owned && !isEq && who) {
         action = `<button onclick="equipItem('${slotId}','${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Equip</button>`;
       } else if (!owned && who && canAfford) {
-        action = `<button onclick="buyShopItem('${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Buy</button>`;
+        action = `<button onclick="buyShopItem('${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Buy − costs ${item.price.toLocaleString()} steps</button>`;
       } else if (!owned && who && !canAfford) {
         action = `<div style="margin-top:6px;font-size:10px;color:var(--muted2);">Need ${(item.price-balance).toLocaleString()} more steps</div>`;
       }
       return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}">
         ${swatch}
-        <div class="wi-name">${item.icon} ${item.name}</div>
+        <div class="wi-name" style="color:var(--text);">${item.icon} ${item.name}</div>
         <div class="wi-desc" style="font-size:10px;color:var(--muted2);margin:3px 0;">${item.desc}</div>
         ${badge}${action}
       </div>`;
@@ -1990,9 +2040,13 @@ async function buyShopItem(itemId) {
   const item = SHOP_ITEMS.find(i=>i.id===itemId);
   if (!item) return;
   const s = calcStats();
-  const myTotal = currentUser==='paul' ? s.paulTotal : s.cristinaTotal;
+  const myRaw = currentUser==='paul' ? s.paulRawSteps : s.cristinaRawSteps;
   const mySpent = spent[currentUser] || 0;
-  const balance = myTotal - mySpent;
+  const balance = myRaw - mySpent;
+  if (item.price >= 20000) {
+    const ok = confirm(`⚠️ This will permanently spend ${item.price.toLocaleString()} steps from your competition total. Your standing will drop by ${item.price.toLocaleString()} steps. Buy ${item.name}?`);
+    if (!ok) return;
+  }
   if (balance < item.price) { showToast('Not enough steps!'); return; }
   if ((shopOwned[currentUser]||[]).includes(itemId)) { showToast('Already owned!'); return; }
   playClick();
@@ -2085,9 +2139,9 @@ function renderBackers() {
 function renderRecords() {
   const s = calcStats();
 
-  // Pace projection: avg steps/week → when do they hit the next big milestone
-  const paulAvg = s.weeksWithData > 0 ? s.paulTotal / s.weeksWithData : 0;
-  const cristinaAvg = s.weeksWithData > 0 ? s.cristinaTotal / s.weeksWithData : 0;
+  // Pace projection: avg steps/week → when do they hit the next big milestone (use raw)
+  const paulAvg = s.weeksWithData > 0 ? s.paulRawSteps / s.weeksWithData : 0;
+  const cristinaAvg = s.weeksWithData > 0 ? s.cristinaRawSteps / s.weeksWithData : 0;
   function projectMilestone(total, avg) {
     if (avg <= 0) return null;
     const targets = [100000, 250000, 500000, 1000000];
@@ -2098,8 +2152,8 @@ function renderRecords() {
     d.setDate(d.getDate() + weeksNeeded * 7);
     return { target: next, date: `${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`, weeks: weeksNeeded };
   }
-  const paulProj = projectMilestone(s.paulTotal, paulAvg);
-  const cristinaProj = projectMilestone(s.cristinaTotal, cristinaAvg);
+  const paulProj = projectMilestone(s.paulRawSteps, paulAvg);
+  const cristinaProj = projectMilestone(s.cristinaRawSteps, cristinaAvg);
 
   const records = [
     { icon:'🏃', label:'Most steps in a week — Paul', value:s.paulBestWeek.toLocaleString(), color:'var(--paul)' },
@@ -2620,16 +2674,32 @@ function renderLeaderboard() {
   lbRenderMonthly();
 }
 
+function setLbFilter(mk) { filterMonth = mk; lbRenderWeekly(); }
+
 function lbRenderWeekly() {
   const el = document.getElementById('lb-weekly-view');
-  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina);
-  if (!weeks.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No data yet.</div>';
+  const allWithData = allWeeksFlat.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina);
+
+  // Month filter chips
+  const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
+    .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
+  const chips = `<div class="month-chips" style="margin-bottom:14px;">
+    <div class="chip ${!filterMonth?'active':''}" onclick="setLbFilter(null)">All</div>
+    ${months.map(m=>`<div class="chip ${m.key===filterMonth?'active':''}" onclick="setLbFilter('${m.key}')">${m.label}</div>`).join('')}
+  </div>`;
+
+  const filteredWeeks = filterMonth
+    ? allWithData.filter(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===filterMonth)
+    : allWithData;
+
+  if (!filteredWeeks.length) {
+    el.innerHTML = chips + '<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No data yet.</div>';
     return;
   }
-  // Build forward to get running scores, then reverse for display
+
+  // Build running scores across ALL data (not filtered), then display filtered rows
   let pScore=0, cScore=0;
-  const rows = weeks.map(w => {
+  const allRows = allWithData.map(w => {
     const d = DB[w.key]||{};
     const p = d.paul||0, c = d.cristina||0;
     let winner = null;
@@ -2641,10 +2711,12 @@ function lbRenderWeekly() {
     else if (c>0) winner='cristina_only';
     return { w, p, c, winner, pSnap:pScore, cSnap:cScore };
   });
-  rows.reverse();
 
-  let html = `<div class="table-card">
-    <div class="table-head-bar">Week-by-week · ${weeks.length} weeks played</div>
+  const filteredKeys = new Set(filteredWeeks.map(w=>w.key));
+  const rows = allRows.filter(r => filteredKeys.has(r.w.key)).reverse();
+
+  let html = chips + `<div class="table-card">
+    <div class="table-head-bar">Week-by-week · ${filteredWeeks.length} week${filteredWeeks.length!==1?'s':''} shown</div>
     <table><thead><tr>
       <th>Week</th>
       <th style="color:var(--paul)">Paul</th>
@@ -2757,42 +2829,6 @@ function lbRenderMonthly() {
   el.innerHTML = html;
 }
 
-function renderHistory() {
-  const weeks = filterMonth
-    ? allWeeksFlat.filter(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===filterMonth)
-    : allWeeksFlat;
-  const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
-    .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
-  document.getElementById('month-filter-chips').innerHTML =
-    `<div class="chip ${!filterMonth?'active':''}" onclick="setHistoryFilter(null)">All</div>` +
-    months.map(m=>`<div class="chip ${m.key===filterMonth?'active':''}" onclick="setHistoryFilter('${m.key}')">${m.label}</div>`).join('');
-
-  const wd = weeks.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina);
-  document.getElementById('history-meta').textContent = `${wd.length} week${wd.length!==1?'s':''} of data`;
-
-  if (!wd.length) {
-    document.getElementById('history-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No data yet</td></tr>';
-    return;
-  }
-  document.getElementById('history-tbody').innerHTML = [...wd].reverse().map(w => {
-    const d=DB[w.key]||{}, p=d.paul, c=d.cristina;
-    const diff = (p&&c) ? Math.abs(p-c) : null;
-    let winner = '';
-    if (p&&c) {
-      if (p>c) winner=`<span class="pill pill-paul">Paul</span>`;
-      else if (c>p) winner=`<span class="pill pill-cristina">Cristina</span>`;
-      else winner=`<span class="pill pill-tie">Tie</span>`;
-    }
-    return `<tr>
-      <td class="td-week">${MONTHS_S[w.month]} W${w.num}<br><span style="font-size:11px;color:var(--muted2)">${fmtShort(w.start)}–${fmtShort(w.end)}</span></td>
-      <td class="td-paul">${p?p.toLocaleString():'–'}</td>
-      <td class="td-cristina">${c?c.toLocaleString():'–'}</td>
-      <td style="color:var(--muted);font-size:13px;">${diff?diff.toLocaleString():'–'}</td>
-      <td>${winner}</td>
-    </tr>`;
-  }).join('');
-}
-
 // ══════════════════════════════════════════
 // ACTIONS
 // ══════════════════════════════════════════
@@ -2806,15 +2842,14 @@ function jumpToMonth(mk) {
   const idx = allWeeksFlat.findIndex(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===mk);
   if (idx>=0) { currentWeekIdx=idx; renderWeekly(); }
 }
-function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
 
 function showSection(name) {
   playClick();
-  ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','history'].forEach(s => {
+  ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','history'][i]===name);
+    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'][i]===name);
   });
   if (name==='records') renderRecords();
   if (name==='champions') renderChampions();
@@ -2823,7 +2858,6 @@ function showSection(name) {
   if (name==='milestones') renderMilestones();
   if (name==='rewards') renderRewards();
   if (name==='leaderboard') renderLeaderboard();
-  if (name==='history') renderHistory();
 }
 
 function showToast(msg) {
