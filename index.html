@@ -852,8 +852,12 @@ tr:hover td { background: var(--surface2); }
     <div id="wardrobe-preview" style="text-align:center;margin-bottom:24px;"></div>
     <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Hats & Accessories</div>
     <div id="wardrobe-hats" class="wardrobe-grid" style="margin-bottom:28px;"></div>
-    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Colours</div>
-    <div id="wardrobe-colors" class="wardrobe-grid"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Suit Colours</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Unlock by walking — earn a new colour every 20,000 steps.</div>
+    <div id="wardrobe-colors" class="wardrobe-grid" style="margin-bottom:28px;"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Hat & Accessory Colours</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">All unlocked — pick the colour for your hat or accessory.</div>
+    <div id="wardrobe-hat-colors" class="wardrobe-grid"></div>
   </div>
 
   <!-- ══ MILESTONES ══ -->
@@ -1083,6 +1087,9 @@ const WARDROBE_HATS = [
   { id:'crown', icon:'👑', name:'Crown', unlock:'Win 3 weeks in a row', check:(me)=>me.streak>=3 },
   { id:'goldgloves', icon:'🥊', name:'Golden Gloves', unlock:'Reach 250K total steps', check:(me)=>me.total>=250000 },
   { id:'halo', icon:'😇', name:'Halo', unlock:'Reach 500K total steps', check:(me)=>me.total>=500000 },
+  { id:'devilhorns', icon:'😈', name:'Devil Horns', unlock:'Always available', check:()=>true },
+  { id:'angelwings', icon:'🤍', name:'Angel Wings', unlock:'Always available', check:()=>true },
+  { id:'hermesshoes', icon:'⚡', name:'Hermes Shoes', unlock:'Always available', check:()=>true },
 ];
 // Colours unlock every 20,000 total steps
 const WARDROBE_COLORS = [
@@ -1097,9 +1104,23 @@ const WARDROBE_COLORS = [
   { id:'silver', name:'Silver', hex:'#94A3B8', hexC:'#94A3B8', threshold:160000 },
   { id:'rainbow', name:'Rainbow', hex:'#FF6B35', hexC:'#4ECDC4', threshold:200000, special:true },
 ];
+const WARDROBE_HAT_COLORS = [
+  { id:'hc_default', name:'Orange', hex:'#FF6B35' },
+  { id:'hc_red', name:'Red', hex:'#EF4444' },
+  { id:'hc_blue', name:'Blue', hex:'#3B82F6' },
+  { id:'hc_green', name:'Green', hex:'#22C55E' },
+  { id:'hc_purple', name:'Purple', hex:'#A855F7' },
+  { id:'hc_pink', name:'Pink', hex:'#EC4899' },
+  { id:'hc_yellow', name:'Yellow', hex:'#EAB308' },
+  { id:'hc_white', name:'White', hex:'#E2E8F0' },
+  { id:'hc_black', name:'Charcoal', hex:'#475569' },
+  { id:'hc_teal', name:'Teal', hex:'#14B8A6' },
+  { id:'hc_cyan', name:'Cyan', hex:'#06B6D4' },
+  { id:'hc_gold', name:'Gold', hex:'#F59E0B' },
+];
 
 // Equipped state, synced via meta tab. Defaults applied if nothing equipped.
-let equipped = { paul:{ hat:'none', color:'default' }, cristina:{ hat:'none', color:'default' } };
+let equipped = { paul:{ hat:'none', color:'default', hatColor:'hc_default' }, cristina:{ hat:'none', color:'default', hatColor:'hc_default' } };
 let claims = {}; // { rewardName: 'paul'|'cristina' }
 let metaLoaded = false;
 
@@ -1383,14 +1404,14 @@ function renderHero() {
   leaderEl.innerHTML = leaderHtml;
 
   // Inject equipped boxer looks (only re-render if the look changed, to avoid flicker)
-  const pLook = (equipped.paul?.hat||'none') + '|' + (equipped.paul?.color||'default');
-  const cLook = (equipped.cristina?.hat||'none') + '|' + (equipped.cristina?.color||'default');
+  const pLook = (equipped.paul?.hat||'none') + '|' + (equipped.paul?.color||'default') + '|' + (equipped.paul?.hatColor||'hc_default');
+  const cLook = (equipped.cristina?.hat||'none') + '|' + (equipped.cristina?.color||'default') + '|' + (equipped.cristina?.hatColor||'hc_default');
   if (paulBox.dataset.look !== pLook) {
-    paulBox.innerHTML = getBoxerSVG('paul', equipped.paul?.hat||'none', equipped.paul?.color||'default');
+    paulBox.innerHTML = getBoxerSVG('paul', equipped.paul?.hat||'none', equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default');
     paulBox.dataset.look = pLook;
   }
   if (cristinaBox.dataset.look !== cLook) {
-    cristinaBox.innerHTML = getBoxerSVG('cristina', equipped.cristina?.hat||'none', equipped.cristina?.color||'default');
+    cristinaBox.innerHTML = getBoxerSVG('cristina', equipped.cristina?.hat||'none', equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default');
     cristinaBox.dataset.look = cLook;
   }
 }
@@ -1704,23 +1725,35 @@ function renderChampions() {
 // ══════════════════════════════════════════
 // RENDER WARDROBE
 // ══════════════════════════════════════════
-function getBoxerSVG(who, hatId, colorId) {
-  // Returns an SVG string for a boxer with the given color and hat accessory
+function darkenHex(hex, amount=45) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.max(0, (n>>16) - amount);
+  const g = Math.max(0, ((n>>8)&0xFF) - amount);
+  const b = Math.max(0, (n&0xFF) - amount);
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
   const colorDef = WARDROBE_COLORS.find(c=>c.id===colorId) || WARDROBE_COLORS[0];
   const bodyColor = colorDef.hex;
   const isC = who==='cristina';
   const skin = isC ? '#FFCCAA' : '#FF9966';
   const hair = isC ? '#4a1a00' : '#663300';
+  const hatColorDef = WARDROBE_HAT_COLORS.find(c=>c.id===hatColorId) || WARDROBE_HAT_COLORS[0];
+  const hc = hatColorDef.hex;
+  const hcDark = darkenHex(hc);
 
-  // Hat overlay SVG (positioned above head, y<0 area uses negative via viewBox shift)
   let hatSvg = '';
   switch(hatId) {
-    case 'tophat': hatSvg = '<rect x="4" y="-4" width="8" height="1" fill="#1a1a1a"/><rect x="5" y="-9" width="6" height="5" fill="#1a1a1a"/><rect x="5" y="-5" width="6" height="1" fill="#8B0000"/>'; break;
-    case 'cap': hatSvg = '<rect x="4" y="-3" width="8" height="2" fill="#2563EB"/><rect x="2" y="-1" width="4" height="1" fill="#1e40af"/>'; break;
-    case 'sunglasses': hatSvg = '<rect x="5" y="2" width="2" height="2" fill="#111"/><rect x="9" y="2" width="2" height="2" fill="#111"/><rect x="7" y="2" width="2" height="1" fill="#111"/>'; break;
-    case 'crown': hatSvg = '<rect x="4" y="-3" width="8" height="2" fill="#FFD700"/><rect x="4" y="-5" width="1" height="2" fill="#FFD700"/><rect x="7" y="-6" width="2" height="3" fill="#FFD700"/><rect x="11" y="-5" width="1" height="2" fill="#FFD700"/>'; break;
-    case 'goldgloves': hatSvg = ''; break; // handled via glove recolor below
-    case 'halo': hatSvg = '<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="#FFD700" stroke-width="0.8"/>'; break;
+    case 'tophat': hatSvg = `<rect x="4" y="-4" width="8" height="1" fill="${hc}"/><rect x="5" y="-9" width="6" height="5" fill="${hc}"/><rect x="5" y="-5" width="6" height="1" fill="${hcDark}"/>`; break;
+    case 'cap': hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="2" y="-1" width="4" height="1" fill="${hcDark}"/>`; break;
+    case 'sunglasses': hatSvg = `<rect x="5" y="2" width="2" height="2" fill="${hc}"/><rect x="9" y="2" width="2" height="2" fill="${hc}"/><rect x="7" y="2" width="2" height="1" fill="${hcDark}"/>`; break;
+    case 'crown': hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="4" y="-5" width="1" height="2" fill="${hc}"/><rect x="7" y="-6" width="2" height="3" fill="${hc}"/><rect x="11" y="-5" width="1" height="2" fill="${hc}"/>`; break;
+    case 'goldgloves': hatSvg = ''; break;
+    case 'halo': hatSvg = `<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="${hc}" stroke-width="0.8"/>`; break;
+    case 'devilhorns': hatSvg = `<rect x="5" y="-1" width="2" height="3" fill="${hc}"/><rect x="6" y="-5" width="1" height="4" fill="${hc}"/><rect x="9" y="-1" width="2" height="3" fill="${hc}"/><rect x="9" y="-5" width="1" height="4" fill="${hc}"/>`; break;
+    case 'angelwings': hatSvg = `<rect x="-2" y="5" width="2" height="7" fill="${hc}" opacity="0.9"/><rect x="-2" y="8" width="1" height="3" fill="${hcDark}" opacity="0.7"/><rect x="-1" y="4" width="1" height="2" fill="${hc}" opacity="0.8"/><rect x="14" y="5" width="2" height="7" fill="${hc}" opacity="0.9"/><rect x="15" y="8" width="1" height="3" fill="${hcDark}" opacity="0.7"/><rect x="14" y="4" width="1" height="2" fill="${hc}" opacity="0.8"/>`; break;
+    case 'hermesshoes': hatSvg = `<rect x="2" y="15" width="2" height="3" fill="${hc}"/><rect x="1" y="16" width="2" height="1" fill="${hc}" opacity="0.7"/><rect x="2" y="14" width="1" height="1" fill="${hcDark}" opacity="0.8"/><rect x="12" y="15" width="2" height="3" fill="${hc}"/><rect x="13" y="16" width="2" height="1" fill="${hc}" opacity="0.7"/><rect x="13" y="14" width="1" height="1" fill="${hcDark}" opacity="0.8"/>`; break;
   }
   const gloveColor = hatId==='goldgloves' ? '#FFD700' : bodyColor;
 
@@ -1767,7 +1800,7 @@ function renderWardrobe() {
   // Preview
   document.getElementById('wardrobe-preview').innerHTML =
     `<div style="display:inline-block;padding:20px 40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
-      <div style="width:90px;height:135px;margin:0 auto;">${getBoxerSVG(who, eq.hat, eq.color)}</div>
+      <div style="width:90px;height:135px;margin:0 auto;">${getBoxerSVG(who, eq.hat, eq.color, eq.hatColor||'hc_default')}</div>
       <div style="font-size:12px;color:var(--muted);margin-top:8px;">Your current look</div>
     </div>`;
 
@@ -1803,6 +1836,21 @@ function renderWardrobe() {
       <div class="wi-unlock">${owned?'Owned':c.threshold.toLocaleString()+' steps'}</div>
     </div>`;
   }).join('');
+
+  // Hat & Accessory Colours (all unlocked)
+  const hatColEl = document.getElementById('wardrobe-hat-colors');
+  if (hatColEl) {
+    hatColEl.innerHTML = WARDROBE_HAT_COLORS.map(c => {
+      const isEq = (eq.hatColor||'hc_default') === c.id;
+      const badge = isEq ? `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>` : '';
+      return `<div class="wardrobe-item owned ${isEq?'equipped '+eqClass:''}" onclick="equipItem('hatColor','${c.id}')">
+        ${badge}
+        <div class="wi-swatch" style="background:${c.hex};"></div>
+        <div class="wi-name">${c.name}</div>
+        <div class="wi-unlock">Owned</div>
+      </div>`;
+    }).join('');
+  }
 }
 
 async function equipItem(slot, id) {
