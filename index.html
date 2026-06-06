@@ -789,6 +789,7 @@ tr:hover td { background: var(--surface2); }
   <button class="nav-tab" onclick="showSection('records')">Records</button>
   <button class="nav-tab" onclick="showSection('champions')">Champions</button>
   <button class="nav-tab" onclick="showSection('wardrobe')">Wardrobe</button>
+  <button class="nav-tab" onclick="showSection('shop')">Shop</button>
   <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
   <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
@@ -871,6 +872,28 @@ tr:hover td { background: var(--surface2); }
     <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Hat & Accessory Colours</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">All unlocked — pick the colour for your hat or accessory.</div>
     <div id="wardrobe-hat-colors" class="wardrobe-grid"></div>
+    <!-- Seasonal cosmetics -->
+    <div style="margin-top:32px;" id="wardrobe-seasonal-section">
+      <div class="sec-head" style="margin-bottom:6px;">
+        <div class="sec-title" style="font-size:17px;">🗓️ Seasonal</div>
+        <div class="sec-meta" id="seasonal-countdown"></div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">One exclusive cosmetic per month. Miss it and it's gone until next year.</div>
+      <div id="wardrobe-seasonal" class="wardrobe-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══ SHOP ══ -->
+  <div id="section-shop" style="display:none">
+    <div class="sec-head" style="margin-bottom:6px;">
+      <div class="sec-title">Step Shop</div>
+      <div class="sec-meta" id="shop-balance-label">Sign in to see your balance</div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Spend your accumulated steps on cosmetics. Balance = total steps minus already-spent steps. Milestone unlocks (Wardrobe) and shop purchases are two separate paths.</div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">🥊 Gloves</div>
+    <div id="shop-gloves-grid" class="wardrobe-grid" style="margin-bottom:28px;"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">✨ Boxer Aura</div>
+    <div id="shop-bg-grid" class="wardrobe-grid"></div>
   </div>
 
   <!-- ══ MILESTONES ══ -->
@@ -1025,9 +1048,11 @@ async function loadMeta() {
     const json = await res.json();
     const rows = json.rows || [];
     // Reset to defaults then apply
-    const eq = { paul:{ hat:'none', color:'default' }, cristina:{ hat:'none', color:'default' } };
+    const eq = { paul:{ hat:'none', color:'default', hatColor:'hc_default', gloves:'none', background:'none' }, cristina:{ hat:'none', color:'default', hatColor:'hc_default', gloves:'none', background:'none' } };
     const cl = {}, ac = {}, lu = {};
     const bk = { paul:0, cristina:0, myVote:null };
+    const sp = { paul:0, cristina:0 };
+    const so = { paul:[], cristina:[] };
     const myId = getVoterId();
     for (let i=1; i<rows.length; i++) {
       const [type, person, key, value] = rows[i];
@@ -1040,8 +1065,10 @@ async function loadMeta() {
         else if (value==='cristina') bk.cristina++;
         if (person===myId) bk.myVote = value;
       }
+      else if (type==='spent' && (person==='paul'||person==='cristina')) { sp[person] = parseInt(value)||0; }
+      else if (type==='owns' && (person==='paul'||person==='cristina')) { if (!so[person].includes(key)) so[person].push(key); }
     }
-    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk;
+    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk; spent = sp; shopOwned = so;
     metaLoaded = true;
     // Persist locally as a fallback cache
     localStorage.setItem('steps_equipped', JSON.stringify(equipped));
@@ -1183,12 +1210,48 @@ const WARDROBE_HAT_COLORS = [
   { id:'hc_gold', name:'Gold', hex:'#F59E0B' },
 ];
 
+// ══════════════════════════════════════════
+// COSMETIC SHOP — spend steps on cosmetics
+// ══════════════════════════════════════════
+const SHOP_ITEMS = [
+  // Gloves slot
+  { id:'gloves_black',   slot:'gloves', icon:'🖤', name:'Shadow Gloves',   desc:'All-black. Very mysterious.',              hex:'#1e293b', price:15000 },
+  { id:'gloves_silver',  slot:'gloves', icon:'🥈', name:'Silver Gloves',   desc:'Metallic silver. Cool under pressure.',    hex:'#94A3B8', price:25000 },
+  { id:'gloves_neon',    slot:'gloves', icon:'⚡', name:'Neon Gloves',     desc:'Electric lime. Seen from space.',          hex:'#22C55E', price:35000 },
+  { id:'gloves_rainbow', slot:'gloves', icon:'🌈', name:'Rainbow Gloves',  desc:'Prismatic. Science cannot explain it.',    hex:'#EC4899', price:60000 },
+  // Background aura slot
+  { id:'bg_fire',   slot:'background', icon:'🔥', name:'Fire Aura',        desc:'Blazing orange glow.',                     hex:'#FF6B35', price:20000 },
+  { id:'bg_ice',    slot:'background', icon:'❄️', name:'Ice Aura',         desc:'Icy blue shimmer.',                        hex:'#06B6D4', price:20000 },
+  { id:'bg_storm',  slot:'background', icon:'⚡', name:'Storm Aura',       desc:'Crackling purple electricity.',            hex:'#A855F7', price:30000 },
+  { id:'bg_gold',   slot:'background', icon:'✨', name:'Champion Aura',    desc:'Golden prestige. For those who earned it.',hex:'#F59E0B', price:50000 },
+];
+
+// ══════════════════════════════════════════
+// SEASONAL COSMETICS — monthly exclusives
+// ══════════════════════════════════════════
+const SEASONAL = {
+  0:  { id:'s_crown',   icon:'👑', name:'Resolution Crown',  svgCase:'s_crown',   unlockDesc:'Win a week in January' },
+  1:  { id:'s_cupid',   icon:'💘', name:'Cupid Wings',       svgCase:'s_cupid',   unlockDesc:'Win a week in February' },
+  2:  { id:'s_clover',  icon:'🍀', name:'Lucky Clover',      svgCase:'s_clover',  unlockDesc:'Win a week in March' },
+  3:  { id:'s_bunny',   icon:'🐰', name:'Bunny Ears',        svgCase:'s_bunny',   unlockDesc:'Win a week in April' },
+  4:  { id:'s_flowers', icon:'🌸', name:'Flower Crown',      svgCase:'s_flowers', unlockDesc:'Win a week in May' },
+  5:  { id:'s_shades',  icon:'🕶️', name:'Summer Shades',    svgCase:'sunglasses',unlockDesc:'Win a week in June' },
+  6:  { id:'s_halo',    icon:'🎆', name:'Firework Halo',     svgCase:'halo',      unlockDesc:'Win a week in July' },
+  7:  { id:'s_sunhat',  icon:'☀️', name:'Sun Hat',           svgCase:'s_sunhat',  unlockDesc:'Win a week in August' },
+  8:  { id:'s_scholar', icon:'🎓', name:'Scholar Cap',       svgCase:'tophat',    unlockDesc:'Win a week in September' },
+  9:  { id:'s_pumpkin', icon:'🎃', name:'Pumpkin Head',      svgCase:'s_pumpkin', unlockDesc:'Win a week in October' },
+  10: { id:'s_antlers', icon:'🍂', name:'Autumn Antlers',    svgCase:'shamehorns',unlockDesc:'Win a week in November' },
+  11: { id:'s_santa',   icon:'🎅', name:'Santa Hat',         svgCase:'s_santa',   unlockDesc:'Win a week in December' },
+};
+
 // Equipped state, synced via meta tab. Defaults applied if nothing equipped.
-let equipped = { paul:{ hat:'none', color:'default', hatColor:'hc_default' }, cristina:{ hat:'none', color:'default', hatColor:'hc_default' } };
+let equipped = { paul:{ hat:'none', color:'default', hatColor:'hc_default', gloves:'none', background:'none' }, cristina:{ hat:'none', color:'default', hatColor:'hc_default', gloves:'none', background:'none' } };
 let claims = {}; // { rewardName: 'paul'|'cristina' }
 let achievementClaims = {}; // { achievementId: { paul: isoTimestamp, cristina: isoTimestamp } }
 let lastUpdated = {}; // { week_key: { person, iso } }
 let backers = { paul:0, cristina:0, myVote:null }; // public supporter tally
+let spent = { paul:0, cristina:0 }; // steps spent in cosmetic shop
+let shopOwned = { paul:[], cristina:[] }; // item ids owned (shop + seasonal)
 let metaLoaded = false;
 
 function getVoterId() {
@@ -1500,16 +1563,26 @@ function renderHero() {
   // Inject equipped boxer looks (only re-render if the look changed, to avoid flicker)
   const pEffHat = getEffectiveHat('paul');
   const cEffHat = getEffectiveHat('cristina');
-  const pLook = pEffHat + '|' + (equipped.paul?.color||'default') + '|' + (equipped.paul?.hatColor||'hc_default');
-  const cLook = cEffHat + '|' + (equipped.cristina?.color||'default') + '|' + (equipped.cristina?.hatColor||'hc_default');
+  const pGloves = equipped.paul?.gloves||'none';
+  const cGloves = equipped.cristina?.gloves||'none';
+  const pLook = [pEffHat, equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default', pGloves, equipped.paul?.background||'none'].join('|');
+  const cLook = [cEffHat, equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default', cGloves, equipped.cristina?.background||'none'].join('|');
   if (paulBox.dataset.look !== pLook) {
-    paulBox.innerHTML = getBoxerSVG('paul', pEffHat, equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default');
+    paulBox.innerHTML = getBoxerSVG('paul', pEffHat, equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default', pGloves);
     paulBox.dataset.look = pLook;
   }
   if (cristinaBox.dataset.look !== cLook) {
-    cristinaBox.innerHTML = getBoxerSVG('cristina', cEffHat, equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default');
+    cristinaBox.innerHTML = getBoxerSVG('cristina', cEffHat, equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default', cGloves);
     cristinaBox.dataset.look = cLook;
   }
+  // Apply background aura as a drop-shadow glow
+  ['paul','cristina'].forEach(who => {
+    const wrap = document.getElementById(`boxer-${who}-wrap`);
+    if (!wrap) return;
+    const bgId = equipped[who]?.background;
+    const bgItem = SHOP_ITEMS.find(i=>i.id===bgId&&i.slot==='background');
+    wrap.style.filter = bgItem ? `drop-shadow(0 0 8px ${bgItem.hex}) drop-shadow(0 0 18px ${bgItem.hex}66)` : '';
+  });
 }
 
 // ══════════════════════════════════════════
@@ -1843,6 +1916,98 @@ async function claimAchievement(id) {
   showToast('Achievement claimed ✓');
 }
 
+// ══════════════════════════════════════════
+// SHOP
+// ══════════════════════════════════════════
+function renderShop() {
+  const s = calcStats();
+  const who = currentUser;
+  const myTotal = who ? (who==='paul' ? s.paulTotal : s.cristinaTotal) : 0;
+  const mySpent = who ? (spent[who] || 0) : 0;
+  const balance = myTotal - mySpent;
+  const myOwned = who ? (shopOwned[who] || []) : [];
+  const eq = who ? (equipped[who] || {}) : {};
+
+  const balEl = document.getElementById('shop-balance-label');
+  if (balEl) balEl.textContent = who ? `Balance: ${balance.toLocaleString()} steps` : 'Sign in to see your balance';
+
+  function renderSlot(slotId, gridId) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    const slotItems = SHOP_ITEMS.filter(i=>i.slot===slotId);
+    const eqClass = who==='cristina' ? 'cristina-eq' : '';
+    grid.innerHTML = slotItems.map(item => {
+      const owned = myOwned.includes(item.id);
+      const isEq = eq[slotId] === item.id;
+      const canAfford = balance >= item.price;
+      const swatch = `<div style="width:28px;height:28px;border-radius:50%;background:${item.hex};border:2px solid rgba(255,255,255,0.15);margin:0 auto 6px;"></div>`;
+      let badge = '', action = '';
+      if (isEq) { badge = `<span class="wi-badge equipped-badge ${eqClass}">Worn</span>`; }
+      else if (!owned) { badge = `<span class="wi-badge locked-badge">${item.price.toLocaleString()} steps</span>`; }
+      if (owned && !isEq && who) {
+        action = `<button onclick="equipItem('${slotId}','${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Equip</button>`;
+      } else if (!owned && who && canAfford) {
+        action = `<button onclick="buyShopItem('${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Buy</button>`;
+      } else if (!owned && who && !canAfford) {
+        action = `<div style="margin-top:6px;font-size:10px;color:var(--muted2);">Need ${(item.price-balance).toLocaleString()} more steps</div>`;
+      }
+      return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}">
+        ${swatch}
+        <div class="wi-name">${item.icon} ${item.name}</div>
+        <div class="wi-desc" style="font-size:10px;color:var(--muted2);margin:3px 0;">${item.desc}</div>
+        ${badge}${action}
+      </div>`;
+    }).join('');
+  }
+  renderSlot('gloves', 'shop-gloves-grid');
+  renderSlot('background', 'shop-bg-grid');
+}
+
+async function buyShopItem(itemId) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  const item = SHOP_ITEMS.find(i=>i.id===itemId);
+  if (!item) return;
+  const s = calcStats();
+  const myTotal = currentUser==='paul' ? s.paulTotal : s.cristinaTotal;
+  const mySpent = spent[currentUser] || 0;
+  const balance = myTotal - mySpent;
+  if (balance < item.price) { showToast('Not enough steps!'); return; }
+  if ((shopOwned[currentUser]||[]).includes(itemId)) { showToast('Already owned!'); return; }
+  playClick();
+  // Optimistic update
+  if (!shopOwned[currentUser]) shopOwned[currentUser] = [];
+  shopOwned[currentUser].push(itemId);
+  spent[currentUser] = mySpent + item.price;
+  renderShop();
+  showToast(`${item.name} purchased! ✓`);
+  await writeMeta('owns', currentUser, itemId, '1');
+  await writeMeta('spent', currentUser, 'total', String(spent[currentUser]));
+}
+
+// ══════════════════════════════════════════
+// SEASONAL COSMETICS
+// ══════════════════════════════════════════
+function hasWonThisMonth(who) {
+  const now = new Date();
+  return allWeeksFlat.some(w => {
+    if (w.year !== now.getFullYear() || w.month !== now.getMonth()) return false;
+    const d = DB[w.key]||{};
+    return who==='paul' ? (d.paul||0)>(d.cristina||0) : (d.cristina||0)>(d.paul||0);
+  });
+}
+
+async function unlockSeasonal(seasonalId) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  if ((shopOwned[currentUser]||[]).includes(seasonalId)) { showToast('Already owned!'); return; }
+  if (!hasWonThisMonth(currentUser)) { showToast('Win a week this month first!'); return; }
+  playClick();
+  if (!shopOwned[currentUser]) shopOwned[currentUser] = [];
+  shopOwned[currentUser].push(seasonalId);
+  renderWardrobe();
+  showToast('Seasonal item unlocked! ✓');
+  await writeMeta('owns', currentUser, seasonalId, '1');
+}
+
 // ── Relative time helper ──
 function timeAgo(iso) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -2017,9 +2182,10 @@ function darkenHex(hex, amount=45) {
   return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
-function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
+function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default', glovesId='none') {
   const colorDef = WARDROBE_COLORS.find(c=>c.id===colorId) || WARDROBE_COLORS[0];
   const bodyColor = colorDef.hex;
+  const glovesItem = SHOP_ITEMS.find(i=>i.id===glovesId&&i.slot==='gloves');
   const isC = who==='cristina';
   const skin = isC ? '#FFCCAA' : '#FF9966';
   const hair = isC ? '#4a1a00' : '#663300';
@@ -2194,8 +2360,72 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
         `<rect x="12" y="-4" width="1" height="1" fill="#95d5b2" opacity="0.4"/>` +
         `<rect x="10" y="-5" width="1" height="1" fill="#b7e4c7" opacity="0.3"/>`;
       break;
+
+    // ── SEASONAL SVG cases ──
+    case 's_crown':   // Resolution Crown — gold crown, same geometry as regular crown
+      hatSvg = `<rect x="4" y="-1" width="8" height="2" fill="#F59E0B"/><rect x="4" y="-3" width="1" height="2" fill="#F59E0B"/><rect x="7" y="-4" width="2" height="3" fill="#F59E0B"/><rect x="11" y="-3" width="1" height="2" fill="#F59E0B"/>`;
+      break;
+    case 's_cupid':   // Cupid Wings — rosy pink, simpler than ascension wings
+      hatSvg =
+        `<rect x="-1" y="1" width="5" height="4" fill="#F9A8D4"/>` +
+        `<rect x="-3" y="0" width="4" height="3" fill="#FBCFE8"/>` +
+        `<rect x="-4" y="-2" width="3" height="3" fill="#FDF2F8" opacity="0.9"/>` +
+        `<rect x="12" y="1" width="5" height="4" fill="#F9A8D4"/>` +
+        `<rect x="15" y="0" width="4" height="3" fill="#FBCFE8"/>` +
+        `<rect x="17" y="-2" width="3" height="3" fill="#FDF2F8" opacity="0.9"/>`;
+      break;
+    case 's_clover':  // Lucky Clover — three-leaf on a short stem
+      hatSvg =
+        `<rect x="7" y="-2" width="2" height="3" fill="#16A34A"/>` +
+        `<rect x="5" y="-5" width="3" height="3" fill="#22C55E"/>` +
+        `<rect x="8" y="-5" width="3" height="3" fill="#22C55E"/>` +
+        `<rect x="6" y="-7" width="4" height="3" fill="#22C55E"/>` +
+        `<rect x="7" y="-6" width="2" height="2" fill="#4ADE80" opacity="0.6"/>`;
+      break;
+    case 's_bunny':   // Bunny Ears — tall white ears with pink inner
+      hatSvg =
+        `<rect x="5" y="-8" width="3" height="8" fill="#F1F5F9"/>` +
+        `<rect x="6" y="-7" width="1" height="6" fill="#FDA4AF"/>` +
+        `<rect x="9" y="-8" width="3" height="8" fill="#F1F5F9"/>` +
+        `<rect x="10" y="-7" width="1" height="6" fill="#FDA4AF"/>`;
+      break;
+    case 's_flowers': // Flower Crown — leafy band + colourful blooms
+      hatSvg =
+        `<rect x="3" y="-1" width="10" height="2" fill="#92400E"/>` +
+        `<rect x="4" y="-3" width="2" height="2" fill="#EC4899"/>` +
+        `<rect x="5" y="-2" width="1" height="1" fill="#FFF" opacity="0.8"/>` +
+        `<rect x="7" y="-4" width="2" height="3" fill="#EAB308"/>` +
+        `<rect x="8" y="-3" width="1" height="1" fill="#FFF" opacity="0.8"/>` +
+        `<rect x="10" y="-3" width="2" height="2" fill="#EC4899"/>` +
+        `<rect x="11" y="-2" width="1" height="1" fill="#FFF" opacity="0.8"/>`;
+      break;
+    case 's_sunhat':  // Sun Hat — wide-brimmed summer hat, hc-coloured
+      hatSvg =
+        `<rect x="2" y="0" width="12" height="1" fill="${hcDark}"/>` +
+        `<rect x="4" y="-2" width="8" height="2" fill="${hc}"/>` +
+        `<rect x="4" y="-1" width="8" height="1" fill="${hcDark}" opacity="0.5"/>`;
+      break;
+    case 's_pumpkin': // Pumpkin Head — orange jack-o-lantern, covers/replaces head
+      hatSvg =
+        `<rect x="4" y="-1" width="8" height="5" fill="#EA580C"/>` +
+        `<rect x="3" y="0" width="2" height="3" fill="#C2410C"/>` +
+        `<rect x="11" y="0" width="2" height="3" fill="#C2410C"/>` +
+        `<rect x="6" y="1" width="1" height="1" fill="#431407"/>` +
+        `<rect x="9" y="1" width="1" height="1" fill="#431407"/>` +
+        `<rect x="6" y="3" width="4" height="1" fill="#431407"/>` +
+        `<rect x="7" y="-2" width="2" height="2" fill="#16A34A"/>`;
+      break;
+    case 's_santa':   // Santa Hat — red, tilted, white brim + pom
+      hatSvg =
+        `<rect x="3" y="0" width="10" height="1" fill="#F1F5F9"/>` +
+        `<rect x="4" y="-2" width="8" height="2" fill="#DC2626"/>` +
+        `<rect x="5" y="-4" width="6" height="2" fill="#DC2626"/>` +
+        `<rect x="7" y="-6" width="4" height="2" fill="#DC2626"/>` +
+        `<rect x="9" y="-8" width="2" height="2" fill="#DC2626"/>` +
+        `<rect x="10" y="-9" width="2" height="2" fill="#F8FAFC"/>`;
+      break;
   }
-  const gloveColor = hatId==='goldgloves' ? '#FFD700' : bodyColor;
+  const gloveColor = hatId==='goldgloves' ? '#FFD700' : (glovesItem ? glovesItem.hex : bodyColor);
 
   return `<svg class="boxer-svg-inner" viewBox="-6 -12 28 36" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%;display:block;">
     ${hatSvg}
@@ -2243,7 +2473,7 @@ function renderWardrobe() {
   // Preview
   document.getElementById('wardrobe-preview').innerHTML =
     `<div style="display:inline-block;padding:20px 40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
-      <div style="width:108px;height:162px;margin:0 auto;">${getBoxerSVG(who, previewHat, eq.color, eq.hatColor||'hc_default')}</div>
+      <div style="width:108px;height:162px;margin:0 auto;">${getBoxerSVG(who, previewHat, eq.color, eq.hatColor||'hc_default', eq.gloves||'none')}</div>
       <div style="font-size:12px;color:var(--muted);margin-top:8px;">Your current look</div>
       ${meWd.shameWeek ? '<div style="font-size:11px;color:#E25B5B;font-weight:600;margin-top:5px;">🍄 Putregai active — walk 20K+ steps to break the curse</div>' : ''}
     </div>`;
@@ -2295,6 +2525,42 @@ function renderWardrobe() {
         <div class="wi-unlock">Owned</div>
       </div>`;
     }).join('');
+  }
+
+  // ── Seasonal cosmetics ──
+  const now = new Date();
+  const curMonth = now.getMonth();
+  const seasonal = SEASONAL[curMonth];
+  const daysLeft = new Date(now.getFullYear(), curMonth+1, 0).getDate() - now.getDate();
+  const countdownEl = document.getElementById('seasonal-countdown');
+  if (countdownEl) countdownEl.textContent = `${daysLeft} day${daysLeft!==1?'s':''} left this month`;
+
+  const seasonalEl = document.getElementById('wardrobe-seasonal');
+  if (seasonalEl && seasonal) {
+    const owned = (shopOwned[who]||[]).includes(seasonal.id);
+    const isEq = (eq.hat||'none') === seasonal.id;
+    const wonMonth = who ? hasWonThisMonth(who) : false;
+    const canUnlock = !owned && wonMonth;
+    let badge = '';
+    if (isEq) badge = `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>`;
+    else if (!owned) badge = `<span style="font-size:9px;font-weight:700;background:#92400E;color:#FCD34D;padding:2px 6px;border-radius:8px;letter-spacing:0.5px;text-transform:uppercase;">⏳ This month only</span>`;
+    let action = '';
+    if (owned && !isEq && who) {
+      action = `<button onclick="equipItem('hat','${seasonal.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Equip</button>`;
+    } else if (canUnlock) {
+      action = `<button onclick="unlockSeasonal('${seasonal.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim!</button>`;
+    } else if (!owned) {
+      action = `<div style="font-size:10px;color:var(--muted2);margin-top:4px;">${wonMonth?'Win a week this month to claim':'Win a week this month first'}</div>`;
+    }
+    seasonalEl.innerHTML = `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}">
+      ${badge}
+      <div class="wi-icon" style="font-size:28px;text-align:center;margin:4px 0;">${seasonal.icon}</div>
+      <div class="wi-name">${seasonal.name}</div>
+      <div style="font-size:10px;color:var(--muted2);margin:3px 0;">${seasonal.unlockDesc}</div>
+      ${action}
+    </div>`;
+  } else if (seasonalEl) {
+    seasonalEl.innerHTML = '<div style="color:var(--muted);font-size:13px;">No seasonal item this month.</div>';
   }
 }
 
@@ -2363,7 +2629,7 @@ function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
 
 function showSection(name) {
   playClick();
-  ['weekly','records','champions','wardrobe','milestones','rewards','history'].forEach(s => {
+  ['weekly','records','champions','wardrobe','shop','milestones','rewards','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
@@ -2372,6 +2638,7 @@ function showSection(name) {
   if (name==='records') renderRecords();
   if (name==='champions') renderChampions();
   if (name==='wardrobe') renderWardrobe();
+  if (name==='shop') renderShop();
   if (name==='milestones') renderMilestones();
   if (name==='rewards') renderRewards();
   if (name==='history') renderHistory();
