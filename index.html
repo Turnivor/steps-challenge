@@ -1902,16 +1902,20 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
   const hcDark = darkenHex(hc);
 
   let hatSvg = '';
+  let overlaySvg = ''; // rendered on top of the body (for glasses etc.)
   switch(hatId) {
     case 'tophat':
-      hatSvg = `<rect x="4" y="-4" width="8" height="1" fill="${hc}"/><rect x="5" y="-9" width="6" height="5" fill="${hc}"/><rect x="5" y="-5" width="6" height="1" fill="${hcDark}"/>`;
+      // shifted down 2px so brim sits on head
+      hatSvg = `<rect x="4" y="-2" width="8" height="1" fill="${hc}"/><rect x="5" y="-7" width="6" height="5" fill="${hc}"/><rect x="5" y="-3" width="6" height="1" fill="${hcDark}"/>`;
       break;
     case 'cap':
-      hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="2" y="-1" width="4" height="1" fill="${hcDark}"/>`;
+      // shifted down 2px so peak lands on head
+      hatSvg = `<rect x="4" y="-1" width="8" height="2" fill="${hc}"/><rect x="2" y="1" width="4" height="1" fill="${hcDark}"/>`;
       break;
     case 'sunglasses':
-      // Comically oversized aviators — dark frames, hc tinted lenses, arms fly out past the face
-      hatSvg =
+      // Comically oversized aviators — rendered in overlay so they sit IN FRONT of the face
+      // Dark frames always, fully opaque hc lenses, arms fly out past the face
+      overlaySvg =
         // Side arms
         `<rect x="-4" y="1" width="5" height="1" fill="#444"/>` +
         `<rect x="15" y="1" width="5" height="1" fill="#444"/>` +
@@ -1923,51 +1927,53 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
         `<rect x="11" y="5" width="3" height="1" fill="#111"/>` +
         // Bridge
         `<rect x="7" y="1" width="2" height="2" fill="#111"/>` +
-        // Left lens tint (inset)
-        `<rect x="1" y="1" width="5" height="3" fill="${hc}" opacity="0.55"/>` +
-        `<rect x="2" y="4" width="3" height="1" fill="${hc}" opacity="0.45"/>` +
-        `<rect x="2" y="5" width="3" height="1" fill="${hc}" opacity="0.3"/>` +
-        // Right lens tint (inset)
-        `<rect x="10" y="1" width="5" height="3" fill="${hc}" opacity="0.55"/>` +
-        `<rect x="11" y="4" width="3" height="1" fill="${hc}" opacity="0.45"/>` +
-        `<rect x="11" y="5" width="3" height="1" fill="${hc}" opacity="0.3"/>`;
+        // Left lens — fully opaque hc colour
+        `<rect x="1" y="1" width="5" height="3" fill="${hc}"/>` +
+        `<rect x="2" y="4" width="3" height="1" fill="${hc}"/>` +
+        `<rect x="2" y="5" width="3" height="1" fill="${hc}"/>` +
+        // Right lens — fully opaque hc colour
+        `<rect x="10" y="1" width="5" height="3" fill="${hc}"/>` +
+        `<rect x="11" y="4" width="3" height="1" fill="${hc}"/>` +
+        `<rect x="11" y="5" width="3" height="1" fill="${hc}"/>`;
       break;
     case 'crown':
-      hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="4" y="-5" width="1" height="2" fill="${hc}"/><rect x="7" y="-6" width="2" height="3" fill="${hc}"/><rect x="11" y="-5" width="1" height="2" fill="${hc}"/>`;
+      // shifted down 2px
+      hatSvg = `<rect x="4" y="-1" width="8" height="2" fill="${hc}"/><rect x="4" y="-3" width="1" height="2" fill="${hc}"/><rect x="7" y="-4" width="2" height="3" fill="${hc}"/><rect x="11" y="-3" width="1" height="2" fill="${hc}"/>`;
       break;
     case 'goldgloves':
       hatSvg = '';
       break;
     case 'halo':
-      hatSvg = `<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="${hc}" stroke-width="0.8"/>`;
+      // shifted down 2px
+      hatSvg = `<ellipse cx="8" cy="-1" rx="4" ry="1.2" fill="none" stroke="${hc}" stroke-width="0.8"/>`;
       break;
     case 'shamehorns':
-      // Wide droopy buffalo-style horns — sweep outward then curl down
+      // Wide droopy buffalo-style horns — shifted down 2px so they root on the head
       hatSvg =
-        `<rect x="4" y="-2" width="2" height="2" fill="${hc}"/>` +
-        `<rect x="2" y="-1" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="0" y="0" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="-2" y="1" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="-4" y="2" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="-3" y="3" width="2" height="1" fill="${hcDark}"/>` +
-        `<rect x="10" y="-2" width="2" height="2" fill="${hc}"/>` +
-        `<rect x="11" y="-1" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="13" y="0" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="15" y="1" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="17" y="2" width="3" height="2" fill="${hc}"/>` +
-        `<rect x="17" y="3" width="2" height="1" fill="${hcDark}"/>`;
+        `<rect x="4" y="0" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="2" y="1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="0" y="2" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-2" y="3" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-4" y="4" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-3" y="5" width="2" height="1" fill="${hcDark}"/>` +
+        `<rect x="10" y="0" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="11" y="1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="13" y="2" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="15" y="3" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="17" y="4" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="17" y="5" width="2" height="1" fill="${hcDark}"/>`;
       break;
     case 'villainhorns':
-      // Sharp upward spikes — absolute villain energy
+      // Sharp upward spikes — shifted down 2px so base roots on head
       hatSvg =
-        `<rect x="5" y="-1" width="2" height="2" fill="${hc}"/>` +
-        `<rect x="5" y="-5" width="2" height="4" fill="${hc}"/>` +
-        `<rect x="6" y="-8" width="1" height="3" fill="${hc}"/>` +
-        `<rect x="5" y="-4" width="1" height="1" fill="${hcDark}" opacity="0.6"/>` +
-        `<rect x="9" y="-1" width="2" height="2" fill="${hc}"/>` +
-        `<rect x="9" y="-5" width="2" height="4" fill="${hc}"/>` +
-        `<rect x="9" y="-8" width="1" height="3" fill="${hc}"/>` +
-        `<rect x="10" y="-4" width="1" height="1" fill="${hcDark}" opacity="0.6"/>`;
+        `<rect x="5" y="1" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="5" y="-3" width="2" height="4" fill="${hc}"/>` +
+        `<rect x="6" y="-6" width="1" height="3" fill="${hc}"/>` +
+        `<rect x="5" y="-2" width="1" height="1" fill="${hcDark}" opacity="0.6"/>` +
+        `<rect x="9" y="1" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="9" y="-3" width="2" height="4" fill="${hc}"/>` +
+        `<rect x="9" y="-6" width="1" height="3" fill="${hc}"/>` +
+        `<rect x="10" y="-2" width="1" height="1" fill="${hcDark}" opacity="0.6"/>`;
       break;
     case 'heavenlywings':
       // Golden wings — always gold regardless of hat colour picker
@@ -2079,6 +2085,7 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
     <rect x="5" y="14" width="2" height="4" fill="${skin}"/><rect x="9" y="14" width="2" height="4" fill="${skin}"/>
     <rect x="4" y="17" width="4" height="2" fill="#333"/><rect x="8" y="17" width="4" height="2" fill="#333"/>
     <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
+    ${overlaySvg}
   </svg>`;
 }
 
