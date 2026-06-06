@@ -149,7 +149,7 @@ body {
 .fighter-wrap { position: relative; }
 
 /* PIXEL ART BOXER — pure CSS/SVG inline */
-.boxer-canvas { width: 64px; height: 96px; display: block; image-rendering: pixelated; }
+.boxer-canvas { width: 72px; height: 108px; display: block; image-rendering: pixelated; }
 
 /* Fighter info */
 .fighter-info { display: flex; flex-direction: column; }
@@ -451,7 +451,7 @@ tr:hover td { background: var(--surface2); }
   .wrap { padding: 24px 16px; }
   .arena { grid-template-columns: 1fr 70px 1fr; gap: 0; }
   .f-score { font-size: 30px; }
-  .boxer-canvas { width: 40px; height: 60px; }
+  .boxer-canvas { width: 44px; height: 66px; }
   .nav-tab { padding: 11px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
   .champ-card { flex-wrap: wrap; gap: 12px; }
   .champ-scores { width: 100%; justify-content: flex-start; }
@@ -847,7 +847,7 @@ tr:hover td { background: var(--surface2); }
       <div class="sec-title">Wardrobe</div>
       <div class="sec-meta" id="wardrobe-who-label">–</div>
     </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Earn hats by hitting milestones and unlock a new colour every 20,000 steps. Tap an owned item to wear it. Your look syncs so the other player sees it too.</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Earn hats & accessories by hitting milestones. Unlock suit colours every 20,000 steps. All hat & accessory colours are free. Beware the Putregai 🥔 — it auto-equips if you log under 20K steps in a week.</div>
     <div id="wardrobe-signin-note" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:13px;color:var(--muted);margin-bottom:18px;">Sign in (top right) to choose and save your boxer's look.</div>
     <div id="wardrobe-preview" style="text-align:center;margin-bottom:24px;"></div>
     <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Hats & Accessories</div>
@@ -1039,17 +1039,25 @@ function buildMe(who) {
   const total = who==='paul' ? s.paulTotal : s.cristinaTotal;
   const wins = who==='paul' ? s.paulWins : s.cristinaWins;
   const streak = who==='paul' ? s.paulStreak : s.cristinaStreak;
-  // big win = ever won a week by 10k+
-  let bigWin = false;
+  let bigWin = false, bigVillainWin = false, bestWeek = 0;
+  let losingStreak = 0, curLoseStreak = 0;
   allWeeksFlat.forEach(w => {
     const d = DB[w.key]||{};
+    const mySteps = d[who] || 0;
+    if (mySteps > bestWeek) bestWeek = mySteps;
     if (d.paul && d.cristina) {
-      const diff = d.paul - d.cristina;
-      if (who==='paul' && diff>=10000) bigWin=true;
-      if (who==='cristina' && -diff>=10000) bigWin=true;
+      const diff = who==='paul' ? d.paul - d.cristina : d.cristina - d.paul;
+      if (diff >= 10000) bigWin = true;
+      if (diff >= 15000) bigVillainWin = true;
+      if (diff < 0) { curLoseStreak++; if (curLoseStreak > losingStreak) losingStreak = curLoseStreak; }
+      else curLoseStreak = 0;
     }
   });
-  return { total, wins, streak, bigWin };
+  const bothAt100k = s.paulTotal >= 100000 && s.cristinaTotal >= 100000;
+  const myWeeks = allWeeksFlat.filter(w => DB[w.key] && DB[w.key][who] != null);
+  const lastWeek = myWeeks[myWeeks.length - 1];
+  const shameWeek = !!(lastWeek && (DB[lastWeek.key][who]||0) > 0 && (DB[lastWeek.key][who]||0) < 20000);
+  return { total, wins, streak, bigWin, bigVillainWin, losingStreak, bothAt100k, bestWeek, shameWeek };
 }
 
 function ownedHats(who) { const me=buildMe(who); return WARDROBE_HATS.filter(h=>h.check(me)); }
@@ -1087,9 +1095,12 @@ const WARDROBE_HATS = [
   { id:'crown', icon:'👑', name:'Crown', unlock:'Win 3 weeks in a row', check:(me)=>me.streak>=3 },
   { id:'goldgloves', icon:'🥊', name:'Golden Gloves', unlock:'Reach 250K total steps', check:(me)=>me.total>=250000 },
   { id:'halo', icon:'😇', name:'Halo', unlock:'Reach 500K total steps', check:(me)=>me.total>=500000 },
-  { id:'devilhorns', icon:'😈', name:'Devil Horns', unlock:'Always available', check:()=>true },
-  { id:'angelwings', icon:'🤍', name:'Angel Wings', unlock:'Always available', check:()=>true },
-  { id:'hermesshoes', icon:'⚡', name:'Hermes Shoes', unlock:'Always available', check:()=>true },
+  { id:'shamehorns', icon:'😔', name:'Horns of Shame', unlock:'Lose 3 weeks in a row', check:(me)=>me.losingStreak>=3 },
+  { id:'villainhorns', icon:'😈', name:'Villain Horns', unlock:'Win a week by 15,000+ steps', check:(me)=>me.bigVillainWin },
+  { id:'heavenlywings', icon:'✨', name:'Heavenly Wings', unlock:'Win 5 weeks total', check:(me)=>me.wins>=5 },
+  { id:'ascentionwings', icon:'🤍', name:'Wings of Ascension', unlock:'Both players reach 100K steps together', check:(me)=>me.bothAt100k },
+  { id:'hermesshoes', icon:'⚡', name:'Hermes Shoes', unlock:'Hit 70,000 steps in a single week', check:(me)=>me.bestWeek>=70000 },
+  { id:'putregai', icon:'🥔', name:'Putregai', unlock:'Auto-equipped when you log under 20K steps in a week', check:(me)=>me.shameWeek },
 ];
 // Colours unlock every 20,000 total steps
 const WARDROBE_COLORS = [
@@ -1342,6 +1353,11 @@ function calcMonthlyChampions() {
   return champions;
 }
 
+function getEffectiveHat(who) {
+  if (buildMe(who).shameWeek) return 'putregai';
+  return equipped[who]?.hat || 'none';
+}
+
 // ══════════════════════════════════════════
 // RENDER HERO
 // ══════════════════════════════════════════
@@ -1404,14 +1420,16 @@ function renderHero() {
   leaderEl.innerHTML = leaderHtml;
 
   // Inject equipped boxer looks (only re-render if the look changed, to avoid flicker)
-  const pLook = (equipped.paul?.hat||'none') + '|' + (equipped.paul?.color||'default') + '|' + (equipped.paul?.hatColor||'hc_default');
-  const cLook = (equipped.cristina?.hat||'none') + '|' + (equipped.cristina?.color||'default') + '|' + (equipped.cristina?.hatColor||'hc_default');
+  const pEffHat = getEffectiveHat('paul');
+  const cEffHat = getEffectiveHat('cristina');
+  const pLook = pEffHat + '|' + (equipped.paul?.color||'default') + '|' + (equipped.paul?.hatColor||'hc_default');
+  const cLook = cEffHat + '|' + (equipped.cristina?.color||'default') + '|' + (equipped.cristina?.hatColor||'hc_default');
   if (paulBox.dataset.look !== pLook) {
-    paulBox.innerHTML = getBoxerSVG('paul', equipped.paul?.hat||'none', equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default');
+    paulBox.innerHTML = getBoxerSVG('paul', pEffHat, equipped.paul?.color||'default', equipped.paul?.hatColor||'hc_default');
     paulBox.dataset.look = pLook;
   }
   if (cristinaBox.dataset.look !== cLook) {
-    cristinaBox.innerHTML = getBoxerSVG('cristina', equipped.cristina?.hat||'none', equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default');
+    cristinaBox.innerHTML = getBoxerSVG('cristina', cEffHat, equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default');
     cristinaBox.dataset.look = cLook;
   }
 }
@@ -1745,19 +1763,153 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default') {
 
   let hatSvg = '';
   switch(hatId) {
-    case 'tophat': hatSvg = `<rect x="4" y="-4" width="8" height="1" fill="${hc}"/><rect x="5" y="-9" width="6" height="5" fill="${hc}"/><rect x="5" y="-5" width="6" height="1" fill="${hcDark}"/>`; break;
-    case 'cap': hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="2" y="-1" width="4" height="1" fill="${hcDark}"/>`; break;
-    case 'sunglasses': hatSvg = `<rect x="5" y="2" width="2" height="2" fill="${hc}"/><rect x="9" y="2" width="2" height="2" fill="${hc}"/><rect x="7" y="2" width="2" height="1" fill="${hcDark}"/>`; break;
-    case 'crown': hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="4" y="-5" width="1" height="2" fill="${hc}"/><rect x="7" y="-6" width="2" height="3" fill="${hc}"/><rect x="11" y="-5" width="1" height="2" fill="${hc}"/>`; break;
-    case 'goldgloves': hatSvg = ''; break;
-    case 'halo': hatSvg = `<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="${hc}" stroke-width="0.8"/>`; break;
-    case 'devilhorns': hatSvg = `<rect x="5" y="-1" width="2" height="3" fill="${hc}"/><rect x="6" y="-5" width="1" height="4" fill="${hc}"/><rect x="9" y="-1" width="2" height="3" fill="${hc}"/><rect x="9" y="-5" width="1" height="4" fill="${hc}"/>`; break;
-    case 'angelwings': hatSvg = `<rect x="-2" y="5" width="2" height="7" fill="${hc}" opacity="0.9"/><rect x="-2" y="8" width="1" height="3" fill="${hcDark}" opacity="0.7"/><rect x="-1" y="4" width="1" height="2" fill="${hc}" opacity="0.8"/><rect x="14" y="5" width="2" height="7" fill="${hc}" opacity="0.9"/><rect x="15" y="8" width="1" height="3" fill="${hcDark}" opacity="0.7"/><rect x="14" y="4" width="1" height="2" fill="${hc}" opacity="0.8"/>`; break;
-    case 'hermesshoes': hatSvg = `<rect x="2" y="15" width="2" height="3" fill="${hc}"/><rect x="1" y="16" width="2" height="1" fill="${hc}" opacity="0.7"/><rect x="2" y="14" width="1" height="1" fill="${hcDark}" opacity="0.8"/><rect x="12" y="15" width="2" height="3" fill="${hc}"/><rect x="13" y="16" width="2" height="1" fill="${hc}" opacity="0.7"/><rect x="13" y="14" width="1" height="1" fill="${hcDark}" opacity="0.8"/>`; break;
+    case 'tophat':
+      hatSvg = `<rect x="4" y="-4" width="8" height="1" fill="${hc}"/><rect x="5" y="-9" width="6" height="5" fill="${hc}"/><rect x="5" y="-5" width="6" height="1" fill="${hcDark}"/>`;
+      break;
+    case 'cap':
+      hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="2" y="-1" width="4" height="1" fill="${hcDark}"/>`;
+      break;
+    case 'sunglasses':
+      // Aviator style — dark frames always, hc tints the lens
+      hatSvg =
+        `<rect x="3" y="1" width="4" height="3" fill="#111"/>` +
+        `<rect x="4" y="4" width="2" height="1" fill="#111"/>` +
+        `<rect x="7" y="2" width="2" height="1" fill="#111"/>` +
+        `<rect x="9" y="1" width="4" height="3" fill="#111"/>` +
+        `<rect x="10" y="4" width="2" height="1" fill="#111"/>` +
+        `<rect x="2" y="2" width="1" height="1" fill="#444"/>` +
+        `<rect x="13" y="2" width="1" height="1" fill="#444"/>` +
+        `<rect x="3" y="1" width="4" height="3" fill="${hc}" opacity="0.55"/>` +
+        `<rect x="4" y="4" width="2" height="1" fill="${hc}" opacity="0.55"/>` +
+        `<rect x="9" y="1" width="4" height="3" fill="${hc}" opacity="0.55"/>` +
+        `<rect x="10" y="4" width="2" height="1" fill="${hc}" opacity="0.55"/>`;
+      break;
+    case 'crown':
+      hatSvg = `<rect x="4" y="-3" width="8" height="2" fill="${hc}"/><rect x="4" y="-5" width="1" height="2" fill="${hc}"/><rect x="7" y="-6" width="2" height="3" fill="${hc}"/><rect x="11" y="-5" width="1" height="2" fill="${hc}"/>`;
+      break;
+    case 'goldgloves':
+      hatSvg = '';
+      break;
+    case 'halo':
+      hatSvg = `<ellipse cx="8" cy="-3" rx="4" ry="1.2" fill="none" stroke="${hc}" stroke-width="0.8"/>`;
+      break;
+    case 'shamehorns':
+      // Wide droopy buffalo-style horns — sweep outward then curl down
+      hatSvg =
+        `<rect x="4" y="-2" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="2" y="-1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="0" y="0" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-2" y="1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-4" y="2" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="-3" y="3" width="2" height="1" fill="${hcDark}"/>` +
+        `<rect x="10" y="-2" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="11" y="-1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="13" y="0" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="15" y="1" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="17" y="2" width="3" height="2" fill="${hc}"/>` +
+        `<rect x="17" y="3" width="2" height="1" fill="${hcDark}"/>`;
+      break;
+    case 'villainhorns':
+      // Sharp upward spikes — absolute villain energy
+      hatSvg =
+        `<rect x="5" y="-1" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="5" y="-5" width="2" height="4" fill="${hc}"/>` +
+        `<rect x="6" y="-8" width="1" height="3" fill="${hc}"/>` +
+        `<rect x="5" y="-4" width="1" height="1" fill="${hcDark}" opacity="0.6"/>` +
+        `<rect x="9" y="-1" width="2" height="2" fill="${hc}"/>` +
+        `<rect x="9" y="-5" width="2" height="4" fill="${hc}"/>` +
+        `<rect x="9" y="-8" width="1" height="3" fill="${hc}"/>` +
+        `<rect x="10" y="-4" width="1" height="1" fill="${hcDark}" opacity="0.6"/>`;
+      break;
+    case 'heavenlywings':
+      // Golden wings — always gold regardless of hat colour picker
+      // Plus a golden halo ring above the head
+      hatSvg =
+        // ── Left wing ──
+        `<rect x="0" y="3" width="5" height="5" fill="#F59E0B"/>` +
+        `<rect x="-1" y="2" width="4" height="3" fill="#FFD700"/>` +
+        `<rect x="-1" y="5" width="4" height="1" fill="#D97706" opacity="0.5"/>` +
+        `<rect x="-3" y="-1" width="5" height="5" fill="#FFD700"/>` +
+        `<rect x="-4" y="0" width="3" height="3" fill="#FFF176"/>` +
+        `<rect x="-3" y="2" width="4" height="1" fill="#D97706" opacity="0.4"/>` +
+        `<rect x="-5" y="-5" width="5" height="5" fill="#FFF176"/>` +
+        `<rect x="-5" y="-4" width="2" height="3" fill="#FFFDE7"/>` +
+        `<rect x="-5" y="-3" width="4" height="1" fill="#FCD34D" opacity="0.4"/>` +
+        `<rect x="-5" y="-9" width="3" height="5" fill="#FFFDE7"/>` +
+        `<rect x="-6" y="-8" width="2" height="3" fill="#FFF9C4"/>` +
+        `<rect x="-4" y="-10" width="2" height="2" fill="#FFFFFF" opacity="0.9"/>` +
+        `<rect x="-3" y="-8" width="1" height="1" fill="#FFFFFF" opacity="0.9"/>` +
+        `<rect x="-6" y="-5" width="1" height="1" fill="#FFF9C4" opacity="0.8"/>` +
+        `<rect x="0" y="-3" width="1" height="1" fill="#FFF176" opacity="0.7"/>` +
+        // ── Right wing ──
+        `<rect x="11" y="3" width="5" height="5" fill="#F59E0B"/>` +
+        `<rect x="13" y="2" width="4" height="3" fill="#FFD700"/>` +
+        `<rect x="13" y="5" width="4" height="1" fill="#D97706" opacity="0.5"/>` +
+        `<rect x="14" y="-1" width="5" height="5" fill="#FFD700"/>` +
+        `<rect x="17" y="0" width="3" height="3" fill="#FFF176"/>` +
+        `<rect x="15" y="2" width="4" height="1" fill="#D97706" opacity="0.4"/>` +
+        `<rect x="16" y="-5" width="5" height="5" fill="#FFF176"/>` +
+        `<rect x="19" y="-4" width="2" height="3" fill="#FFFDE7"/>` +
+        `<rect x="17" y="-3" width="4" height="1" fill="#FCD34D" opacity="0.4"/>` +
+        `<rect x="18" y="-9" width="3" height="5" fill="#FFFDE7"/>` +
+        `<rect x="20" y="-8" width="2" height="3" fill="#FFF9C4"/>` +
+        `<rect x="18" y="-10" width="2" height="2" fill="#FFFFFF" opacity="0.9"/>` +
+        `<rect x="18" y="-8" width="1" height="1" fill="#FFFFFF" opacity="0.9"/>` +
+        `<rect x="21" y="-5" width="1" height="1" fill="#FFF9C4" opacity="0.8"/>` +
+        `<rect x="14" y="-3" width="1" height="1" fill="#FFF176" opacity="0.7"/>` +
+        // ── Halo ring ──
+        `<ellipse cx="8" cy="-3" rx="5" ry="1.5" fill="none" stroke="#FFD700" stroke-width="1.2"/>` +
+        `<ellipse cx="8" cy="-3" rx="5" ry="1.5" fill="none" stroke="#FFF176" stroke-width="0.5" opacity="0.8"/>`;
+      break;
+    case 'ascentionwings':
+      // White/silver wings — decent but clearly lesser than heavenly
+      hatSvg =
+        `<rect x="0" y="3" width="4" height="5" fill="#CBD5E1"/>` +
+        `<rect x="-1" y="2" width="3" height="3" fill="#E2E8F0"/>` +
+        `<rect x="-2" y="-1" width="4" height="5" fill="#E2E8F0"/>` +
+        `<rect x="-4" y="-5" width="4" height="5" fill="#F1F5F9"/>` +
+        `<rect x="-4" y="-8" width="3" height="4" fill="#F8FAFC"/>` +
+        `<rect x="-1" y="4" width="3" height="1" fill="#94A3B8" opacity="0.5"/>` +
+        `<rect x="-3" y="1" width="3" height="1" fill="#94A3B8" opacity="0.4"/>` +
+        `<rect x="12" y="3" width="4" height="5" fill="#CBD5E1"/>` +
+        `<rect x="14" y="2" width="3" height="3" fill="#E2E8F0"/>` +
+        `<rect x="14" y="-1" width="4" height="5" fill="#E2E8F0"/>` +
+        `<rect x="16" y="-5" width="4" height="5" fill="#F1F5F9"/>` +
+        `<rect x="17" y="-8" width="3" height="4" fill="#F8FAFC"/>` +
+        `<rect x="14" y="4" width="3" height="1" fill="#94A3B8" opacity="0.5"/>` +
+        `<rect x="16" y="1" width="3" height="1" fill="#94A3B8" opacity="0.4"/>`;
+      break;
+    case 'hermesshoes':
+      // Wing tabs on sides of shoes
+      hatSvg =
+        `<rect x="2" y="13" width="3" height="3" fill="${hc}"/>` +
+        `<rect x="1" y="14" width="2" height="2" fill="${hcDark}" opacity="0.7"/>` +
+        `<rect x="3" y="11" width="2" height="2" fill="${hc}" opacity="0.8"/>` +
+        `<rect x="3" y="10" width="1" height="1" fill="${hc}" opacity="0.5"/>` +
+        `<rect x="11" y="13" width="3" height="3" fill="${hc}"/>` +
+        `<rect x="13" y="14" width="2" height="2" fill="${hcDark}" opacity="0.7"/>` +
+        `<rect x="11" y="11" width="2" height="2" fill="${hc}" opacity="0.8"/>` +
+        `<rect x="12" y="10" width="1" height="1" fill="${hc}" opacity="0.5"/>`;
+      break;
+    case 'putregai':
+      // Green mold patch on shoulder with rising spores — always green, forced shame item
+      hatSvg =
+        `<rect x="11" y="4" width="3" height="2" fill="#2d6a4f"/>` +
+        `<rect x="12" y="3" width="2" height="1" fill="#40916c"/>` +
+        `<rect x="10" y="3" width="1" height="2" fill="#1b4332"/>` +
+        `<rect x="13" y="2" width="1" height="2" fill="#2d6a4f"/>` +
+        `<rect x="10" y="1" width="1" height="1" fill="#52b788" opacity="0.9"/>` +
+        `<rect x="13" y="0" width="1" height="1" fill="#40916c" opacity="0.8"/>` +
+        `<rect x="11" y="-1" width="1" height="1" fill="#52b788" opacity="0.7"/>` +
+        `<rect x="14" y="-2" width="1" height="1" fill="#74c69d" opacity="0.6"/>` +
+        `<rect x="9" y="-2" width="1" height="1" fill="#74c69d" opacity="0.5"/>` +
+        `<rect x="12" y="-4" width="1" height="1" fill="#95d5b2" opacity="0.4"/>` +
+        `<rect x="10" y="-5" width="1" height="1" fill="#b7e4c7" opacity="0.3"/>`;
+      break;
   }
   const gloveColor = hatId==='goldgloves' ? '#FFD700' : bodyColor;
 
-  return `<svg class="boxer-svg-inner" viewBox="-2 -10 20 30" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%;display:block;">
+  return `<svg class="boxer-svg-inner" viewBox="-6 -12 28 36" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%;display:block;">
     ${hatSvg}
     <rect x="5" y="0" width="6" height="5" fill="${skin}"/>
     <rect x="4" y="1" width="1" height="3" fill="${skin}"/><rect x="11" y="1" width="1" height="3" fill="${skin}"/>
@@ -1796,20 +1948,24 @@ function renderWardrobe() {
   const ownedC = ownedColors(who).map(c=>c.id);
   const eqClass = who==='cristina' ? 'cristina-eq' : '';
   const badgeClass = who==='cristina' ? 'cristina-b' : '';
+  const meWd = buildMe(who);
+  const previewHat = meWd.shameWeek ? 'putregai' : (eq.hat||'none');
 
   // Preview
   document.getElementById('wardrobe-preview').innerHTML =
     `<div style="display:inline-block;padding:20px 40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
-      <div style="width:90px;height:135px;margin:0 auto;">${getBoxerSVG(who, eq.hat, eq.color, eq.hatColor||'hc_default')}</div>
+      <div style="width:108px;height:162px;margin:0 auto;">${getBoxerSVG(who, previewHat, eq.color, eq.hatColor||'hc_default')}</div>
       <div style="font-size:12px;color:var(--muted);margin-top:8px;">Your current look</div>
+      ${meWd.shameWeek ? '<div style="font-size:11px;color:#E25B5B;font-weight:600;margin-top:5px;">🍄 Putregai active — walk 20K+ steps to break the curse</div>' : ''}
     </div>`;
 
   // Hats
   document.getElementById('wardrobe-hats').innerHTML = WARDROBE_HATS.map(h => {
     const owned = ownedH.includes(h.id);
-    const isEq = eq.hat===h.id;
+    const isEq = previewHat === h.id;
     let badge = '';
-    if (isEq) badge = `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>`;
+    if (isEq && h.id === 'putregai' && meWd.shameWeek) badge = `<span class="wi-badge" style="position:absolute;top:6px;right:6px;background:#7f1d1d;color:#fca5a5;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;text-transform:uppercase;letter-spacing:0.5px;">CURSED</span>`;
+    else if (isEq) badge = `<span class="wi-badge equipped-badge ${badgeClass}">Worn</span>`;
     else if (!owned) badge = `<span class="wi-badge locked-badge">🔒</span>`;
     return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}" ${owned?`onclick="equipItem('hat','${h.id}')"`:''}>
       ${badge}
