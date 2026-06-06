@@ -426,6 +426,13 @@ tr:hover td { background: var(--surface2); }
 .pill-cristina { background: var(--cristina-soft); color: var(--cristina); }
 .pill-tie { background: var(--surface3); color: var(--muted); }
 
+/* ── LEADERBOARD ── */
+.lb-sub-tabs { display:flex; gap:8px; margin-bottom:20px; }
+.lb-tab { padding:8px 20px; border:1px solid var(--border); border-radius:8px; background:var(--surface2); color:var(--muted); font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer; transition:all 0.15s; letter-spacing:0.5px; }
+.lb-tab.lb-active { background:var(--surface3); color:var(--text); border-color:rgba(255,107,35,0.5); }
+.lb-month-card { margin-bottom:12px; padding:16px 18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); border-left:3px solid var(--border); }
+.lb-week-dot { display:inline-flex; align-items:center; justify-content:center; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700; }
+
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 24px; right: 24px;
@@ -792,6 +799,7 @@ tr:hover td { background: var(--surface2); }
   <button class="nav-tab" onclick="showSection('shop')">Shop</button>
   <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
   <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
+  <button class="nav-tab" onclick="showSection('leaderboard')">Leaderboard</button>
   <button class="nav-tab" onclick="showSection('history')">All Weeks</button>
 </nav>
 
@@ -925,6 +933,20 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ ALL WEEKS ══ -->
+  <!-- ══ LEADERBOARD ══ -->
+  <div id="section-leaderboard" style="display:none">
+    <div class="sec-head" style="margin-bottom:16px;">
+      <div class="sec-title">Leaderboard</div>
+      <div class="sec-meta" id="lb-meta">–</div>
+    </div>
+    <div class="lb-sub-tabs">
+      <button id="lb-tab-weekly" class="lb-tab lb-active" onclick="lbSwitch('weekly')">📅 Weekly</button>
+      <button id="lb-tab-monthly" class="lb-tab" onclick="lbSwitch('monthly')">📆 Monthly</button>
+    </div>
+    <div id="lb-weekly-view"></div>
+    <div id="lb-monthly-view" style="display:none"></div>
+  </div>
+
   <div id="section-history" style="display:none">
     <div class="sec-head" style="margin-bottom:16px;">
       <div class="sec-title">All Weeks</div>
@@ -2576,6 +2598,165 @@ async function equipItem(slot, id) {
 // ══════════════════════════════════════════
 // RENDER HISTORY
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════
+function lbSwitch(view) {
+  document.getElementById('lb-weekly-view').style.display = view==='weekly' ? '' : 'none';
+  document.getElementById('lb-monthly-view').style.display = view==='monthly' ? '' : 'none';
+  document.getElementById('lb-tab-weekly').classList.toggle('lb-active', view==='weekly');
+  document.getElementById('lb-tab-monthly').classList.toggle('lb-active', view==='monthly');
+}
+
+function renderLeaderboard() {
+  const st = calcStats();
+  const meta = st.paulWins > st.cristinaWins
+    ? `Paul leads ${st.paulWins}–${st.cristinaWins} all-time`
+    : st.cristinaWins > st.paulWins
+    ? `Cristina leads ${st.cristinaWins}–${st.paulWins} all-time`
+    : `Tied ${st.paulWins}–${st.cristinaWins} all-time`;
+  document.getElementById('lb-meta').textContent = meta;
+  lbRenderWeekly();
+  lbRenderMonthly();
+}
+
+function lbRenderWeekly() {
+  const el = document.getElementById('lb-weekly-view');
+  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul || DB[w.key]?.cristina);
+  if (!weeks.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No data yet.</div>';
+    return;
+  }
+  // Build forward to get running scores, then reverse for display
+  let pScore=0, cScore=0;
+  const rows = weeks.map(w => {
+    const d = DB[w.key]||{};
+    const p = d.paul||0, c = d.cristina||0;
+    let winner = null;
+    if (p>0 && c>0) {
+      if (p>c) { pScore++; winner='paul'; }
+      else if (c>p) { cScore++; winner='cristina'; }
+      else winner='tie';
+    } else if (p>0) winner='paul_only';
+    else if (c>0) winner='cristina_only';
+    return { w, p, c, winner, pSnap:pScore, cSnap:cScore };
+  });
+  rows.reverse();
+
+  let html = `<div class="table-card">
+    <div class="table-head-bar">Week-by-week · ${weeks.length} weeks played</div>
+    <table><thead><tr>
+      <th>Week</th>
+      <th style="color:var(--paul)">Paul</th>
+      <th style="color:var(--cristina)">Cristina</th>
+      <th>Winner</th>
+      <th>Score</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach(({w, p, c, winner, pSnap, cSnap}) => {
+    const paulWon = winner==='paul', criWon = winner==='cristina', tied = winner==='tie';
+    const rowBg = paulWon ? 'background:rgba(255,107,35,0.07)' : criWon ? 'background:rgba(20,184,166,0.07)' : '';
+    const gap = p>0&&c>0 ? `<span style="font-size:11px;color:var(--muted2);margin-left:4px;">+${((Math.abs(p-c))/1000).toFixed(1)}k</span>` : '';
+    const winCell = paulWon ? `<span class="pill pill-paul">Paul</span>${gap}`
+      : criWon ? `<span class="pill pill-cristina">Cristina</span>${gap}`
+      : tied ? `<span class="pill pill-tie">Tie</span>`
+      : `<span style="color:var(--muted2);font-size:11px;">–</span>`;
+    const scoreCell = (paulWon||criWon||tied) ? `<span style="font-size:12px;font-weight:700;color:var(--muted)">${pSnap}–${cSnap}</span>` : '';
+
+    html += `<tr style="${rowBg}">
+      <td class="td-week">${MONTHS_S[w.month]} W${w.num}<br><span style="font-size:10px;color:var(--muted2)">${fmtShort(w.start)}–${fmtShort(w.end)}</span></td>
+      <td class="${paulWon?'td-paul':'td-week'}" style="${paulWon?'':'font-size:14px;color:var(--text)'}">${p>0?p.toLocaleString():'–'}</td>
+      <td class="${criWon?'td-cristina':'td-week'}" style="${criWon?'':'font-size:14px;color:var(--text)'}">${c>0?c.toLocaleString():'–'}</td>
+      <td>${winCell}</td>
+      <td>${scoreCell}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  el.innerHTML = html;
+}
+
+function lbRenderMonthly() {
+  const el = document.getElementById('lb-monthly-view');
+  const monthly = calcMonthlyChampions();
+  const keys = Object.keys(monthly).sort().reverse();
+  if (!keys.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">No data yet.</div>';
+    return;
+  }
+
+  // Tally monthly wins
+  let pMonths=0, cMonths=0;
+  keys.forEach(mk => { const m=monthly[mk]; if(m.winner==='paul') pMonths++; else if(m.winner==='cristina') cMonths++; });
+
+  const leaderName = pMonths>cMonths?'Paul':cMonths>pMonths?'Cristina':null;
+  const leaderColor = pMonths>cMonths?'var(--paul)':cMonths>pMonths?'var(--cristina)':'var(--muted)';
+
+  let html = `<div style="display:flex;align-items:center;gap:20px;padding:16px 20px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:160px;">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Monthly wins</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--paul);letter-spacing:1px;">${pMonths}</span>
+        <span style="color:var(--muted);">vs</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--cristina);letter-spacing:1px;">${cMonths}</span>
+      </div>
+    </div>
+    ${leaderName ? `<div style="font-size:13px;color:${leaderColor};font-weight:700;">🏆 ${leaderName} leads monthly</div>` : `<div style="font-size:13px;color:var(--muted);">🤝 Tied monthly</div>`}
+  </div>`;
+
+  keys.forEach(mk => {
+    const m = monthly[mk];
+    const [y, mo] = mk.split('-');
+    const mWeeks = allWeeksFlat.filter(w => w.year===parseInt(y) && w.month===parseInt(mo)-1);
+    let pWk=0, cWk=0, tieWk=0;
+    mWeeks.forEach(w => {
+      const d=DB[w.key]||{};
+      if (d.paul&&d.cristina) {
+        if(d.paul>d.cristina) pWk++; else if(d.cristina>d.paul) cWk++; else tieWk++;
+      }
+    });
+    const isP=m.winner==='paul', isC=m.winner==='cristina';
+    const borderColor = isP?'var(--paul)':isC?'var(--cristina)':'var(--muted)';
+    const winName = isP?'Paul':isC?'Cristina':'Tie';
+    const winColor = isP?'var(--paul)':isC?'var(--cristina)':'var(--muted)';
+    const trophy = (isP||isC)?'🏆':'🤝';
+    const pPct = m.paul+m.cristina>0 ? Math.round(m.paul/(m.paul+m.cristina)*100) : 50;
+    const cPct = 100-pPct;
+
+    html += `<div class="lb-month-card" style="border-left-color:${borderColor};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px;">${m.label}</div>
+          <div style="font-size:12px;color:var(--muted);">${pWk+cWk+tieWk} week${pWk+cWk+tieWk!==1?'s':''} completed
+            · <span style="color:var(--paul);">${pWk}W</span> Paul
+            · <span style="color:var(--cristina);">${cWk}W</span> Cristina
+            ${tieWk>0?`· ${tieWk} tie`:''}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:15px;font-weight:700;color:${winColor};">${trophy} ${winName}</div>
+          <div style="font-size:11px;color:var(--muted2);margin-top:2px;">${m.paul.toLocaleString()} vs ${m.cristina.toLocaleString()}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;height:6px;border-radius:3px;background:var(--surface3);overflow:hidden;display:flex;">
+        <div style="width:${pPct}%;background:var(--paul);border-radius:3px 0 0 3px;transition:width 0.4s;"></div>
+        <div style="width:${cPct}%;background:var(--cristina);border-radius:0 3px 3px 0;transition:width 0.4s;"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+        ${mWeeks.map(w => {
+          const d=DB[w.key]||{};
+          const hw = d.paul&&d.cristina ? (d.paul>d.cristina?'paul':d.cristina>d.paul?'cristina':'tie') : null;
+          const bg = hw==='paul'?'var(--paul)':hw==='cristina'?'var(--cristina)':hw==='tie'?'var(--surface3)':'var(--surface3)';
+          const fg = hw==='cristina'?'#0A0A0C':hw?'#fff':'var(--muted2)';
+          return `<span class="lb-week-dot" style="background:${bg};color:${fg};">W${w.num}</span>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
 function renderHistory() {
   const weeks = filterMonth
     ? allWeeksFlat.filter(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===filterMonth)
@@ -2629,11 +2810,11 @@ function setHistoryFilter(mk) { filterMonth=mk; renderHistory(); }
 
 function showSection(name) {
   playClick();
-  ['weekly','records','champions','wardrobe','shop','milestones','rewards','history'].forEach(s => {
+  ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','history'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','milestones','rewards','history'][i]===name);
+    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','history'][i]===name);
   });
   if (name==='records') renderRecords();
   if (name==='champions') renderChampions();
@@ -2641,6 +2822,7 @@ function showSection(name) {
   if (name==='shop') renderShop();
   if (name==='milestones') renderMilestones();
   if (name==='rewards') renderRewards();
+  if (name==='leaderboard') renderLeaderboard();
   if (name==='history') renderHistory();
 }
 
