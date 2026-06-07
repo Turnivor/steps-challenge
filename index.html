@@ -608,7 +608,9 @@ tr:hover td { background: var(--surface2); }
   position: relative;
 }
 .wardrobe-item.owned:hover { border-color: var(--border2); transform: translateY(-2px); }
-.wardrobe-item.locked { opacity: 0.45; cursor: not-allowed; }
+.wardrobe-item.locked { cursor: not-allowed; }
+.wardrobe-item.locked .wi-icon, .wardrobe-item.locked .wi-swatch { opacity: 0.4; }
+.wardrobe-item.locked .wi-name { color: var(--muted); }
 .wardrobe-item.equipped { border-color: var(--paul); background: var(--paul-soft); }
 .wardrobe-item.equipped.cristina-eq { border-color: var(--cristina); background: var(--cristina-soft); }
 .wi-icon { font-size: 28px; margin-bottom: 6px; display: block; }
@@ -622,7 +624,7 @@ tr:hover td { background: var(--surface2); }
 }
 .wi-badge.equipped-badge { background: var(--paul); color: #fff; }
 .wi-badge.equipped-badge.cristina-b { background: var(--cristina); color: #0A0A0C; }
-.wi-badge.locked-badge { background: var(--surface3); color: var(--muted2); }
+.wi-badge.locked-badge { background: rgba(255,107,53,0.18); color: #FDBA74; border: 1px solid rgba(255,107,53,0.35); }
 
 /* ── SKELETON LOADER ── */
 .skeleton {
@@ -1439,9 +1441,13 @@ function setSyncState(ok) {
 
 function findCurrentWeek() {
   if (!allWeeksFlat.length) { currentWeekIdx=0; return; }
+  const now = new Date();
+  const todayKey = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   for (let i=0; i<allWeeksFlat.length; i++) {
     const w = allWeeksFlat[i];
-    if (TODAY >= w.start && TODAY <= w.end) { currentWeekIdx=i; return; }
+    const sKey = new Date(w.start.getFullYear(), w.start.getMonth(), w.start.getDate()).getTime();
+    const eKey = new Date(w.end.getFullYear(), w.end.getMonth(), w.end.getDate()).getTime();
+    if (todayKey >= sKey && todayKey <= eKey) { currentWeekIdx=i; return; }
   }
   currentWeekIdx = allWeeksFlat.length-1;
 }
@@ -2021,12 +2027,12 @@ function renderShop() {
       } else if (!owned && who && canAfford) {
         action = `<button onclick="buyShopItem('${item.id}')" style="margin-top:6px;width:100%;padding:6px;border:none;border-radius:6px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Buy − costs ${item.price.toLocaleString()} steps</button>`;
       } else if (!owned && who && !canAfford) {
-        action = `<div style="margin-top:6px;font-size:10px;color:var(--muted2);">Need ${(item.price-balance).toLocaleString()} more steps</div>`;
+        action = `<div style="margin-top:6px;font-size:11px;color:#9999AD;font-weight:600;">Need ${(item.price-balance).toLocaleString()} more steps</div>`;
       }
       return `<div class="wardrobe-item ${owned?'owned':'locked'} ${isEq?'equipped '+eqClass:''}">
         ${swatch}
         <div class="wi-name" style="color:var(--text);">${item.icon} ${item.name}</div>
-        <div class="wi-desc" style="font-size:10px;color:var(--muted2);margin:3px 0;">${item.desc}</div>
+        <div class="wi-desc" style="font-size:11px;color:#A0A0B8;margin:4px 0;line-height:1.4;">${item.desc}</div>
         ${badge}${action}
       </div>`;
     }).join('');
@@ -2512,8 +2518,8 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default', glovesId='non
     <rect x="7" y="4" width="2" height="1" fill="${isC?'#ff6688':'#cc4400'}"/>
     <rect x="5" y="5" width="6" height="6" fill="${bodyColor}"/>
     <rect x="5" y="11" width="6" height="3" fill="${bodyColor}" opacity="0.7"/>
-    <rect x="2" y="6" width="3" height="3" fill="${gloveColor}"/><rect x="11" y="6" width="3" height="3" fill="${gloveColor}"/>
     <rect x="1" y="7" width="2" height="2" fill="${skin}"/><rect x="13" y="7" width="2" height="2" fill="${skin}"/>
+    <rect x="2" y="6" width="3" height="3" fill="${gloveColor}"/><rect x="11" y="6" width="3" height="3" fill="${gloveColor}"/>
     <rect x="5" y="14" width="2" height="4" fill="${skin}"/><rect x="9" y="14" width="2" height="4" fill="${skin}"/>
     <rect x="4" y="17" width="4" height="2" fill="#333"/><rect x="8" y="17" width="4" height="2" fill="#333"/>
     <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
