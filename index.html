@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👟</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Creepster&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Creepster&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <style>
@@ -18,227 +18,267 @@
   --cristina: #4ECDC4;
   --cristina-soft: rgba(78,205,196,0.15);
   --cristina-mid: rgba(78,205,196,0.4);
-  --bg: #0A0A0C;
-  --surface: #111114;
-  --surface2: #191920;
-  --surface3: #212128;
-  --border: #272730;
-  --border2: #32323E;
-  --text: #EDEDF0;
-  --muted: #72728A;
-  --muted2: #48485A;
+  --bg: #070809;
+  --surface: #0c1117;
+  --surface2: #0a0e13;
+  --surface3: #1c2530;
+  --border: #1c2530;
+  --border2: #2a3340;
+  --text: #cfe9e6;
+  --muted: #8a99a6;
+  --muted2: #46505c;
   --radius: 16px;
   --radius-sm: 10px;
   --grit: rgba(255,255,255,0.015);
+  --accent: #5fd3c8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Space Mono', monospace;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   padding-bottom: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image:
+    radial-gradient(1200px 700px at 50% -10%, #11161c 0%, #070809 60%),
+    linear-gradient(rgba(78,205,196,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78,205,196,.05) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+  background-attachment: fixed;
+}
+@keyframes wf-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes wf-glitch {
+  0%,87%,100% { transform: translate(0); text-shadow:none; }
+  89% { transform: translate(-2px,0); text-shadow: 2px 0 #FF6B35, -2px 0 #4ECDC4; }
+  91% { transform: translate(2px,0);  text-shadow: -2px 0 #FF6B35, 2px 0 #4ECDC4; }
+  93% { transform: translate(-1px,0); text-shadow: 1px 0 #FF6B35; }
+  95% { transform: translate(0); text-shadow:none; }
 }
 
-/* ── CRAWLING MONTH BANNER ── */
+/* ── STATUS BAR (terminal) ── */
 .crawling-banner {
-  text-align: center;
-  padding: 10px 20px 8px;
-  background: linear-gradient(90deg, transparent, rgba(255,107,53,0.05) 30%, rgba(78,205,196,0.05) 70%, transparent);
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-.crawling-banner::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 60%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--paul), transparent);
-  animation: scanline 4s linear infinite;
-}
-@keyframes scanline { to { left: 200%; } }
-.crawling-title {
-  font-family: 'Creepster', cursive;
-  font-size: 22px;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.85;
-}
-.crawling-title span { color: #8B4513; opacity: 0.9; }
-
-/* ── HERO HEADER ── */
-.hero {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 28px 44px 0;
-  position: relative;
-  overflow: hidden;
-}
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--paul-mid), transparent 40%, transparent 60%, var(--cristina-mid));
-}
-.hero-top {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-}
-.wordmark {
-  font-family: 'Syne', sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  line-height: 1;
-}
-.wordmark .p { color: var(--paul); }
-.wordmark .vs { color: var(--muted2); font-size: 18px; font-weight: 400; margin: 0 6px; }
-.wordmark .c { color: var(--cristina); }
-.wordmark .sub {
-  display: block;
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--muted2);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-top: 5px;
-}
-.sync-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 20px;
-  padding: 7px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  transition: all 0.2s;
-}
-.sync-btn:hover { border-color: var(--cristina-mid); color: var(--cristina); }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted2); flex-shrink: 0; }
-.sync-dot.live { background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E80; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-/* ── FIGHTER ARENA ── */
-.arena {
-  display: grid;
-  grid-template-columns: 1fr 160px 1fr;
-  align-items: center;
-  gap: 0;
-  padding: 16px 0 24px;
-  border-top: 1px solid var(--border);
-  margin-top: 8px;
-}
-.fighter-side { display: flex; align-items: center; gap: 16px; }
-.fighter-side.right { flex-direction: row-reverse; }
-.fighter-wrap { position: relative; }
-
-/* PIXEL ART BOXER — pure CSS/SVG inline */
-.boxer-canvas { width: 100px; height: 150px; display: block; image-rendering: pixelated; }
-
-/* Fighter info */
-.fighter-info { display: flex; flex-direction: column; }
-.fighter-info.right { align-items: flex-end; }
-.f-name { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
-.f-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 44px;
-  font-weight: 400;
-  letter-spacing: 2px;
-  line-height: 1;
-}
-.f-score.p { color: var(--paul); }
-.f-score.c { color: var(--cristina); }
-.f-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
-
-/* VS center */
-.vs-center { text-align: center; }
-.vs-ring {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 50%;
-  width: 56px; height: 56px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  margin: 0 auto 8px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 1px;
-  color: var(--muted);
-  position: relative;
-}
-.vs-ring::before {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background: conic-gradient(var(--paul) 0%, var(--paul) var(--paul-pct, 50%), var(--cristina) var(--paul-pct, 50%), var(--cristina) 100%);
-  z-index: -1;
-  opacity: 0.5;
-}
-.vs-leader-tag {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-/* ── VS BAR ── */
-.vs-bar-row {
-  padding: 0 44px 18px;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  padding: 11px 18px;
+  font-size: 12px;
+  max-width: 1120px;
+  margin: 24px auto 0;
 }
-.vs-bar {
-  height: 5px;
-  border-radius: 3px;
+@media(max-width:1168px){ .crawling-banner { margin: 16px 12px 0; } }
+.crawling-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: none;
+  color: var(--accent);
+  opacity: 1;
+  display: inline-block;
+  animation: wf-glitch 6s steps(1,end) infinite;
+}
+.crawling-title span { color: var(--accent); }
+.status-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.synced-dot { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+.synced-dot .dot { width: 7px; height: 7px; border-radius: 50%; background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E; }
+.synced-dot.offline .dot { background: #d9a441; box-shadow: 0 0 6px #d9a441; animation: wf-platpulse 1s ease-in-out infinite; }
+.icon-btn {
+  border: 1px solid var(--border2); background: var(--surface2); color: var(--text);
+  width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s; padding: 0;
+}
+.icon-btn:hover { background: var(--surface3); }
+.auth-btn { width: auto; padding: 0 10px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; font-weight: 700; }
+.auth-user { font-size: 10px; letter-spacing: 1px; font-weight: 700; }
+
+/* ── SIGN-IN PANEL ── */
+.signin-panel {
+  max-width: 1120px;
+  margin: 0 auto;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--surface2);
+  padding: 16px 18px;
+}
+.signin-panel.hidden { display: none; }
+.signin-label { font-size: 11px; letter-spacing: 2px; color: var(--accent); margin-bottom: 12px; }
+.signin-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.signin-userbtns { display: flex; gap: 8px; }
+.signin-userbtn {
+  padding: 9px 16px; border-radius: 6px; border: 1px solid var(--border2); background: var(--surface3);
+  color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 1px;
+  transition: all 0.15s;
+}
+.signin-userbtn.active.paul { border-color: var(--paul); color: var(--paul); }
+.signin-userbtn.active.cristina { border-color: var(--cristina); color: var(--cristina); }
+.signin-pininput {
+  width: 90px; background: #070b0f; border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  font-family: 'Space Mono', monospace; font-size: 15px; letter-spacing: 4px; padding: 8px 12px; text-align: center;
+}
+.signin-enter-btn { border: none; border-radius: 6px; background: var(--accent); color: #06201d; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 12px; padding: 9px 16px; cursor: pointer; letter-spacing: 1px; }
+.signin-esc-btn { border: 1px solid var(--border); color: var(--muted); background: none; border-radius: 6px; padding: 9px 12px; font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; }
+.signin-err { color: #fca5a5; font-size: 11px; }
+.signin-hint { font-size: 10px; color: var(--muted2); margin-top: 10px; }
+
+/* ── HERO / THIS WEEK ── */
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(var(--surface), #080b0f);
+  background-image: linear-gradient(rgba(78,205,196,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(78,205,196,.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  padding: 22px 24px 26px;
+  position: relative;
   overflow: hidden;
-  background: var(--surface3);
-  display: flex;
 }
-.vb-paul { background: linear-gradient(90deg, var(--paul), #ff9966); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
-.vb-cristina { background: linear-gradient(90deg, #6fded7, var(--cristina)); transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* week selector */
+.week-selector { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 22px; }
+.week-arrow {
+  border: 1px solid var(--border2); background: var(--surface2); color: var(--text);
+  width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.week-arrow:hover { background: var(--surface3); }
+.week-arrow:disabled { opacity: 0.25; cursor: not-allowed; }
+.week-label-box { text-align: center; min-width: 230px; }
+.week-label-main { font-weight: 700; font-size: 16px; letter-spacing: 2px; color: var(--text); font-family: 'Syne', sans-serif; }
+.week-label-sub { font-size: 11px; color: #6b7785; letter-spacing: 1px; margin-top: 2px; }
+
+/* arena grid */
+.hero-arena { display: grid; grid-template-columns: 1fr 200px 1fr; gap: 18px; align-items: stretch; }
+@media(max-width: 760px) { .hero-arena { grid-template-columns: 1fr; } }
+.hero-fighter { display: flex; flex-direction: column; }
+.hero-platform { position: relative; height: 168px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.lead-tag { position: absolute; top: 6px; font-size: 10px; letter-spacing: 2px; border-radius: 4px; padding: 3px 7px; font-family: 'Space Mono', monospace; }
+.lead-tag.paul { left: 6px; color: var(--paul); border: 1px solid rgba(255,107,53,.4); background: rgba(255,107,53,.08); }
+.lead-tag.cristina { right: 6px; color: var(--cristina); border: 1px solid rgba(78,205,196,.4); background: rgba(78,205,196,.08); }
+.wf-boxer { width: 90px; height: 130px; position: relative; }
+.platform-glow { width: 74px; height: 8px; border-radius: 50%; margin-top: 6px; }
+.tier-label { text-align: center; margin-top: 6px; font-size: 11px; letter-spacing: 2px; font-family: 'Space Mono', monospace; }
+
+/* boxer vitality animations */
+@keyframes wf-crawl { 0%{transform:translateY(15px) rotate(-2deg) scaleY(.9)} 50%{transform:translateY(17px) rotate(2deg) scaleY(.87)} 100%{transform:translateY(15px) rotate(-2deg) scaleY(.9)} }
+@keyframes wf-sway  { 0%{transform:translateY(5px) rotate(-3deg)} 50%{transform:translateY(2px) rotate(3deg)} 100%{transform:translateY(5px) rotate(-3deg)} }
+@keyframes wf-fit { 0%{transform:translate(0,0) rotate(0)} 14%{transform:translate(-5px,3px) rotate(-5deg)} 28%{transform:translate(0,-5px) rotate(0)} 42%{transform:translate(5px,3px) rotate(5deg)} 56%{transform:translate(0,-5px) rotate(0)} 70%{transform:translate(-3px,2px) rotate(-3deg)} 100%{transform:translate(0,0) rotate(0)} }
+@keyframes wf-punch { 0%{transform:translateX(0)} 10%{transform:translateX(11px) scaleX(1.06)} 20%{transform:translateX(1px)} 30%{transform:translateX(13px) scaleX(1.06)} 42%{transform:translateX(0)} 56%{transform:translateY(-7px)} 70%{transform:translateY(0)} 100%{transform:translateX(0)} }
+@keyframes wf-punchl{ 0%{transform:translateX(0)} 10%{transform:translateX(-11px) scaleX(1.06)} 20%{transform:translateX(-1px)} 30%{transform:translateX(-13px) scaleX(1.06)} 42%{transform:translateX(0)} 56%{transform:translateY(-7px)} 70%{transform:translateY(0)} 100%{transform:translateX(0)} }
+@keyframes wf-platpulse { 0%,100%{transform:scaleX(1);opacity:.55} 50%{transform:scaleX(1.15);opacity:.9} }
+.wf-boxer.tier-crawl { animation: wf-crawl 3.2s ease-in-out infinite; filter: grayscale(.6) brightness(.75); }
+.wf-boxer.tier-groggy { animation: wf-sway 2.4s ease-in-out infinite; filter: grayscale(.25) brightness(.9); }
+.wf-boxer.tier-fit { animation: wf-fit 2.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(159,230,223,.5)); }
+.wf-boxer.tier-beast.paul { animation: wf-punch 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,107,53,.7)); }
+.wf-boxer.tier-beast.cristina { animation: wf-punchl 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(78,205,196,.7)); }
+.platform-glow.tier-crawl { background: radial-gradient(ellipse, rgba(226,91,91,.4), transparent 70%); animation: wf-platpulse 3.2s ease-in-out infinite; }
+.platform-glow.tier-groggy { background: radial-gradient(ellipse, rgba(217,164,65,.4), transparent 70%); animation: wf-platpulse 2.4s ease-in-out infinite; }
+.platform-glow.tier-fit { background: radial-gradient(ellipse, rgba(159,230,223,.5), transparent 70%); animation: wf-platpulse 2.6s ease-in-out infinite; }
+.platform-glow.tier-beast { background: radial-gradient(ellipse, rgba(255,107,53,.6), transparent 70%); animation: wf-platpulse 1.4s ease-in-out infinite; }
+
+/* fighter stat boxes */
+.fighter-stat-box { margin-top: 12px; border-radius: 9px; padding: 14px 16px; flex: 1; }
+.fighter-stat-box.paul { border: 1px solid #3a2a22; border-left: 3px solid var(--paul); background: #15110e; }
+.fighter-stat-box.cristina { border: 1px solid #1e3a37; border-right: 3px solid var(--cristina); background: #0c1716; text-align: right; }
+.stat-unit-label { font-size: 10px; letter-spacing: 2px; }
+.stat-unit-label.paul { color: #FF8a5e; }
+.stat-unit-label.cristina { color: #5fd3c8; }
+.stat-steps { font-size: 38px; font-weight: 700; line-height: 1.05; margin: 2px 0; }
+.stat-steps.paul { color: var(--paul); }
+.stat-steps.cristina { color: var(--cristina); }
+.stat-steps-label { font-size: 11px; color: #8a8a9a; }
+.vitality-row { margin-top: 13px; display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 1px; color: #8a8a9a; }
+.vitality-bar { margin-top: 5px; height: 13px; border-radius: 4px; overflow: hidden; position: relative; }
+.vitality-bar.paul { border: 1px solid #3a2a22; background: #0c0a08; }
+.vitality-bar.cristina { border: 1px solid #1e3a37; background: #08100f; }
+.vitality-marker { position: absolute; top: 0; bottom: 0; width: 1px; background: #c98a2e88; z-index: 2; }
+.vitality-fill { height: 100%; transition: width .4s ease; }
+.vitality-fill.paul { background: repeating-linear-gradient(90deg,#FF6B35,#FF6B35 5px,#ff8a5e 5px,#ff8a5e 10px); }
+.vitality-fill.cristina { background: repeating-linear-gradient(90deg,#3fd3c8,#3fd3c8 5px,#4ECDC4 5px,#4ECDC4 10px); margin-left: auto; }
+.stat-meta-row { display: flex; justify-content: space-between; font-size: 11px; color: #8a8a9a; margin-top: 10px; }
+.stat-meta-row b { color: var(--text); }
+.risk-banner { margin-top: 9px; font-size: 10px; color: #fca5a5; border: 1px solid #7f1d1d; background: #1a0d0d; border-radius: 5px; padding: 5px 8px; letter-spacing: .5px; }
+.fighter-stat-box.cristina .risk-banner { text-align: left; }
+.log-steps-box { margin-top: 11px; border-top: 1px dashed; padding-top: 11px; }
+.fighter-stat-box.paul .log-steps-box { border-color: #3a2a22; }
+.fighter-stat-box.cristina .log-steps-box { border-color: #1e3a37; text-align: left; }
+.log-steps-label { font-size: 10px; letter-spacing: 1px; margin-bottom: 6px; }
+.log-steps-label.paul { color: #FF8a5e; }
+.log-steps-label.cristina { color: #5fd3c8; }
+.log-steps-input {
+  width: 100%; background: #070b0f; border-radius: 6px; font-family: 'Space Mono', monospace;
+  font-weight: 700; font-size: 17px; padding: 8px 12px;
+}
+.log-steps-input.paul { border: 1px solid #3a2a22; color: var(--paul); }
+.log-steps-input.cristina { border: 1px solid #1e3a37; color: var(--cristina); }
+.log-hint { margin-top: 11px; border-top: 1px dashed var(--border); padding-top: 9px; font-size: 10px; color: #5a6470; }
+.fighter-stat-box.cristina .log-hint { text-align: left; }
+
+/* center gauge */
+.hero-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.lead-gauge { width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--border); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(0,0,0,.5) inset; transition: background .5s ease; }
+.lead-gauge-inner { width: 108px; height: 108px; border-radius: 50%; background: #080b0f; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--border); }
+.lead-pct { font-size: 26px; font-weight: 700; line-height: 1; transition: color .4s; }
+.lead-word { font-size: 9px; letter-spacing: 2px; color: #6b7785; margin-top: 3px; }
+.vs-label { font-weight: 700; font-size: 18px; letter-spacing: 3px; color: #3a4452; }
+.delta-box { text-align: center; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 8px 14px; }
+.delta-label { font-size: 9px; letter-spacing: 2px; color: #6b7785; }
+.delta-value { font-size: 17px; font-weight: 700; transition: color .4s; }
+
+/* strength ladder */
+.ladder-card { max-width: 1120px; margin: 18px auto 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface2); padding: 16px 20px; }
+.ladder-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.ladder-head-title { font-size: 11px; letter-spacing: 2px; color: #6b7785; }
+.ladder-legend { display: flex; gap: 14px; font-size: 10px; color: #8a8a9a; }
+.ladder-legend span { display: flex; align-items: center; gap: 5px; }
+.ladder-track { position: relative; height: 34px; margin: 18px 0 6px; }
+.ladder-marker { position: absolute; transform: translateX(-50%); font-size: 13px; line-height: 1; transition: left .4s ease; }
+.ladder-marker.paul { top: -3px; color: var(--paul); }
+.ladder-marker.cristina { bottom: -3px; color: var(--cristina); }
+.ladder-zones { display: flex; height: 16px; border-radius: 5px; overflow: hidden; border: 1px solid var(--border); }
+.ladder-zones > div { border-right: 1px solid var(--border); }
+.ladder-zones > div:last-child { border-right: none; }
+.ladder-zone-labels { display: flex; font-size: 9px; letter-spacing: .5px; line-height: 1.3; }
+.ladder-foot { font-size: 11px; color: #6b7785; margin-top: 13px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 11px; }
+
+/* hero quick-nav */
+.hero-quicknav { margin-top: 22px; display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; }
 
 /* ── NAV ── */
 nav.main-nav {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 44px;
+  max-width: 1120px;
+  margin: 14px auto 0;
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0 4px;
 }
 .nav-tab {
-  padding: 13px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 7px 13px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: #6b7785;
+  background: var(--surface2);
   cursor: pointer;
-  border: none;
-  background: none;
-  border-bottom: 2px solid transparent;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Space Mono', monospace;
   transition: all 0.15s;
 }
-.nav-tab:hover { color: var(--text); }
-.nav-tab.active { color: var(--text); border-bottom-color: var(--paul); }
+.nav-tab:hover { color: var(--text); border-color: var(--border2); }
+.nav-tab.active { color: var(--accent); border-color: var(--accent); background: rgba(95,211,200,.08); }
 
 /* ── WRAP ── */
-.wrap { max-width: 1060px; margin: 0 auto; padding: 32px 44px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 32px 20px; }
 
 /* ── WEEK NAV ── */
 .week-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -273,8 +313,20 @@ nav.main-nav {
 
 /* ── SEC HEAD ── */
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
-.sec-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-.sec-meta { font-size: 12px; color: var(--muted); }
+.sec-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 1px; color: #fff; }
+.sec-meta { font-size: 11px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; }
+
+/* ── CYBER PANEL (tab sections) ── */
+#section-records, #section-champions, #section-wardrobe, #section-shop,
+#section-milestones, #section-rewards, #section-leaderboard {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(var(--surface), #080b0f);
+  background-image: linear-gradient(rgba(78,205,196,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(78,205,196,.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  padding: 22px 24px 26px;
+  margin-bottom: 24px;
+}
 
 /* ── WEEK CARDS ── */
 .week-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
@@ -365,8 +417,8 @@ nav.main-nav {
   top: 0; left: 0;
   width: 3px; height: 100%;
 }
-.milestone-card.unlocked.paul-ms::before { background: var(--paul); }
-.milestone-card.unlocked.cristina-ms::before { background: var(--cristina); }
+.milestone-card.unlocked.paul-ms::before { background: var(--paul); box-shadow: 0 0 8px var(--paul); }
+.milestone-card.unlocked.cristina-ms::before { background: var(--cristina); box-shadow: 0 0 8px var(--cristina); }
 .milestone-card.unlocked.both-ms::before { background: linear-gradient(180deg, var(--paul), var(--cristina)); }
 .ms-icon { font-size: 22px; flex-shrink: 0; filter: grayscale(1); opacity: 0.3; transition: all 0.3s; }
 .milestone-card.unlocked .ms-icon { filter: none; opacity: 1; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
@@ -394,7 +446,7 @@ nav.main-nav {
   position: relative;
 }
 .reward-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.reward-card.claimed { border-color: rgba(91,222,142,0.3); background: rgba(91,222,142,0.05); }
+.reward-card.claimed { border-color: rgba(91,222,142,0.3); background: rgba(91,222,142,0.05); box-shadow: 0 0 16px -8px rgba(91,222,142,0.5); }
 .reward-icon { font-size: 28px; margin-bottom: 8px; display: block; }
 .reward-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
 .reward-trigger { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
@@ -429,9 +481,9 @@ tr:hover td { background: var(--surface2); }
 /* ── LEADERBOARD ── */
 .lb-sub-tabs { display:flex; gap:8px; margin-bottom:20px; }
 .lb-tab { padding:8px 20px; border:1px solid var(--border); border-radius:8px; background:var(--surface2); color:var(--muted); font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer; transition:all 0.15s; letter-spacing:0.5px; }
-.lb-tab.lb-active { background:var(--surface3); color:var(--text); border-color:rgba(255,107,35,0.5); }
+.lb-tab.lb-active { background:var(--surface3); color:var(--text); border-color:rgba(255,107,53,0.5); }
 .lb-month-card { margin-bottom:12px; padding:16px 18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); border-left:3px solid var(--border); }
-.lb-week-dot { display:inline-flex; align-items:center; justify-content:center; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700; }
+.lb-week-dot { display:inline-flex; align-items:center; justify-content:center; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:700; letter-spacing:0.5px; }
 
 /* ── TOAST ── */
 .toast {
@@ -580,8 +632,8 @@ tr:hover td { background: var(--surface2); }
   position: relative;
   overflow: hidden;
 }
-.champ-card.paul-champ { border-left: 4px solid var(--paul); }
-.champ-card.cristina-champ { border-left: 4px solid var(--cristina); }
+.champ-card.paul-champ { border-left: 4px solid var(--paul); box-shadow: -8px 0 20px -14px var(--paul); }
+.champ-card.cristina-champ { border-left: 4px solid var(--cristina); box-shadow: -8px 0 20px -14px var(--cristina); }
 .champ-card.tie-champ { border-left: 4px solid var(--muted2); }
 .champ-trophy { font-size: 36px; flex-shrink: 0; }
 .champ-body { flex: 1; }
@@ -591,40 +643,50 @@ tr:hover td { background: var(--surface2); }
 .champ-score-p { color: var(--paul); font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
 .champ-score-c { color: var(--cristina); font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
 
-/* ── WARDROBE ── */
+/* ── WARDROBE / SHOP CELLS ── */
 .wardrobe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
   gap: 10px;
 }
 .wardrobe-item {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s;
   position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  border-radius: 9px;
+  padding: 14px 9px 11px;
+  min-height: 94px;
+  border: 1px solid #161d25;
+  background: #090d12;
+  color: #46505c;
+  opacity: .5;
+  cursor: not-allowed;
+  transition: transform 0.12s, border-color 0.12s;
 }
+.wardrobe-item.owned, .wardrobe-item.equipped { opacity: 1; cursor: pointer; }
+.wardrobe-item.owned { border-color: var(--border); background: var(--surface); color: var(--text); }
 .wardrobe-item.owned:hover { border-color: var(--border2); transform: translateY(-2px); }
-.wardrobe-item.locked { cursor: not-allowed; }
-.wardrobe-item.locked .wi-icon, .wardrobe-item.locked .wi-swatch { opacity: 0.4; }
-.wardrobe-item.locked .wi-name { color: var(--muted); }
-.wardrobe-item.equipped { border-color: var(--paul); background: var(--paul-soft); }
-.wardrobe-item.equipped.cristina-eq { border-color: var(--cristina); background: var(--cristina-soft); }
-.wi-icon { font-size: 28px; margin-bottom: 6px; display: block; }
-.wi-swatch { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 8px; border: 2px solid var(--border2); }
-.wi-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-.wi-unlock { font-size: 10px; color: var(--muted2); line-height: 1.3; }
-.wi-badge {
-  position: absolute; top: 6px; right: 6px;
-  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px;
-  text-transform: uppercase; letter-spacing: 0.5px;
+.wardrobe-item.equipped {
+  border-color: var(--paul); background: rgba(255,107,53,0.08); color: #fff;
+  box-shadow: 0 0 0 1px rgba(255,107,53,0.25), 0 0 22px -8px var(--paul);
 }
-.wi-badge.equipped-badge { background: var(--paul); color: #fff; }
-.wi-badge.equipped-badge.cristina-b { background: var(--cristina); color: #0A0A0C; }
-.wi-badge.locked-badge { background: rgba(255,107,53,0.18); color: #FDBA74; border: 1px solid rgba(255,107,53,0.35); }
+.wardrobe-item.equipped.cristina-eq {
+  border-color: var(--cristina); background: rgba(78,205,196,0.08);
+  box-shadow: 0 0 0 1px rgba(78,205,196,0.25), 0 0 22px -8px var(--cristina);
+}
+.wi-icon { font-size: 26px; line-height: 1; margin-bottom: 7px; display: block; }
+.wi-swatch { width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 8px; border: 2px solid #ffffff22; }
+.wi-name { font-size: 11px; font-weight: 700; letter-spacing: 0.4px; color: inherit; margin-bottom: 3px; }
+.wi-unlock { font-size: 9px; color: #6b7785; line-height: 1.3; }
+.wi-badge {
+  position: absolute; top: 7px; right: 7px;
+  font-size: 8px; font-weight: 700; letter-spacing: 1px; padding: 2px 6px; border-radius: 5px;
+  font-family: 'Space Mono', monospace; text-transform: uppercase;
+}
+.wi-badge.equipped-badge { background: var(--paul); color: #1a0d07; }
+.wi-badge.equipped-badge.cristina-b { background: var(--cristina); color: #06201d; }
+.wi-badge.locked-badge { background: #11171e; color: #5a6470; }
 
 /* ── SKELETON LOADER ── */
 .skeleton {
@@ -658,139 +720,151 @@ tr:hover td { background: var(--surface2); }
 </head>
 <body>
 
-<!-- ── CRAWLING MONTH BANNER ── -->
+<!-- ── STATUS BAR ── -->
 <div class="crawling-banner">
-  <div class="crawling-title" id="crawling-banner-text">☠ <span>Crawling Month</span> — June 2026 ☠</div>
+  <div class="crawling-title" id="crawling-banner-text">&gt; CRAWLING_MONTH.exe // JUNE_2026</div>
+  <div class="status-right">
+    <span class="synced-dot" id="synced-dot"><span class="dot"></span><span id="sync-label">SYNCED</span></span>
+    <button class="icon-btn" id="sound-toggle" onclick="toggleSound()" title="Toggle sound effects"><span id="sound-icon">🔊</span></button>
+    <button class="icon-btn" onclick="loadFromSheet(true)" title="Sync now">↻</button>
+    <div id="auth-area"></div>
+  </div>
 </div>
 
-<!-- ── HERO ── -->
+<!-- ── SIGN-IN PANEL ── -->
+<div class="signin-panel hidden" id="signin-panel">
+  <div class="signin-label">▸ AUTHENTICATE — who's logging?</div>
+  <div class="signin-row">
+    <div class="signin-userbtns">
+      <button class="signin-userbtn paul" id="signin-btn-paul" onclick="pendPinUser('paul')">PAUL</button>
+      <button class="signin-userbtn cristina" id="signin-btn-cristina" onclick="pendPinUser('cristina')">CRISTINA</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="password" inputmode="numeric" maxlength="4" placeholder="PIN" id="signin-pin-input" class="signin-pininput" onkeydown="if(event.key==='Enter')submitInlinePin();if(event.key==='Escape')toggleSigninPanel(false);"/>
+      <button class="signin-enter-btn" onclick="submitInlinePin()">ENTER →</button>
+      <button class="signin-esc-btn" onclick="toggleSigninPanel(false)">esc</button>
+    </div>
+    <span class="signin-err" id="signin-err" style="display:none;">✗ wrong PIN — try again</span>
+  </div>
+  <div class="signin-hint">Your boxer only edits its own column · PINs live in the app config</div>
+</div>
+
+<!-- ── HERO / THIS WEEK ── -->
 <div class="hero">
-  <div class="hero-top">
-    <div class="wordmark">
-      <span class="p">Paul</span><span class="vs">vs</span><span class="c">Cristina</span>
-      <span class="sub">Step Challenge · 2026</span>
+  <div class="week-selector">
+    <button class="week-arrow" id="btn-prev" onclick="changeWeek(-1)">‹</button>
+    <div class="week-label-box">
+      <div class="week-label-main" id="week-title">Week –</div>
+      <div class="week-label-sub" id="week-dates">–</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="sync-btn" id="sound-toggle" onclick="toggleSound()" title="Toggle sound effects" style="padding:7px 10px;">
-        <span id="sound-icon">🔊</span>
-      </button>
-      <button class="sync-btn" onclick="loadFromSheet(true)">
-        <span class="sync-dot" id="sync-dot"></span>
-        <span id="sync-label">Sync</span>
-      </button>
-    </div>
+    <button class="week-arrow" id="btn-next" onclick="changeWeek(1)" disabled>›</button>
   </div>
 
-  <div class="arena">
-    <!-- PAUL SIDE -->
-    <div class="fighter-side">
-      <div class="fighter-wrap" id="boxer-paul-wrap">
-        <svg class="boxer-canvas" id="boxer-paul" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
-          <!-- head -->
-          <rect x="5" y="0" width="6" height="5" fill="#FF9966"/>
-          <rect x="4" y="1" width="1" height="3" fill="#FF9966"/>
-          <rect x="11" y="1" width="1" height="3" fill="#FF9966"/>
-          <!-- hair -->
-          <rect x="5" y="0" width="6" height="1" fill="#663300"/>
-          <rect x="4" y="1" width="2" height="1" fill="#663300"/>
-          <!-- eyes -->
-          <rect x="6" y="2" width="1" height="1" fill="#1a1a2e"/>
-          <rect x="9" y="2" width="1" height="1" fill="#1a1a2e"/>
-          <!-- mouth -->
-          <rect x="7" y="4" width="2" height="1" fill="#cc4400"/>
-          <!-- body -->
-          <rect x="5" y="5" width="6" height="6" fill="#FF6B35"/>
-          <!-- shorts -->
-          <rect x="5" y="11" width="6" height="3" fill="#cc4400"/>
-          <!-- gloves -->
-          <rect x="2" y="6" width="3" height="3" fill="#FF6B35"/>
-          <rect x="11" y="6" width="3" height="3" fill="#FF6B35"/>
-          <rect x="1" y="7" width="2" height="2" fill="#FF9966"/>
-          <rect x="13" y="7" width="2" height="2" fill="#FF9966"/>
-          <!-- legs -->
-          <rect x="5" y="14" width="2" height="4" fill="#FF9966"/>
-          <rect x="9" y="14" width="2" height="4" fill="#FF9966"/>
-          <!-- shoes -->
-          <rect x="4" y="17" width="4" height="2" fill="#333"/>
-          <rect x="8" y="17" width="4" height="2" fill="#333"/>
-          <!-- belt -->
-          <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
-          <!-- shine -->
-          <rect x="6" y="6" width="1" height="2" fill="#FF9966" opacity="0.5"/>
-        </svg>
+  <div class="hero-arena">
+    <!-- PAUL -->
+    <div class="hero-fighter">
+      <div class="hero-platform">
+        <div class="lead-tag paul" id="paul-lead-tag" style="display:none;">◤ LEADING</div>
+        <div class="wf-boxer" id="boxer-paul-wrap"></div>
+        <div class="platform-glow" id="paul-platform-glow"></div>
       </div>
-      <div class="fighter-info">
-        <div class="f-name">Paul</div>
-        <div class="f-score p" id="hero-paul">–</div>
-        <div class="f-sub" id="hero-paul-sub">all-time steps</div>
+      <div class="tier-label" id="paul-tier-label">–</div>
+
+      <div class="fighter-stat-box paul">
+        <div class="stat-unit-label paul">UNIT_73 // PAUL</div>
+        <div class="stat-steps paul" id="paul-week-steps">–</div>
+        <div class="stat-steps-label">steps this week</div>
+        <div class="vitality-row"><span>VITALITY</span><span id="paul-vit-pct">0%</span></div>
+        <div class="vitality-bar paul">
+          <div class="vitality-marker" style="left:25%;"></div>
+          <div class="vitality-fill paul" id="paul-vit-fill" style="width:0%;"></div>
+        </div>
+        <div class="stat-meta-row">
+          <span>🔥 streak <b id="paul-streak">0</b></span><span>avg <b id="paul-pace">–</b>/wk</span>
+        </div>
+        <div class="risk-banner" id="paul-risk" style="display:none;">🥔 PUTREGAI RISK · under 20K = the curse</div>
+        <div class="log-steps-box" id="paul-log-box" style="display:none;">
+          <div class="log-steps-label paul">✎ LOG STEPS // <span id="paul-log-week">this week</span></div>
+          <input type="number" class="log-steps-input paul" id="paul-log-input" onchange="saveInlineSteps('paul', this.value)"/>
+        </div>
+        <div class="log-hint" id="paul-log-hint" style="display:none;">Sign in as Paul to log steps →</div>
       </div>
     </div>
 
-    <!-- VS CENTER -->
-    <div class="vs-center">
-      <div class="vs-ring" id="vs-ring">VS</div>
-      <div class="vs-leader-tag" id="vs-leader">–</div>
-    </div>
-
-    <!-- CRISTINA SIDE -->
-    <div class="fighter-side right">
-      <div class="fighter-wrap" id="boxer-cristina-wrap">
-        <svg class="boxer-canvas" id="boxer-cristina" viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
-          <!-- head -->
-          <rect x="5" y="0" width="6" height="5" fill="#FFCCAA"/>
-          <rect x="4" y="1" width="1" height="3" fill="#FFCCAA"/>
-          <rect x="11" y="1" width="1" height="3" fill="#FFCCAA"/>
-          <!-- hair long -->
-          <rect x="4" y="0" width="8" height="1" fill="#4a1a00"/>
-          <rect x="3" y="1" width="2" height="5" fill="#4a1a00"/>
-          <rect x="11" y="1" width="2" height="5" fill="#4a1a00"/>
-          <rect x="4" y="0" width="1" height="2" fill="#4a1a00"/>
-          <rect x="11" y="0" width="1" height="2" fill="#4a1a00"/>
-          <!-- eyes -->
-          <rect x="6" y="2" width="1" height="1" fill="#1a1a2e"/>
-          <rect x="9" y="2" width="1" height="1" fill="#1a1a2e"/>
-          <!-- eyelash -->
-          <rect x="6" y="1" width="2" height="1" fill="#4a1a00"/>
-          <rect x="9" y="1" width="2" height="1" fill="#4a1a00"/>
-          <!-- mouth smile -->
-          <rect x="7" y="4" width="2" height="1" fill="#ff6688"/>
-          <!-- body -->
-          <rect x="5" y="5" width="6" height="6" fill="#4ECDC4"/>
-          <!-- shorts -->
-          <rect x="5" y="11" width="6" height="3" fill="#2a9d95"/>
-          <!-- gloves -->
-          <rect x="2" y="6" width="3" height="3" fill="#4ECDC4"/>
-          <rect x="11" y="6" width="3" height="3" fill="#4ECDC4"/>
-          <rect x="1" y="7" width="2" height="2" fill="#6fded7"/>
-          <rect x="13" y="7" width="2" height="2" fill="#6fded7"/>
-          <!-- legs -->
-          <rect x="5" y="14" width="2" height="4" fill="#FFCCAA"/>
-          <rect x="9" y="14" width="2" height="4" fill="#FFCCAA"/>
-          <!-- shoes -->
-          <rect x="4" y="17" width="4" height="2" fill="#222"/>
-          <rect x="8" y="17" width="4" height="2" fill="#222"/>
-          <!-- belt -->
-          <rect x="5" y="10" width="6" height="1" fill="#FFD700"/>
-          <!-- shine -->
-          <rect x="6" y="6" width="1" height="2" fill="#6fded7" opacity="0.5"/>
-        </svg>
+    <!-- CENTER GAUGE -->
+    <div class="hero-center">
+      <div class="lead-gauge" id="lead-gauge">
+        <div class="lead-gauge-inner">
+          <span class="lead-pct" id="lead-pct">50%</span>
+          <span class="lead-word" id="lead-word">TIED</span>
+        </div>
       </div>
-      <div class="fighter-info right">
-        <div class="f-name">Cristina</div>
-        <div class="f-score c" id="hero-cristina">–</div>
-        <div class="f-sub" id="hero-cristina-sub">all-time steps</div>
+      <div class="vs-label">VS</div>
+      <div class="delta-box">
+        <div class="delta-label">DELTA</div>
+        <div class="delta-value" id="delta-value">0</div>
       </div>
     </div>
-    <div id="auth-area" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"></div>
-</div>
-</div>
 
-<div class="vs-bar-row">
-  <div class="vs-bar">
-    <div class="vb-paul" id="vb-paul" style="width:50%"></div>
-    <div class="vb-cristina" id="vb-cristina" style="width:50%"></div>
+    <!-- CRISTINA -->
+    <div class="hero-fighter">
+      <div class="hero-platform">
+        <div class="lead-tag cristina" id="cristina-lead-tag" style="display:none;">LEADING ◢</div>
+        <div class="wf-boxer" id="boxer-cristina-wrap"></div>
+        <div class="platform-glow" id="cristina-platform-glow"></div>
+      </div>
+      <div class="tier-label" id="cristina-tier-label">–</div>
+
+      <div class="fighter-stat-box cristina">
+        <div class="stat-unit-label cristina">UNIT_15 // CRISTINA</div>
+        <div class="stat-steps cristina" id="cristina-week-steps">–</div>
+        <div class="stat-steps-label">steps this week</div>
+        <div class="vitality-row"><span id="cristina-vit-pct">0%</span><span>VITALITY</span></div>
+        <div class="vitality-bar cristina">
+          <div class="vitality-marker" style="right:75%;"></div>
+          <div class="vitality-fill cristina" id="cristina-vit-fill" style="width:0%;"></div>
+        </div>
+        <div class="stat-meta-row">
+          <span>avg <b id="cristina-pace">–</b>/wk</span><span>streak <b id="cristina-streak">0</b> 🔥</span>
+        </div>
+        <div class="risk-banner" id="cristina-risk" style="display:none;">🥔 PUTREGAI RISK · under 20K = the curse</div>
+        <div class="log-steps-box" id="cristina-log-box" style="display:none;">
+          <div class="log-steps-label cristina">✎ LOG STEPS // <span id="cristina-log-week">this week</span></div>
+          <input type="number" class="log-steps-input cristina" id="cristina-log-input" onchange="saveInlineSteps('cristina', this.value)"/>
+        </div>
+        <div class="log-hint" id="cristina-log-hint" style="display:none;">Sign in as Cristina to log steps →</div>
+      </div>
+    </div>
   </div>
-</div>
+  </div>
+
+  <!-- ── STRENGTH LADDER ── -->
+  <div class="ladder-card">
+    <div class="ladder-head">
+      <div class="ladder-head-title">▸ STRENGTH LADDER — same scale for both fighters</div>
+      <div class="ladder-legend">
+        <span><span style="width:9px;height:9px;background:var(--paul);display:inline-block;clip-path:polygon(50% 0,100% 100%,0 100%);"></span>PAUL</span>
+        <span><span style="width:9px;height:9px;background:var(--cristina);display:inline-block;clip-path:polygon(0 0,100% 0,50% 100%);"></span>CRISTINA</span>
+      </div>
+    </div>
+    <div class="ladder-track">
+      <div class="ladder-marker paul" id="paul-ladder-marker" style="left:0%;">▼</div>
+      <div class="ladder-zones">
+        <div style="width:25%;background:#E25B5B26;"></div>
+        <div style="width:25%;background:#d9a44126;"></div>
+        <div style="width:31.25%;background:#4ECDC426;"></div>
+        <div style="width:18.75%;background:#FF6B3526;"></div>
+      </div>
+      <div class="ladder-marker cristina" id="cristina-ladder-marker" style="left:0%;">▲</div>
+    </div>
+    <div class="ladder-zone-labels">
+      <span style="width:25%;color:#E25B5B;">CRAWLING<br><span style="color:#5a6470;">0 – 20k</span></span>
+      <span style="width:25%;color:#d9a441;">GROGGY<br><span style="color:#5a6470;">20 – 40k</span></span>
+      <span style="width:31.25%;color:#9fe6df;">SHADOWBOXING<br><span style="color:#5a6470;">40 – 65k</span></span>
+      <span style="width:18.75%;color:#FF8a5e;">BEAST<br><span style="color:#5a6470;">65k +</span></span>
+    </div>
+    <div class="ladder-foot">The boxer changes state the moment its weekly steps cross a line above.</div>
+  </div>
 
 <!-- ── NAV ── -->
 <nav class="main-nav">
@@ -811,15 +885,7 @@ tr:hover td { background: var(--surface2); }
 
   <!-- ══ THIS WEEK ══ -->
   <div id="section-weekly">
-    <div class="week-nav">
-      <div class="month-chips" id="month-chips"></div>
-      <button class="nav-btn" id="btn-prev" onclick="changeWeek(-1)">←</button>
-      <button class="nav-btn" id="btn-next" onclick="changeWeek(1)" disabled>→</button>
-    </div>
-    <div class="sec-head">
-      <div class="sec-title" id="week-title">Week –</div>
-      <div class="sec-meta" id="week-dates">–</div>
-    </div>
+    <div class="month-chips" id="month-chips" style="margin-bottom:20px;"></div>
     <div class="week-cards" id="week-cards"></div>
     <div id="week-updated" style="text-align:center;font-size:11px;color:var(--muted2);margin:-16px 0 16px;min-height:16px;"></div>
     <div id="backers-widget"></div>
@@ -1435,8 +1501,10 @@ function setStatus(type, msg) {
   el.innerHTML = type==='loading' ? `<span class="spin">↻</span> ${msg}` : msg;
 }
 function setSyncState(ok) {
-  document.getElementById('sync-dot').className = ok ? 'sync-dot live' : 'sync-dot';
-  document.getElementById('sync-label').textContent = ok ? 'Synced' : 'Sync';
+  const dot = document.getElementById('synced-dot');
+  if (dot) dot.classList.toggle('offline', !ok);
+  const label = document.getElementById('sync-label');
+  if (label) label.textContent = ok ? 'SYNCED' : 'SYNCING';
 }
 
 function findCurrentWeek() {
@@ -1533,65 +1601,102 @@ function getEffectiveHat(who) {
 }
 
 // ══════════════════════════════════════════
-// RENDER HERO
+// RENDER HERO (vitality-driven, per viewed week)
 // ══════════════════════════════════════════
+const WEEK_SCALE = 80000;
+const VITALITY_TIERS = [
+  { key:'crawl',  max:20000,    label:'CRAWLING',     color:'#E25B5B', filter:'grayscale(.6) brightness(.75)' },
+  { key:'groggy', max:40000,    label:'GROGGY',       color:'#d9a441', filter:'grayscale(.25) brightness(.9)' },
+  { key:'fit',    max:65000,    label:'SHADOWBOXING', color:'#9fe6df', filter:'drop-shadow(0 0 6px rgba(159,230,223,.5))' },
+  { key:'beast',  max:Infinity, label:'BEAST',        color:'#FF8a5e', filter:'' },
+];
+const TIER_FILTER_BEAST = { paul:'drop-shadow(0 0 10px rgba(255,107,53,.7))', cristina:'drop-shadow(0 0 10px rgba(78,205,196,.7))' };
+function weekTier(steps) {
+  return VITALITY_TIERS.find(t => steps < t.max) || VITALITY_TIERS[VITALITY_TIERS.length-1];
+}
+
 function renderHero() {
+  if (!allWeeksFlat.length) return;
   const s = calcStats();
-  document.getElementById('hero-paul').textContent = s.paulTotal.toLocaleString();
-  document.getElementById('hero-cristina').textContent = s.cristinaTotal.toLocaleString();
-  document.getElementById('hero-paul-sub').textContent = `${s.paulWins}W · ${s.weeksWithData} weeks`;
-  document.getElementById('hero-cristina-sub').textContent = `${s.cristinaWins}W · ${s.weeksWithData} weeks`;
+  const w = allWeeksFlat[currentWeekIdx];
+  const d = DB[w.key]||{};
+  const pS = d.paul||0, cS = d.cristina||0;
 
-  const total = s.paulTotal + s.cristinaTotal;
-  let pp = 50;
-  if (total > 0) {
-    pp = Math.round((s.paulTotal/total)*100);
-    document.getElementById('vb-paul').style.width = pp+'%';
-    document.getElementById('vb-cristina').style.width = (100-pp)+'%';
-  }
+  document.getElementById('paul-week-steps').textContent = pS ? pS.toLocaleString() : '–';
+  document.getElementById('cristina-week-steps').textContent = cS ? cS.toLocaleString() : '–';
 
-  // VS ring conic gradient via style
-  document.getElementById('vs-ring').style.setProperty('--paul-pct', pp+'%');
+  const pVit = Math.min(100, Math.round(pS/WEEK_SCALE*100));
+  const cVit = Math.min(100, Math.round(cS/WEEK_SCALE*100));
+  document.getElementById('paul-vit-pct').textContent = pVit+'%';
+  document.getElementById('cristina-vit-pct').textContent = cVit+'%';
+  document.getElementById('paul-vit-fill').style.width = pVit+'%';
+  document.getElementById('cristina-vit-fill').style.width = cVit+'%';
 
-  // Head-to-head record in the VS ring
-  const vsRing = document.getElementById('vs-ring');
-  if (s.weeksWithBothData > 0) {
-    vsRing.innerHTML = `<div style="font-size:15px;line-height:1;"><span style="color:var(--paul)">${s.paulWins}</span><span style="color:var(--muted2);font-size:11px;margin:0 2px;">-</span><span style="color:var(--cristina)">${s.cristinaWins}</span></div>`;
-  } else {
-    vsRing.textContent = 'VS';
-  }
+  const pTier = weekTier(pS), cTier = weekTier(cS);
+  const pTierLabel = document.getElementById('paul-tier-label');
+  const cTierLabel = document.getElementById('cristina-tier-label');
+  pTierLabel.textContent = pTier.label;
+  pTierLabel.style.color = pTier.color;
+  cTierLabel.textContent = cTier.label;
+  cTierLabel.style.color = cTier.color;
 
-  const leaderEl = document.getElementById('vs-leader');
+  const paulStreak = s.liveCurStreakWho==='paul' ? s.liveCurStreak : 0;
+  const cristinaStreak = s.liveCurStreakWho==='cristina' ? s.liveCurStreak : 0;
+  document.getElementById('paul-streak').textContent = paulStreak;
+  document.getElementById('cristina-streak').textContent = cristinaStreak;
+  document.getElementById('paul-pace').textContent = s.weeksWithData>0 ? Math.round(s.paulRawSteps/s.weeksWithData).toLocaleString() : '–';
+  document.getElementById('cristina-pace').textContent = s.weeksWithData>0 ? Math.round(s.cristinaRawSteps/s.weeksWithData).toLocaleString() : '–';
+
+  document.getElementById('paul-risk').style.display = (pS>0 && pS<20000) ? '' : 'none';
+  document.getElementById('cristina-risk').style.display = (cS>0 && cS<20000) ? '' : 'none';
+
+  // Lead gauge
+  const total = pS+cS;
+  const leadPct = total>0 ? Math.round((pS/total)*100) : 50;
+  let leadColor, leadWord;
+  if (pS>cS) { leadColor='var(--paul)'; leadWord='PAUL LEADS'; }
+  else if (cS>pS) { leadColor='var(--cristina)'; leadWord='CRISTINA LEADS'; }
+  else { leadColor='var(--muted)'; leadWord='TIED'; }
+  const leadPctEl = document.getElementById('lead-pct');
+  leadPctEl.textContent = leadPct+'%';
+  leadPctEl.style.color = leadColor;
+  document.getElementById('lead-word').textContent = leadWord;
+  document.getElementById('lead-gauge').style.background = `conic-gradient(var(--paul) 0%, var(--paul) ${leadPct}%, var(--cristina) ${leadPct}%, var(--cristina) 100%)`;
+  const delta = pS-cS;
+  const deltaEl = document.getElementById('delta-value');
+  deltaEl.textContent = delta===0 ? '0' : (delta>0?'+':'') + delta.toLocaleString();
+  deltaEl.style.color = leadColor;
+
+  document.getElementById('paul-lead-tag').style.display = pS>cS ? '' : 'none';
+  document.getElementById('cristina-lead-tag').style.display = cS>pS ? '' : 'none';
+
+  // Strength ladder
+  document.getElementById('paul-ladder-marker').style.left = Math.min(98, Math.max(2, (pS/WEEK_SCALE)*100)) + '%';
+  document.getElementById('cristina-ladder-marker').style.left = Math.min(98, Math.max(2, (cS/WEEK_SCALE)*100)) + '%';
+
+  // Inline log-steps inputs
+  ['paul','cristina'].forEach(who => {
+    const box = document.getElementById(`${who}-log-box`);
+    const hint = document.getElementById(`${who}-log-hint`);
+    const inp = document.getElementById(`${who}-log-input`);
+    document.getElementById(`${who}-log-week`).textContent = `Week ${w.num}`;
+    if (currentUser === who) {
+      box.style.display = '';
+      hint.style.display = 'none';
+      if (document.activeElement !== inp) inp.value = (who==='paul'?pS:cS) || '';
+    } else {
+      box.style.display = 'none';
+      hint.style.display = '';
+    }
+  });
+
+  // Boxer wraps + vitality animation
   const paulBox = document.getElementById('boxer-paul-wrap');
   const cristinaBox = document.getElementById('boxer-cristina-wrap');
-
-  // Streak indicator
-  let streakBadge = '';
-  if (s.liveCurStreak >= 2) {
-    const sColor = s.liveCurStreakWho === 'paul' ? 'var(--paul)' : 'var(--cristina)';
-    streakBadge = ` <span style="color:${sColor};font-weight:700;">🔥${s.liveCurStreak}</span>`;
-  }
-
-  // Determine state
-  let paulClass, cristinaClass, leaderHtml;
-  if (s.paulTotal > s.cristinaTotal) {
-    paulClass = 'boxer-canvas boxer-winner';
-    cristinaClass = 'boxer-canvas boxer-loser';
-    leaderHtml = '<span style="color:var(--paul)">Paul leads</span>' + streakBadge;
-  } else if (s.cristinaTotal > s.paulTotal) {
-    paulClass = 'boxer-canvas boxer-loser';
-    cristinaClass = 'boxer-canvas boxer-winner-left';
-    leaderHtml = '<span style="color:var(--cristina)">Cristina leads</span>' + streakBadge;
-  } else {
-    paulClass = 'boxer-canvas boxer-tie';
-    cristinaClass = 'boxer-canvas boxer-tie';
-    leaderHtml = 'All tied up!';
-  }
-
-  // Only update if state changed to avoid animation restart flicker
-  if (paulBox.className !== paulClass) paulBox.className = paulClass;
-  if (cristinaBox.className !== cristinaClass) cristinaBox.className = cristinaClass;
-  leaderEl.innerHTML = leaderHtml;
+  paulBox.className = `wf-boxer tier-${pTier.key} paul`;
+  cristinaBox.className = `wf-boxer tier-${cTier.key} cristina`;
+  document.getElementById('paul-platform-glow').className = `platform-glow tier-${pTier.key}`;
+  document.getElementById('cristina-platform-glow').className = `platform-glow tier-${cTier.key}`;
 
   // Inject equipped boxer looks (only re-render if the look changed, to avoid flicker)
   const pEffHat = getEffectiveHat('paul');
@@ -1608,13 +1713,17 @@ function renderHero() {
     cristinaBox.innerHTML = getBoxerSVG('cristina', cEffHat, equipped.cristina?.color||'default', equipped.cristina?.hatColor||'hc_default', cGloves);
     cristinaBox.dataset.look = cLook;
   }
-  // Apply background aura as a drop-shadow glow
+
+  // Combine vitality filter with equipped background aura (if any)
   ['paul','cristina'].forEach(who => {
     const wrap = document.getElementById(`boxer-${who}-wrap`);
     if (!wrap) return;
+    const tier = who==='paul' ? pTier : cTier;
+    const baseFilter = tier.key==='beast' ? TIER_FILTER_BEAST[who] : tier.filter;
     const bgId = equipped[who]?.background;
     const bgItem = SHOP_ITEMS.find(i=>i.id===bgId&&i.slot==='background');
-    wrap.style.filter = bgItem ? `drop-shadow(0 0 8px ${bgItem.hex}) drop-shadow(0 0 18px ${bgItem.hex}66)` : '';
+    const auraFilter = bgItem ? `drop-shadow(0 0 8px ${bgItem.hex}) drop-shadow(0 0 18px ${bgItem.hex}66)` : '';
+    wrap.style.filter = [baseFilter, auraFilter].filter(Boolean).join(' ');
   });
 }
 
@@ -1635,9 +1744,9 @@ function renderWeekly() {
   const d = DB[w.key]||{};
   document.getElementById('week-title').textContent = `Week ${w.num}`;
   document.getElementById('week-dates').textContent = `${MONTHS_F[w.month]} — ${fmtShort(w.start)} to ${fmtShort(w.end)}`;
-  // Update the gritty banner to the viewed month
+  // Update the terminal status line to the viewed month
   const bannerEl = document.getElementById('crawling-banner-text');
-  if (bannerEl) bannerEl.innerHTML = `☠ <span>Crawling Month</span> — ${MONTHS_F[w.month]} ${w.year} ☠`;
+  if (bannerEl) bannerEl.textContent = `> CRAWLING_MONTH.exe // ${MONTHS_F[w.month].toUpperCase()}_${w.year}`;
 
   const months = [...new Set(allWeeksFlat.map(x=>`${x.year}-${String(x.month+1).padStart(2,'0')}`))]
     .map(mk=>{ const [y,mo]=mk.split('-'); return { key:mk, label:`${MONTHS_S[parseInt(mo)-1]} ${y}` }; });
@@ -2843,10 +2952,11 @@ function renderAll() { renderHero(); renderWeekly(); checkForNewWins(); }
 function changeWeek(dir) {
   currentWeekIdx = Math.max(0,Math.min(allWeeksFlat.length-1,currentWeekIdx+dir));
   renderWeekly();
+  renderHero();
 }
 function jumpToMonth(mk) {
   const idx = allWeeksFlat.findIndex(w=>`${w.year}-${String(w.month+1).padStart(2,'0')}`===mk);
-  if (idx>=0) { currentWeekIdx=idx; renderWeekly(); }
+  if (idx>=0) { currentWeekIdx=idx; renderWeekly(); renderHero(); }
 }
 
 function showSection(name) {
@@ -2942,177 +3052,93 @@ let currentUser = localStorage.getItem('steps_user') || null;
 function renderAuthArea() {
   const area = document.getElementById('auth-area');
   if (!currentUser) {
-    area.innerHTML = '<button class="sync-btn" onclick="showPinModal()" style="border-color:rgba(255,107,53,0.4);color:var(--paul);">🔐 Sign in to add data</button>';
+    area.innerHTML = '<button class="icon-btn auth-btn" onclick="toggleSigninPanel()">🔐 SIGN IN</button>';
   } else {
-    const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
+    const name = currentUser === 'paul' ? 'PAUL' : 'CRISTINA';
     const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
-    area.innerHTML = '<span style="font-size:12px;color:' + color + ';font-weight:600;">' + name + ' signed in</span> <button class="sync-btn" onclick="signOut()" style="font-size:11px;padding:5px 10px;">Sign out</button>';
-    renderWritePanel();
+    area.innerHTML = `<span class="auth-user" style="color:${color};">${name}</span><button class="icon-btn auth-btn" onclick="signOut()">SIGN OUT</button>`;
+  }
+  renderHero();
+}
+
+let pendingPinUser = null;
+function toggleSigninPanel(force) {
+  const panel = document.getElementById('signin-panel');
+  const show = force !== undefined ? force : panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !show);
+  if (show) {
+    pendingPinUser = null;
+    document.getElementById('signin-pin-input').value = '';
+    document.getElementById('signin-err').style.display = 'none';
+    document.getElementById('signin-btn-paul').classList.remove('active','paul');
+    document.getElementById('signin-btn-cristina').classList.remove('active','cristina');
+    document.getElementById('signin-pin-input').focus();
   }
 }
 
-function showPinModal() {
-  let modal = document.getElementById('pin-modal');
-  if (modal) { modal.style.display = 'flex'; return; }
-  modal = document.createElement('div');
-  modal.id = 'pin-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
-  modal.innerHTML = `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:320px;max-width:90vw;">
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">Sign in</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Enter your name and PIN to add your steps.</div>
-      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:6px;">Who are you?</label>
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button onclick="selectPinUser('paul')" id="pin-btn-paul" style="flex:1;padding:10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface2);color:var(--paul);font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all 0.15s;">Paul</button>
-        <button onclick="selectPinUser('cristina')" id="pin-btn-cristina" style="flex:1;padding:10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface2);color:var(--cristina);font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all 0.15s;">Cristina</button>
-      </div>
-      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:6px;">PIN</label>
-      <input id="pin-input" type="password" maxlength="8"
-        style="width:100%;background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:18px;letter-spacing:6px;outline:none;margin-bottom:8px;"
-        placeholder="••••" onkeydown="if(event.key==='Enter')submitPin()" />
-      <div id="pin-error" style="font-size:12px;color:#E25B5B;min-height:18px;margin-bottom:12px;"></div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="submitPin()" style="flex:1;padding:11px;border:none;border-radius:var(--radius-sm);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:var(--paul);color:#fff;cursor:pointer;">Sign in</button>
-        <button onclick="closePinModal()" style="padding:11px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--muted);font-family:'DM Sans',sans-serif;cursor:pointer;">Cancel</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
+function pendPinUser(who) {
+  pendingPinUser = who;
+  const paulBtn = document.getElementById('signin-btn-paul');
+  const cristinaBtn = document.getElementById('signin-btn-cristina');
+  paulBtn.classList.toggle('active', who === 'paul');
+  paulBtn.classList.toggle('paul', who === 'paul');
+  cristinaBtn.classList.toggle('active', who === 'cristina');
+  cristinaBtn.classList.toggle('cristina', who === 'cristina');
+  document.getElementById('signin-err').style.display = 'none';
+  document.getElementById('signin-pin-input').focus();
 }
 
-let selectedPinUser = null;
-function selectPinUser(who) {
-  selectedPinUser = who;
-  const paulBtn = document.getElementById('pin-btn-paul');
-  const cristinaBtn = document.getElementById('pin-btn-cristina');
-  if (paulBtn) paulBtn.style.borderColor = who === 'paul' ? 'var(--paul)' : 'var(--border)';
-  if (cristinaBtn) cristinaBtn.style.borderColor = who === 'cristina' ? 'var(--cristina)' : 'var(--border)';
-}
-
-function submitPin() {
-  const pin = document.getElementById('pin-input')?.value;
-  const errEl = document.getElementById('pin-error');
-  if (!selectedPinUser) { if (errEl) errEl.textContent = 'Please select Paul or Cristina first.'; return; }
-  if (!pin) { if (errEl) errEl.textContent = 'Please enter your PIN.'; return; }
-  if (pin !== PINS[selectedPinUser]) { if (errEl) errEl.textContent = 'Wrong PIN. Try again.'; return; }
-  currentUser = selectedPinUser;
+function submitInlinePin() {
+  const pin = document.getElementById('signin-pin-input')?.value;
+  const errEl = document.getElementById('signin-err');
+  if (!pendingPinUser || !pin || pin !== PINS[pendingPinUser]) {
+    errEl.style.display = '';
+    return;
+  }
+  currentUser = pendingPinUser;
   localStorage.setItem('steps_user', currentUser);
-  closePinModal();
+  toggleSigninPanel(false);
   renderAuthArea();
-  // Refresh sections that depend on who's signed in
   if (document.getElementById('section-wardrobe').style.display !== 'none') renderWardrobe();
   if (document.getElementById('section-rewards').style.display !== 'none') renderRewards();
   showToast('Signed in as ' + (currentUser === 'paul' ? 'Paul' : 'Cristina') + ' ✓');
-}
-
-function closePinModal() {
-  const m = document.getElementById('pin-modal');
-  if (m) m.style.display = 'none';
 }
 
 function signOut() {
   currentUser = null;
   localStorage.removeItem('steps_user');
   renderAuthArea();
-  const wp = document.getElementById('write-panel');
-  if (wp) wp.style.display = 'none';
   if (document.getElementById('section-wardrobe').style.display !== 'none') renderWardrobe();
   if (document.getElementById('section-rewards').style.display !== 'none') renderRewards();
 }
 
-function renderWritePanel() {
-  let wp = document.getElementById('write-panel');
-  if (!wp) {
-    wp = document.createElement('div');
-    wp.id = 'write-panel';
-    document.querySelector('.wrap').prepend(wp);
-  }
-  if (!currentUser) { wp.style.display = 'none'; return; }
+async function saveInlineSteps(who, value) {
+  if (currentUser !== who) return;
+  const steps = parseInt(value);
+  if (isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); renderHero(); return; }
 
-  const name = currentUser === 'paul' ? 'Paul' : 'Cristina';
-  const color = currentUser === 'paul' ? 'var(--paul)' : 'var(--cristina)';
-  const weekOpts = allWeeksFlat.map(w =>
-    '<option value="' + w.key + '">Week ' + w.num + ' — ' + MONTHS_S[w.month] + ' ' + fmtShort(w.start) + '–' + fmtShort(w.end) + '</option>'
-  ).join('');
-  const curKey = allWeeksFlat[currentWeekIdx]?.key || '';
-  const curVal = curKey && DB[curKey]?.[currentUser] ? DB[curKey][currentUser] : '';
-
-  wp.style.display = '';
-  wp.innerHTML = `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;border-top:3px solid ${color};">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${color};margin-bottom:14px;">Add ${name}'s steps</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:1;min-width:180px;">
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:5px;">Week</label>
-          <select id="wp-week-sel" class="week-sel" style="margin-bottom:0;" onchange="onWpWeekChange()">${weekOpts}</select>
-        </div>
-        <div style="flex:1;min-width:140px;">
-          <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);display:block;margin-bottom:5px;">Weekly total steps</label>
-          <input id="wp-steps-inp" type="number" min="0" max="999999"
-            class="step-inp ${currentUser === 'cristina' ? 'c-inp' : ''}"
-            style="margin-bottom:0;font-size:20px;padding:10px 12px;"
-            placeholder="e.g. 54000" value="${curVal}" />
-        </div>
-        <button onclick="writeToSheet()" style="padding:11px 24px;border:none;border-radius:var(--radius-sm);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:${color};color:${currentUser==='paul'?'#fff':'#0A0A0C'};cursor:pointer;white-space:nowrap;">Save to Sheet</button>
-      </div>
-      <div id="wp-status" style="font-size:12px;color:var(--muted);margin-top:8px;"></div>
-    </div>
-  `;
-
-  const sel = document.getElementById('wp-week-sel');
-  if (sel && curKey) sel.value = curKey;
-}
-
-function onWpWeekChange() {
-  const key = document.getElementById('wp-week-sel')?.value;
-  if (!key || !currentUser) return;
-  const val = DB[key]?.[currentUser];
-  const inp = document.getElementById('wp-steps-inp');
-  if (inp) inp.value = val || '';
-}
-
-async function writeToSheet() {
-  if (!currentUser) { showToast('Please sign in first'); return; }
-  const key = document.getElementById('wp-week-sel')?.value;
-  const steps = parseInt(document.getElementById('wp-steps-inp')?.value);
-  if (!key || isNaN(steps) || steps < 0) { showToast('Enter a valid step count'); return; }
+  const key = allWeeksFlat[currentWeekIdx]?.key;
+  if (!key) return;
 
   playPunch();
-  const wpStatus = document.getElementById('wp-status');
-  wpStatus.textContent = '↻ Saving to Sheet...';
-  wpStatus.style.color = 'var(--muted)';
 
-  // Update local DB immediately so UI reflects change
   if (!DB[key]) DB[key] = { paul: null, cristina: null };
-  DB[key][currentUser] = steps;
+  DB[key][who] = steps;
   saveDB();
   buildWeeksFlat();
   renderAll();
-  renderWritePanel();
-  const sel = document.getElementById('wp-week-sel');
-  if (sel) sel.value = key;
 
-  // Write to Google Sheet via Apps Script
   try {
-    const res = await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ week_key: key, person: currentUser, steps: steps })
+      body: JSON.stringify({ week_key: key, person: who, steps: steps })
     });
-    // no-cors means we can't read the response, but if no exception it went through
-    if (wpStatus) {
-      wpStatus.textContent = '✓ Saved to Google Sheet!';
-      wpStatus.style.color = '#5BDE8E';
-    }
     showToast('Saved to Sheet ✓');
-    writeMeta('updated', currentUser, key, new Date().toISOString());
+    writeMeta('updated', who, key, new Date().toISOString());
   } catch(e) {
-    if (wpStatus) {
-      wpStatus.textContent = '⚠ Saved locally — sheet update failed. Hit Sync later.';
-      wpStatus.style.color = '#E2AA5B';
-    }
-    showToast('Saved locally ✓');
+    showToast('Saved locally — sync later');
   }
 }
 
