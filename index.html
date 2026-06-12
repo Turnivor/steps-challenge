@@ -1463,16 +1463,16 @@ function getVoterId() {
 // ══════════════════════════════════════════
 const REWARDS = [
   { icon:'🍕', name:'Pizza Slice', trigger:'Win any week', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
-  { icon:'🍣', name:'1 Piece of Sushi', trigger:'Win 2 weeks in a month', condition:(stats)=>stats.paulWins>=2||stats.cristinaWins>=2, winner:true },
+  { icon:'🍣', name:'1 Piece of Sushi', trigger:'Win 3 weeks in a month', condition:(stats)=>stats.paulWins>=3||stats.cristinaWins>=3, winner:true },
   { icon:'🎵', name:'Vinyl / Steam Game', trigger:'First to 500K total steps — Cristina picks a vinyl record, Paul picks a Steam game (~200 RON)', condition:(stats)=>stats.paulTotal>=500000||stats.cristinaTotal>=500000, winner:true },
-  { icon:'📺', name:'Month of Streaming', trigger:'Hit 100K total steps — loser pays a month of winner\'s streaming (Spotify, YouTube Premium, etc.)', condition:(stats)=>stats.paulTotal>=100000||stats.cristinaTotal>=100000, winner:true },
+  { icon:'📺', name:'Month of Streaming', trigger:'Hit 150K total steps — loser pays a month of winner\'s streaming (Spotify, YouTube Premium, etc.)', condition:(stats)=>stats.paulTotal>=150000||stats.cristinaTotal>=150000, winner:true },
   { icon:'☕', name:'Fancy Coffee', trigger:'Win 3 weeks in a row', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
   { icon:'🧃', name:'Smoothie', trigger:'Both reach 50K total steps', condition:(stats)=>stats.paulTotal>=50000&&stats.cristinaTotal>=50000, winner:false },
-  { icon:'🍫', name:'Chocolate of Choosing', trigger:'First to 250K total steps — winner picks any chocolate they want', condition:(stats)=>stats.paulTotal>=250000||stats.cristinaTotal>=250000, winner:true },
-  { icon:'🧦', name:'1 Sock (just one)', trigger:'Hit 500K total steps', condition:(stats)=>stats.paulTotal>=500000||stats.cristinaTotal>=500000, winner:true },
+  { icon:'🍫', name:'Chocolate of Choosing', trigger:'First to 300K total steps — winner picks any chocolate they want', condition:(stats)=>stats.paulTotal>=300000||stats.cristinaTotal>=300000, winner:true },
+  { icon:'🧦', name:'1 Sock (just one)', trigger:'Hit 600K total steps', condition:(stats)=>stats.paulTotal>=600000||stats.cristinaTotal>=600000, winner:true },
   { icon:'🥗', name:'Healthy Lunch Out', trigger:'Both complete a full month of data', condition:(stats)=>stats.weeksWithBothData>=4, winner:false },
-  { icon:'🍵', name:'Fancy Tea', trigger:'Win 4 weeks total', condition:(stats)=>stats.paulWins>=4||stats.cristinaWins>=4, winner:true },
-  { icon:'🗺️', name:'Mystery Route', trigger:'Win any week — winner picks a walking route, loser follows without complaining or knowing the destination in advance', condition:(stats)=>stats.paulWins>0||stats.cristinaWins>0, winner:true },
+  { icon:'🍵', name:'Fancy Tea', trigger:'Win 6 weeks total', condition:(stats)=>stats.paulWins>=6||stats.cristinaWins>=6, winner:true },
+  { icon:'🗺️', name:'Mystery Route', trigger:'Win 2 weeks — winner picks a walking route, loser follows without complaining or knowing the destination in advance', condition:(stats)=>stats.paulWins>=2||stats.cristinaWins>=2, winner:true },
   { icon:'🎲', name:'Mystery Gift', trigger:'Win 3 weeks in a row — loser buys something random under 20 RON', condition:(stats)=>stats.paulStreak>=3||stats.cristinaStreak>=3, winner:true },
   { icon:'🤣', name:'10 Excuse List', trigger:'Win 5 weeks total — loser must write 10 hilariously bad reasons why they didn\'t do enough steps', condition:(stats)=>stats.paulWins>=5||stats.cristinaWins>=5, winner:true },
   { icon:'🧴', name:'Sunscreen', trigger:'First to 200K total steps — winner picks the sunscreen (no fancy Korean ones)', condition:(stats)=>stats.paulTotal>=200000||stats.cristinaTotal>=200000, winner:true },
@@ -1484,6 +1484,10 @@ const REWARDS = [
   { icon:'🎨', name:'Try a Hobby Together', trigger:'Win 4 weeks total — pick a hobby to try together once (crochet, board game, biking, etc.)', condition:(stats)=>stats.paulWins>=4||stats.cristinaWins>=4, winner:false, assignTo:'both' },
   { icon:'🚶', name:'Crawl of Shame', trigger:'Lose 3 weeks in a row — loser does a silly walk (mersul piticului / mers în 4 labe / GoT walk of shame style) for a few minutes in a public place', condition:(stats)=>stats.paulLoseStreak>=3||stats.cristinaLoseStreak>=3, winner:false, assignTo:'loser', assignFn:(stats)=>stats.paulLoseStreak>=stats.cristinaLoseStreak?'paul':'cristina' },
   { icon:'📮', name:'Postcard of Defeat', trigger:'Lose 5 weeks total — loser sends the winner a postcard (or a photo of themselves somewhere cool) with a message admitting defeat', condition:(stats)=>stats.paulLosses>=5||stats.cristinaLosses>=5, winner:false, assignTo:'loser' },
+
+  { icon:'🔥', name:'Phoenix Week', trigger:'Win a week right after losing the previous one — the rebounder picks the next walking playlist', condition:(stats)=>stats.paulJustRebounded||stats.cristinaJustRebounded, winner:false, assignTo:'loser', assignFn:(stats)=>stats.paulJustRebounded?'paul':'cristina', tone:'comeback' },
+  { icon:'🪨', name:'David vs Goliath', trigger:'The player who is behind by 20,000+ total steps wins a week — the leader owes them a coffee', condition:(stats)=>!!stats.trailingPerson && stats.stepGap>=20000 && stats.trailingPerson===stats.liveCurStreakWho, winner:false, assignTo:'loser', assignFn:(stats)=>stats.trailingPerson, tone:'comeback' },
+  { icon:'💪', name:'Never Give Up', trigger:'Keep the gap under 10,000 steps deep into the month — the underdog earns a victory snack of choice', condition:(stats)=>stats.stepGap<10000 && stats.weeksWithBothData>=4, winner:false, assignTo:'loser', assignFn:(stats)=>stats.trailingPerson||'paul', tone:'comeback' },
 ];
 
 // ══════════════════════════════════════════
@@ -1654,6 +1658,8 @@ function calcStats() {
   let paulBestWeek=0, cristinaBestWeek=0, biggestMargin=0, biggestMarginWho='';
   // Running current streak (most recent consecutive wins, ends at last completed week)
   let liveCurStreakWho='', liveCurStreak=0;
+  // Results of completed (both-entered) weeks, in chronological order — used for rebound detection
+  let completedResults = [];
   const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul||DB[w.key]?.cristina);
   weeks.forEach(w => {
     const d = DB[w.key]||{};
@@ -1665,15 +1671,23 @@ function calcStats() {
       weeksWithBothData++;
       const margin = Math.abs(p-c);
       if (margin > biggestMargin) { biggestMargin = margin; biggestMarginWho = p>c?'paul':c>p?'cristina':''; }
-      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; liveCurStreakWho='paul'; liveCurStreak=paulCurStreak; cristinaLosses++; cristinaCurLoseStreak++; paulCurLoseStreak=0; }
-      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; liveCurStreakWho='cristina'; liveCurStreak=cristinaCurStreak; paulLosses++; paulCurLoseStreak++; cristinaCurLoseStreak=0; }
-      else { ties++; paulCurStreak=0; cristinaCurStreak=0; liveCurStreakWho=''; liveCurStreak=0; paulCurLoseStreak=0; cristinaCurLoseStreak=0; }
+      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; liveCurStreakWho='paul'; liveCurStreak=paulCurStreak; cristinaLosses++; cristinaCurLoseStreak++; paulCurLoseStreak=0; completedResults.push('paul'); }
+      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; liveCurStreakWho='cristina'; liveCurStreak=cristinaCurStreak; paulLosses++; paulCurLoseStreak++; cristinaCurLoseStreak=0; completedResults.push('cristina'); }
+      else { ties++; paulCurStreak=0; cristinaCurStreak=0; liveCurStreakWho=''; liveCurStreak=0; paulCurLoseStreak=0; cristinaCurLoseStreak=0; completedResults.push('tie'); }
       paulStreak = Math.max(paulStreak, paulCurStreak);
       cristinaStreak = Math.max(cristinaStreak, cristinaCurStreak);
       paulLoseStreak = Math.max(paulLoseStreak, paulCurLoseStreak);
       cristinaLoseStreak = Math.max(cristinaLoseStreak, cristinaCurLoseStreak);
     }
   });
+  // Comeback detection — did the most recent completed week flip the previous week's result?
+  let paulJustRebounded = false, cristinaJustRebounded = false;
+  if (completedResults.length >= 2) {
+    const older = completedResults[completedResults.length-2];
+    const newer = completedResults[completedResults.length-1];
+    if (older==='cristina' && newer==='paul') paulJustRebounded = true;
+    if (older==='paul' && newer==='cristina') cristinaJustRebounded = true;
+  }
   // Raw totals (pre-spend) — used for wardrobe/milestone unlocks and shop balance
   const paulRawSteps = paulTotal;
   const cristinaRawSteps = cristinaTotal;
@@ -1698,12 +1712,16 @@ function calcStats() {
   // Distance equivalent (avg 0.75m per step → km, based on raw)
   const paulKm = Math.round(paulRawSteps * 0.00075);
   const cristinaKm = Math.round(cristinaRawSteps * 0.00075);
+  // Comeback / underdog stats
+  const stepGap = Math.abs(paulTotal - cristinaTotal);
+  const trailingPerson = paulTotal < cristinaTotal ? 'paul' : (cristinaTotal < paulTotal ? 'cristina' : null);
   return { paulTotal, cristinaTotal, paulRawSteps, cristinaRawSteps, paulWins, cristinaWins, ties,
     paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length,
     paulBestWeek, cristinaBestWeek, biggestMargin, biggestMarginWho,
     liveCurStreakWho, liveCurStreak, paulKm, cristinaKm,
     paulLoseStreak, cristinaLoseStreak, paulCurLoseStreak, cristinaCurLoseStreak,
-    paulLosses, cristinaLosses, paulMorale, cristinaMorale };
+    paulLosses, cristinaLosses, paulMorale, cristinaMorale,
+    stepGap, trailingPerson, paulJustRebounded, cristinaJustRebounded };
 }
 
 // Per-month champion calculator
@@ -2060,11 +2078,20 @@ function renderRewards() {
     } else if (assignTo === 'loser') {
       const who = r.assignFn ? r.assignFn(sRaw) : loser;
       const name = who==='paul'?'Paul':'Cristina';
-      statusHtml = `<span class="reward-status reward-penalty">${name} must do this 😅</span>`;
-      cardClass += ' penalty';
-      // Show "mark as done" only to the signed-in person if they're the one on the hook
-      if (currentUser === who) {
-        claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(226,91,91,0.15);border:1px solid rgba(226,91,91,0.3);color:#E25B5B;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as done</button>`;
+      if (r.tone === 'comeback') {
+        statusHtml = `<span class="reward-status reward-earned">${name} earns this 💪</span>`;
+        cardClass += ' claimed';
+        // Show "mark as claimed" only to the signed-in person if they're the one earning it
+        if (currentUser === who) {
+          claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as claimed</button>`;
+        }
+      } else {
+        statusHtml = `<span class="reward-status reward-penalty">${name} must do this 😅</span>`;
+        cardClass += ' penalty';
+        // Show "mark as done" only to the signed-in person if they're the one on the hook
+        if (currentUser === who) {
+          claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(226,91,91,0.15);border:1px solid rgba(226,91,91,0.3);color:#E25B5B;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as done</button>`;
+        }
       }
     } else {
       statusHtml = `<span class="reward-status reward-earned">Both earn this!</span>`;
