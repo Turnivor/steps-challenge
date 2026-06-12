@@ -233,6 +233,53 @@ body {
 .delta-label { font-size: 9px; letter-spacing: 2px; color: #6b7785; }
 .delta-value { font-size: 17px; font-weight: 700; transition: color .4s; }
 
+/* ── FIGHT! BANNER (Mortal Kombat style) ── */
+.fight-banner {
+  width: 150px; height: 150px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(45deg, #2b2b2b 0 6px, #1a1a1a 6px 12px),
+    linear-gradient(180deg, #3a3a3a, #0d0d0d);
+  border: 3px solid #000;
+  box-shadow: inset 0 0 0 2px #4a4a4a, inset 0 0 26px rgba(0,0,0,.85), 0 0 22px -4px rgba(226,30,30,.55);
+  image-rendering: pixelated;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.fight-banner:active { transform: scale(0.97); }
+.fight-text {
+  font-family: 'Creepster', 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  letter-spacing: 3px;
+  color: #ff2b2b;
+  text-shadow:
+    3px 3px 0 #4a0000,
+    -2px -2px 0 #ffae00,
+    0 0 10px #ff2b2b,
+    0 0 22px #ff0000;
+  -webkit-text-stroke: 1px #000;
+  transform: scaleY(1.15);
+  animation: fight-flicker 2.6s steps(1) infinite;
+}
+.fight-sub {
+  margin-top: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #ffae00;
+  text-shadow: 1px 1px 0 #000;
+}
+@keyframes fight-flicker {
+  0%, 88%, 100% { opacity: 1; transform: scaleY(1.15) scale(1); }
+  90% { opacity: .8; transform: scaleY(1.1) scale(0.98); }
+  92% { opacity: 1; transform: scaleY(1.2) scale(1.02); }
+  94% { opacity: .9; transform: scaleY(1.15) scale(1); }
+}
+
 /* strength ladder */
 .ladder-card { max-width: 1120px; margin: 18px auto 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface2); padding: 16px 20px; }
 .ladder-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
@@ -808,18 +855,11 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
 
-    <!-- CENTER GAUGE -->
+    <!-- CENTER FIGHT BANNER -->
     <div class="hero-center">
-      <div class="lead-gauge" id="lead-gauge">
-        <div class="lead-gauge-inner">
-          <span class="lead-pct" id="lead-pct">50%</span>
-          <span class="lead-word" id="lead-word">TIED</span>
-        </div>
-      </div>
-      <div class="vs-label">VS</div>
-      <div class="delta-box">
-        <div class="delta-label">DELTA</div>
-        <div class="delta-value" id="delta-value">0</div>
+      <div class="fight-banner" id="fight-banner" onclick="playFightFanfare()" title="Tap for FIGHT! sting">
+        <div class="fight-text">FIGHT!</div>
+        <div class="fight-sub">VS</div>
       </div>
     </div>
 
@@ -853,34 +893,6 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
   </div>
-  </div>
-
-  <!-- ── STRENGTH LADDER ── -->
-  <div class="ladder-card">
-    <div class="ladder-head">
-      <div class="ladder-head-title">▸ STRENGTH LADDER — same scale for both fighters</div>
-      <div class="ladder-legend">
-        <span><span style="width:9px;height:9px;background:var(--paul);display:inline-block;clip-path:polygon(50% 0,100% 100%,0 100%);"></span>PAUL</span>
-        <span><span style="width:9px;height:9px;background:var(--cristina);display:inline-block;clip-path:polygon(0 0,100% 0,50% 100%);"></span>CRISTINA</span>
-      </div>
-    </div>
-    <div class="ladder-track">
-      <div class="ladder-marker paul" id="paul-ladder-marker" style="left:0%;">▼</div>
-      <div class="ladder-zones">
-        <div style="width:25%;background:#E25B5B26;"></div>
-        <div style="width:25%;background:#d9a44126;"></div>
-        <div style="width:31.25%;background:#4ECDC426;"></div>
-        <div style="width:18.75%;background:#FF6B3526;"></div>
-      </div>
-      <div class="ladder-marker cristina" id="cristina-ladder-marker" style="left:0%;">▲</div>
-    </div>
-    <div class="ladder-zone-labels">
-      <span style="width:25%;color:#E25B5B;">CRAWLING<br><span style="color:#5a6470;">0 – 20k</span></span>
-      <span style="width:25%;color:#d9a441;">GROGGY<br><span style="color:#5a6470;">20 – 40k</span></span>
-      <span style="width:31.25%;color:#9fe6df;">SHADOWBOXING<br><span style="color:#5a6470;">40 – 65k</span></span>
-      <span style="width:18.75%;color:#FF8a5e;">BEAST<br><span style="color:#5a6470;">65k +</span></span>
-    </div>
-    <div class="ladder-foot">The boxer changes state the moment its weekly steps cross a line above.</div>
   </div>
 
 <!-- ── NAV ── -->
@@ -924,6 +936,55 @@ tr:hover td { background: var(--surface2); }
       <div class="sec-title">Personal Records</div>
       <div class="sec-meta">All-time bests</div>
     </div>
+
+    <!-- ── THIS WEEK'S LEAD ── -->
+    <div class="ladder-card" style="margin:0 0 16px;">
+      <div class="ladder-head" style="margin-bottom:4px;">
+        <div class="ladder-head-title">▸ THIS WEEK'S LEAD</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;padding:10px 0 4px;">
+        <div class="lead-gauge" id="lead-gauge">
+          <div class="lead-gauge-inner">
+            <span class="lead-pct" id="lead-pct">50%</span>
+            <span class="lead-word" id="lead-word">TIED</span>
+          </div>
+        </div>
+        <div class="vs-label">VS</div>
+        <div class="delta-box">
+          <div class="delta-label">DELTA</div>
+          <div class="delta-value" id="delta-value">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STRENGTH LADDER ── -->
+    <div class="ladder-card" style="margin:0 0 24px;">
+      <div class="ladder-head">
+        <div class="ladder-head-title">▸ STRENGTH LADDER — same scale for both fighters</div>
+        <div class="ladder-legend">
+          <span><span style="width:9px;height:9px;background:var(--paul);display:inline-block;clip-path:polygon(50% 0,100% 100%,0 100%);"></span>PAUL</span>
+          <span><span style="width:9px;height:9px;background:var(--cristina);display:inline-block;clip-path:polygon(0 0,100% 0,50% 100%);"></span>CRISTINA</span>
+        </div>
+      </div>
+      <div class="ladder-track">
+        <div class="ladder-marker paul" id="paul-ladder-marker" style="left:0%;">▼</div>
+        <div class="ladder-zones">
+          <div style="width:25%;background:#E25B5B26;"></div>
+          <div style="width:25%;background:#d9a44126;"></div>
+          <div style="width:31.25%;background:#4ECDC426;"></div>
+          <div style="width:18.75%;background:#FF6B3526;"></div>
+        </div>
+        <div class="ladder-marker cristina" id="cristina-ladder-marker" style="left:0%;">▲</div>
+      </div>
+      <div class="ladder-zone-labels">
+        <span style="width:25%;color:#E25B5B;">CRAWLING<br><span style="color:#5a6470;">0 – 20k</span></span>
+        <span style="width:25%;color:#d9a441;">GROGGY<br><span style="color:#5a6470;">20 – 40k</span></span>
+        <span style="width:31.25%;color:#9fe6df;">SHADOWBOXING<br><span style="color:#5a6470;">40 – 65k</span></span>
+        <span style="width:18.75%;color:#FF8a5e;">BEAST<br><span style="color:#5a6470;">65k +</span></span>
+      </div>
+      <div class="ladder-foot">The boxer changes state the moment its weekly steps cross a line above.</div>
+    </div>
+
     <div id="records-grid" class="milestones-grid"></div>
     <!-- Trend sparkline -->
     <div class="chart-card" style="margin-top:24px;">
@@ -1118,6 +1179,16 @@ function playVictoryFanfare() {
   playTone(659, 0.15, 'square', 0.12, 0.12);  // E5
   playTone(784, 0.15, 'square', 0.12, 0.24);  // G5
   playTone(1047, 0.35, 'square', 0.14, 0.36); // C6
+}
+
+function playFightFanfare() {
+  if (!soundEnabled) return;
+  // Arcade "get ready" sting — descending power chord + low gong hit, fight-game vibe
+  playTone(220, 0.35, 'sawtooth', 0.16, 0);
+  playTone(165, 0.35, 'sawtooth', 0.16, 0.08);
+  playTone(110, 0.5, 'sawtooth', 0.18, 0.16);
+  playTone(55, 0.7, 'square', 0.2, 0.16);
+  playTone(880, 0.6, 'triangle', 0.08, 0.32);
 }
 
 function playClick() {
