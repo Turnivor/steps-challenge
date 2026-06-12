@@ -157,13 +157,29 @@ body {
 
 /* arena grid */
 .hero-arena { display: grid; grid-template-columns: 1fr 200px 1fr; gap: 18px; align-items: stretch; }
-@media(max-width: 760px) { .hero-arena { grid-template-columns: 1fr; } }
+@media(max-width: 760px) {
+  .hero-arena { grid-template-columns: 1fr 1fr; grid-template-areas: "paul cristina" "fight fight"; gap: 10px; }
+  .hero-arena > .hero-fighter:first-child { grid-area: paul; }
+  .hero-arena > .hero-fighter:last-child { grid-area: cristina; }
+  .hero-arena > .hero-center { grid-area: fight; }
+  .hero-platform { height: 110px; }
+  .wf-boxer { width: 64px; height: 92px; }
+  .platform-glow { width: 52px; }
+  .fighter-stat-box { padding: 10px 12px; }
+  .stat-steps { font-size: 26px; }
+  .stat-unit-label { font-size: 9px; }
+  .vitality-row, .stat-meta-row, .stat-steps-label { font-size: 9px; }
+  .risk-banner { font-size: 9px; padding: 4px 6px; }
+  .fight-banner { width: 100%; height: auto; flex-direction: row; gap: 14px; padding: 12px; }
+  .fight-text { font-size: 24px; }
+  .fight-sub { margin-top: 0; }
+}
 .hero-fighter { display: flex; flex-direction: column; }
 .hero-platform { position: relative; height: 168px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .lead-tag { position: absolute; top: 6px; font-size: 10px; letter-spacing: 2px; border-radius: 4px; padding: 3px 7px; font-family: 'Space Mono', monospace; }
 .lead-tag.paul { left: 6px; color: var(--paul); border: 1px solid rgba(255,107,53,.4); background: rgba(255,107,53,.08); }
 .lead-tag.cristina { right: 6px; color: var(--cristina); border: 1px solid rgba(78,205,196,.4); background: rgba(78,205,196,.08); }
-.wf-boxer { width: 90px; height: 130px; position: relative; }
+.wf-boxer { width: 90px; height: 130px; position: relative; filter: drop-shadow(0 1px 3px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(255,255,255,.06)); }
 .platform-glow { width: 74px; height: 8px; border-radius: 50%; margin-top: 6px; }
 .tier-label { text-align: center; margin-top: 6px; font-size: 11px; letter-spacing: 2px; font-family: 'Space Mono', monospace; }
 
@@ -174,11 +190,11 @@ body {
 @keyframes wf-punch { 0%{transform:translateX(0)} 10%{transform:translateX(11px) scaleX(1.06)} 20%{transform:translateX(1px)} 30%{transform:translateX(13px) scaleX(1.06)} 42%{transform:translateX(0)} 56%{transform:translateY(-7px)} 70%{transform:translateY(0)} 100%{transform:translateX(0)} }
 @keyframes wf-punchl{ 0%{transform:translateX(0)} 10%{transform:translateX(-11px) scaleX(1.06)} 20%{transform:translateX(-1px)} 30%{transform:translateX(-13px) scaleX(1.06)} 42%{transform:translateX(0)} 56%{transform:translateY(-7px)} 70%{transform:translateY(0)} 100%{transform:translateX(0)} }
 @keyframes wf-platpulse { 0%,100%{transform:scaleX(1);opacity:.55} 50%{transform:scaleX(1.15);opacity:.9} }
-.wf-boxer.tier-crawl { animation: wf-crawl 3.2s ease-in-out infinite; filter: grayscale(.6) brightness(.75); }
-.wf-boxer.tier-groggy { animation: wf-sway 2.4s ease-in-out infinite; filter: grayscale(.25) brightness(.9); }
-.wf-boxer.tier-fit { animation: wf-fit 2.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(159,230,223,.5)); }
-.wf-boxer.tier-beast.paul { animation: wf-punch 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,107,53,.7)); }
-.wf-boxer.tier-beast.cristina { animation: wf-punchl 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(78,205,196,.7)); }
+.wf-boxer.tier-crawl { animation: wf-crawl 3.2s ease-in-out infinite; filter: grayscale(.35) brightness(.92) drop-shadow(0 1px 3px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(255,255,255,.06)); }
+.wf-boxer.tier-groggy { animation: wf-sway 2.4s ease-in-out infinite; filter: grayscale(.25) brightness(.9) drop-shadow(0 1px 3px rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(255,255,255,.06)); }
+.wf-boxer.tier-fit { animation: wf-fit 2.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(159,230,223,.5)) drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+.wf-boxer.tier-beast.paul { animation: wf-punch 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,107,53,.7)) drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+.wf-boxer.tier-beast.cristina { animation: wf-punchl 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(78,205,196,.7)) drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
 .platform-glow.tier-crawl { background: radial-gradient(ellipse, rgba(226,91,91,.4), transparent 70%); animation: wf-platpulse 3.2s ease-in-out infinite; }
 .platform-glow.tier-groggy { background: radial-gradient(ellipse, rgba(217,164,65,.4), transparent 70%); animation: wf-platpulse 2.4s ease-in-out infinite; }
 .platform-glow.tier-fit { background: radial-gradient(ellipse, rgba(159,230,223,.5), transparent 70%); animation: wf-platpulse 2.6s ease-in-out infinite; }
@@ -2679,18 +2695,18 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default', glovesId='non
       // curse sits ON TOP of the boxer, head to toe.
       overlaySvg =
         // ── head/hair: mold cap + lichen colonies (ring = halo + dark core) ──
-        `<rect x="2" y="-3" width="12" height="6" fill="#3f4d1a" opacity="0.88"/>` +
+        `<rect x="2" y="-3" width="12" height="6" fill="#3f4d1a" opacity="0.45"/>` +
         `<rect x="3" y="-5" width="3" height="3" fill="#5c6b6b" opacity="0.6"/><rect x="4" y="-4" width="1" height="1" fill="#15170d" opacity="0.9"/>` +
         `<rect x="8" y="-6" width="3" height="3" fill="#7a8c2e" opacity="0.6"/><rect x="9" y="-5" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
-        `<rect x="0" y="-1" width="3" height="3" fill="#4a3728" opacity="0.85"/>` +
-        `<rect x="12" y="-2" width="3" height="4" fill="#4a3728" opacity="0.85"/>` +
+        `<rect x="0" y="-1" width="3" height="3" fill="#4a3728" opacity="0.6"/>` +
+        `<rect x="12" y="-2" width="3" height="4" fill="#4a3728" opacity="0.6"/>` +
         // ── eyes swallowed by dark mold blotches ──
         `<rect x="5" y="1" width="3" height="3" fill="#3a4d2a" opacity="0.85"/><rect x="6" y="2" width="1" height="1" fill="#050603"/>` +
         `<rect x="8" y="1" width="3" height="3" fill="#3a4d2a" opacity="0.85"/><rect x="9" y="2" width="1" height="1" fill="#050603"/>` +
         // ── torso colonies + waist smear ──
         `<rect x="5" y="6" width="3" height="3" fill="#5c6b6b" opacity="0.55"/><rect x="6" y="7" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
         `<rect x="8" y="8" width="3" height="3" fill="#7a8c2e" opacity="0.55"/><rect x="9" y="9" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
-        `<rect x="5" y="10" width="6" height="2" fill="#2a3310" opacity="0.75"/>` +
+        `<rect x="5" y="10" width="6" height="2" fill="#2a3310" opacity="0.5"/>` +
         // ── arm colonies + sprouting tufts ──
         `<rect x="0" y="6" width="3" height="3" fill="#6b7a1f" opacity="0.55"/><rect x="1" y="7" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
         `<rect x="12" y="6" width="3" height="3" fill="#5c6b6b" opacity="0.5"/><rect x="13" y="7" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
@@ -2698,7 +2714,7 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default', glovesId='non
         `<g class="putregai-tuft putregai-tuft2"><rect x="15" y="6" width="1" height="2" fill="#4a5c1f" opacity="0.8"/><rect x="14" y="5" width="3" height="1" fill="#9ACD32" opacity="0.6"/></g>` +
         // ── leg colonies ──
         `<rect x="5" y="15" width="3" height="3" fill="#556b2f" opacity="0.55"/><rect x="6" y="16" width="1" height="1" fill="#1f2a0d" opacity="0.9"/>` +
-        `<rect x="9" y="15" width="2" height="4" fill="#2a3310" opacity="0.8"/>` +
+        `<rect x="9" y="15" width="2" height="4" fill="#2a3310" opacity="0.5"/>` +
         // ── dripping ooze off chest, arm, leg ──
         `<rect class="putregai-drip" x="7" y="12" width="1" height="3" fill="#6b7a1f" opacity="0.85"/>` +
         `<rect class="putregai-drip putregai-drip2" x="2" y="9" width="1" height="2" fill="#4a3728" opacity="0.8"/>` +
