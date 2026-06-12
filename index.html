@@ -89,6 +89,7 @@ body {
 .synced-dot { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
 .synced-dot .dot { width: 7px; height: 7px; border-radius: 50%; background: #5BDE8E; box-shadow: 0 0 6px #5BDE8E; }
 .synced-dot.offline .dot { background: #d9a441; box-shadow: 0 0 6px #d9a441; animation: wf-platpulse 1s ease-in-out infinite; }
+.sync-ago { color: var(--muted2); letter-spacing: 1px; text-transform: none; }
 .icon-btn {
   border: 1px solid var(--border2); background: var(--surface2); color: var(--text);
   width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 13px;
@@ -582,6 +583,30 @@ tr:hover td { background: var(--surface2); }
   .celebrate-banner { padding: 24px 28px; width: 85vw; }
   .celebrate-title { font-size: 32px; }
   .record-value { font-size: 22px; }
+  .wardrobe-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .icon-btn:not(.auth-btn) { width: 36px; height: 36px; font-size: 15px; }
+  .week-arrow { width: 40px; height: 40px; }
+}
+
+/* ── PHONE-TIGHT (≤430px) ── */
+@media(max-width:430px){
+  .wardrobe-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .hero { padding: 16px 14px 20px; }
+  .wrap { padding: 16px 10px; }
+  .crawling-banner { padding: 9px 12px; }
+  .crawling-title { font-size: 10px; }
+  .sec-title { font-size: 15px; }
+  .stat-steps { font-size: 22px; }
+  .wf-boxer { width: 52px; height: 76px; }
+  .hero-platform { height: 92px; }
+  .lead-gauge { width: 120px; height: 120px; }
+  .lead-gauge-inner { width: 88px; height: 88px; }
+  .lead-pct { font-size: 22px; }
+  .ladder-zone-labels { font-size: 8px; }
+  .week-label-box { min-width: 0; }
+  .week-label-main { font-size: 14px; }
+  .celebrate-banner { padding: 20px 22px; width: 90vw; }
+  .celebrate-title { font-size: 26px; }
 }
 
 /* ── PIXEL BOXER ANIMATIONS ── */
@@ -808,6 +833,36 @@ tr:hover td { background: var(--surface2); }
 .celebrate-banner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
 .celebrate-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; margin-bottom: 8px; }
 .celebrate-sub { font-size: 14px; color: var(--muted); }
+
+/* ── INTRO / HOW THIS WORKS ── */
+.intro-panel {
+  max-width: 1120px;
+  margin: 0 auto 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  padding: 16px 20px;
+}
+.intro-panel.hidden { display: none; }
+.intro-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.intro-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.intro-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.intro-body p { margin-bottom: 8px; }
+.intro-body p:last-child { margin-bottom: 0; }
+.intro-body b { color: var(--text); }
+
+/* ── ACCESSIBILITY ── */
+.nav-tab:focus-visible, .icon-btn:focus-visible, .week-arrow:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -816,9 +871,10 @@ tr:hover td { background: var(--surface2); }
 <div class="crawling-banner">
   <div class="crawling-title" id="crawling-banner-text">&gt; CRAWLING_MONTH.exe // JUNE_2026</div>
   <div class="status-right">
-    <span class="synced-dot" id="synced-dot"><span class="dot"></span><span id="sync-label">SYNCED</span></span>
-    <button class="icon-btn" id="sound-toggle" onclick="toggleSound()" title="Toggle sound effects"><span id="sound-icon">🔊</span></button>
-    <button class="icon-btn" onclick="loadFromSheet(true)" title="Sync now">↻</button>
+    <span class="synced-dot" id="synced-dot"><span class="dot"></span><span id="sync-label">SYNCED</span><span class="sync-ago" id="sync-ago"></span></span>
+    <button class="icon-btn" id="info-toggle" onclick="toggleIntro()" title="How this works" aria-label="How this works">ℹ️</button>
+    <button class="icon-btn" id="sound-toggle" onclick="toggleSound()" title="Toggle sound effects" aria-label="Toggle sound effects"><span id="sound-icon">🔊</span></button>
+    <button class="icon-btn" onclick="loadFromSheet(true)" title="Sync now" aria-label="Sync now">↻</button>
     <div id="auth-area"></div>
   </div>
 </div>
@@ -844,12 +900,12 @@ tr:hover td { background: var(--surface2); }
 <!-- ── HERO / THIS WEEK ── -->
 <div class="hero">
   <div class="week-selector">
-    <button class="week-arrow" id="btn-prev" onclick="changeWeek(-1)">‹</button>
+    <button class="week-arrow" id="btn-prev" onclick="changeWeek(-1)" aria-label="Previous week">‹</button>
     <div class="week-label-box">
       <div class="week-label-main" id="week-title">Week –</div>
       <div class="week-label-sub" id="week-dates">–</div>
     </div>
-    <button class="week-arrow" id="btn-next" onclick="changeWeek(1)" disabled>›</button>
+    <button class="week-arrow" id="btn-next" onclick="changeWeek(1)" disabled aria-label="Next week">›</button>
   </div>
 
   <div class="hero-arena">
@@ -924,24 +980,38 @@ tr:hover td { background: var(--surface2); }
   </div>
 
 <!-- ── NAV ── -->
-<nav class="main-nav">
-  <button class="nav-tab active" onclick="showSection('weekly')">This Week</button>
-  <button class="nav-tab" onclick="showSection('records')">Records</button>
-  <button class="nav-tab" onclick="showSection('champions')">Champions</button>
-  <button class="nav-tab" onclick="showSection('wardrobe')">Wardrobe</button>
-  <button class="nav-tab" onclick="showSection('shop')">Shop</button>
-  <button class="nav-tab" onclick="showSection('milestones')">Milestones</button>
-  <button class="nav-tab" onclick="showSection('rewards')">Rewards</button>
-  <button class="nav-tab" onclick="showSection('leaderboard')">Leaderboard</button>
+<nav class="main-nav" role="tablist">
+  <button class="nav-tab active" role="tab" aria-selected="true" onclick="showSection('weekly')">This Week</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('records')">Records</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('champions')">Champions</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('wardrobe')">Wardrobe</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('shop')">Shop</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('milestones')">Milestones</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('rewards')">Rewards</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('leaderboard')">Leaderboard</button>
 </nav>
 
 <div class="wrap">
+  <!-- ── HOW THIS WORKS ── -->
+  <div class="intro-panel hidden" id="intro-panel">
+    <div class="intro-head">
+      <div class="intro-title">ℹ️ How this works</div>
+      <button class="icon-btn" onclick="toggleIntro()" aria-label="Close how this works">✕</button>
+    </div>
+    <div class="intro-body">
+      <p><b>The challenge:</b> log your steps each week, Monday–Sunday. Whoever has the higher total wins the week.</p>
+      <p><b>⚠️ The shop:</b> buying cosmetics spends real steps from your competition total — looking good costs you ground.</p>
+      <p><b>Rewards:</b> winning unlocks treats for the winner, some tasks for the loser, and a few "comeback" rewards for the underdog.</p>
+      <p><b>Wardrobe:</b> hats unlock via milestones, and a new suit colour unlocks every 20,000 steps.</p>
+    </div>
+  </div>
+
   <div class="status-bar status-loading" id="status-bar" style="display:none">
     <span class="spin">↻</span> Syncing...
   </div>
 
   <!-- ══ THIS WEEK ══ -->
-  <div id="section-weekly">
+  <div id="section-weekly" role="tabpanel">
     <div class="month-chips" id="month-chips" style="margin-bottom:20px;"></div>
     <div class="week-cards" id="week-cards"></div>
     <div id="week-updated" style="text-align:center;font-size:11px;color:var(--muted2);margin:-16px 0 16px;min-height:16px;"></div>
@@ -949,7 +1019,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ RECORDS ══ -->
-  <div id="section-records" style="display:none">
+  <div id="section-records" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:20px;">
       <div class="sec-title">Personal Records</div>
       <div class="sec-meta">All-time bests</div>
@@ -1029,7 +1099,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ CHAMPIONS ══ -->
-  <div id="section-champions" style="display:none">
+  <div id="section-champions" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:20px;">
       <div class="sec-title">Trophy Cabinet</div>
       <div class="sec-meta">Monthly champions</div>
@@ -1038,7 +1108,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ WARDROBE ══ -->
-  <div id="section-wardrobe" style="display:none">
+  <div id="section-wardrobe" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:6px;">
       <div class="sec-title">Wardrobe</div>
       <div class="sec-meta" id="wardrobe-who-label">–</div>
@@ -1066,7 +1136,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ SHOP ══ -->
-  <div id="section-shop" style="display:none">
+  <div id="section-shop" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:6px;">
       <div class="sec-title">Step Shop</div>
       <div class="sec-meta" id="shop-balance-label">Sign in to see your balance</div>
@@ -1080,7 +1150,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ MILESTONES ══ -->
-  <div id="section-milestones" style="display:none">
+  <div id="section-milestones" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:20px;">
       <div class="sec-title">Milestones & Badges</div>
       <div class="sec-meta" id="ms-unlocked-count">–</div>
@@ -1089,7 +1159,7 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <!-- ══ REWARDS ══ -->
-  <div id="section-rewards" style="display:none">
+  <div id="section-rewards" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:6px;">
       <div class="sec-title">Reward Board</div>
       <button onclick="showDebtNotice()" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--muted);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:0.5px;">📄 Issue Debt Notice</button>
@@ -1109,7 +1179,7 @@ tr:hover td { background: var(--surface2); }
 
   <!-- ══ ALL WEEKS ══ -->
   <!-- ══ LEADERBOARD ══ -->
-  <div id="section-leaderboard" style="display:none">
+  <div id="section-leaderboard" style="display:none" role="tabpanel">
     <div class="sec-head" style="margin-bottom:16px;">
       <div class="sec-title">Leaderboard</div>
       <div class="sec-meta" id="lb-meta">–</div>
@@ -1229,6 +1299,13 @@ function toggleSound() {
   localStorage.setItem('steps_sound', soundEnabled ? 'on' : 'off');
   document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
   if (soundEnabled) { getAudioCtx(); playClick(); }
+}
+
+function toggleIntro() {
+  playClick();
+  const panel = document.getElementById('intro-panel');
+  const nowHidden = panel.classList.toggle('hidden'); // returns true if 'hidden' was just added
+  if (nowHidden) localStorage.setItem('steps_intro_seen', 'true');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1451,6 +1528,7 @@ let spent = { paul:0, cristina:0 }; // steps spent in cosmetic shop
 let shopOwned = { paul:[], cristina:[] }; // item ids owned (shop + seasonal)
 let shameClaims = {}; // { 'achId__YYYY-MM': 'paul'|'cristina' } — monthly-scoped, resets each month
 let metaLoaded = false;
+let lastSyncTime = null; // timestamp (ms) of last successful sync
 
 function getVoterId() {
   let id = localStorage.getItem('steps_voter_id');
@@ -1594,6 +1672,7 @@ async function loadFromSheet(manual=false, retries=2) {
       const text = await res.text();
       if (!text || text.trim().length === 0) throw new Error('Empty response');
       parseCSV(text);
+      lastSyncTime = Date.now();
       setSyncState(true);
       success = true;
       if (manual) { showToast('✓ Synced!'); setTimeout(()=>{ document.getElementById('status-bar').style.display='none'; }, 1500); }
@@ -1631,6 +1710,24 @@ function setSyncState(ok) {
   if (dot) dot.classList.toggle('offline', !ok);
   const label = document.getElementById('sync-label');
   if (label) label.textContent = ok ? 'SYNCED' : 'SYNCING';
+  if (ok) updateSyncAgo();
+}
+
+function syncAgoText(ms) {
+  const s = Math.floor(ms / 1000);
+  if (s < 10) return 'just now';
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+function updateSyncAgo() {
+  const el = document.getElementById('sync-ago');
+  if (!el) return;
+  el.textContent = lastSyncTime == null ? '' : ` · ${syncAgoText(Date.now() - lastSyncTime)}`;
 }
 
 function findCurrentWeek() {
@@ -3175,7 +3272,9 @@ function showSection(name) {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    btn.classList.toggle('active', ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'][i]===name);
+    const isActive = ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'][i]===name;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
   if (name==='records') renderRecords();
   if (name==='champions') renderChampions();
@@ -3232,8 +3331,8 @@ function fireCelebration(who, weekKey) {
   // Victory sound
   playVictoryFanfare();
 
-  // Confetti burst
-  if (typeof confetti === 'function') {
+  // Confetti burst (skip if the user prefers reduced motion)
+  if (typeof confetti === 'function' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const end = Date.now() + 1500;
     const colors = [color, '#ffffff', color];
     (function frame() {
@@ -3381,6 +3480,9 @@ async function fullSync() {
 }
 fullSync();
 setInterval(fullSync, CONFIG.AUTO_SYNC_MS);
+
+// Keep the "synced X ago" label ticking even without a new sync
+setInterval(updateSyncAgo, 15000);
 </script>
 </body>
 </html>
