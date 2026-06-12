@@ -461,6 +461,8 @@ nav.main-nav {
 .reward-earned { background: rgba(91,222,142,0.15); color: #5BDE8E; }
 .reward-paul { background: var(--paul-soft); color: var(--paul); }
 .reward-cristina { background: var(--cristina-soft); color: var(--cristina); }
+.reward-penalty { background: rgba(226,91,91,0.15); color: #E25B5B; }
+.reward-card.penalty { border-color: rgba(226,91,91,0.3); background: rgba(226,91,91,0.05); box-shadow: 0 0 16px -8px rgba(226,91,91,0.5); }
 
 /* ── HISTORY TABLE ── */
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; }
@@ -1362,6 +1364,10 @@ const REWARDS = [
   { icon:'🎓', name:"Winner's Diploma", trigger:'Win 10 weeks total — loser hand-writes a diploma for the overall champion', condition:(stats)=>stats.paulWins>=10||stats.cristinaWins>=10, winner:true },
   { icon:'🏆', name:'Tiny Trophy', trigger:'Win 7 weeks total — find the smallest trophy imaginable. Attach a note: "For extraordinary achievements in moving from one place to another"', condition:(stats)=>stats.paulWins>=7||stats.cristinaWins>=7, winner:true },
   { icon:'🩹', name:'Emergency Anti-Laziness Kit', trigger:'Loser accumulates 5 total losses — winner assembles: 1 band-aid + 1 energy bar. Label it: "Break glass in case of laziness"', condition:(stats)=>(stats.weeksWithBothData-Math.min(stats.paulWins,stats.cristinaWins))>=5, winner:true },
+  { icon:'🎯', name:"Winner's Challenge", trigger:'First to 750K total steps — winner sets a fun challenge for the loser (not too big, not too small)', condition:(stats)=>stats.paulTotal>=750000||stats.cristinaTotal>=750000, winner:true },
+  { icon:'🎨', name:'Try a Hobby Together', trigger:'Win 4 weeks total — pick a hobby to try together once (crochet, board game, biking, etc.)', condition:(stats)=>stats.paulWins>=4||stats.cristinaWins>=4, winner:false, assignTo:'both' },
+  { icon:'🚶', name:'Crawl of Shame', trigger:'Lose 3 weeks in a row — loser does a silly walk (mersul piticului / mers în 4 labe / GoT walk of shame style) for a few minutes in a public place', condition:(stats)=>stats.paulLoseStreak>=3||stats.cristinaLoseStreak>=3, winner:false, assignTo:'loser', assignFn:(stats)=>stats.paulLoseStreak>=stats.cristinaLoseStreak?'paul':'cristina' },
+  { icon:'📮', name:'Postcard of Defeat', trigger:'Lose 5 weeks total — loser sends the winner a postcard (or a photo of themselves somewhere cool) with a message admitting defeat', condition:(stats)=>stats.paulLosses>=5||stats.cristinaLosses>=5, winner:false, assignTo:'loser' },
 ];
 
 // ══════════════════════════════════════════
@@ -1526,6 +1532,8 @@ function findCurrentWeek() {
 function calcStats() {
   let paulTotal=0, cristinaTotal=0, paulWins=0, cristinaWins=0, ties=0;
   let paulStreak=0, cristinaStreak=0, paulCurStreak=0, cristinaCurStreak=0;
+  let paulLoseStreak=0, cristinaLoseStreak=0, paulCurLoseStreak=0, cristinaCurLoseStreak=0;
+  let paulLosses=0, cristinaLosses=0;
   let weeksWithBothData=0;
   let paulBestWeek=0, cristinaBestWeek=0, biggestMargin=0, biggestMarginWho='';
   // Running current streak (most recent consecutive wins, ends at last completed week)
@@ -1541,11 +1549,13 @@ function calcStats() {
       weeksWithBothData++;
       const margin = Math.abs(p-c);
       if (margin > biggestMargin) { biggestMargin = margin; biggestMarginWho = p>c?'paul':c>p?'cristina':''; }
-      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; liveCurStreakWho='paul'; liveCurStreak=paulCurStreak; }
-      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; liveCurStreakWho='cristina'; liveCurStreak=cristinaCurStreak; }
-      else { ties++; paulCurStreak=0; cristinaCurStreak=0; liveCurStreakWho=''; liveCurStreak=0; }
+      if (p>c) { paulWins++; paulCurStreak++; cristinaCurStreak=0; liveCurStreakWho='paul'; liveCurStreak=paulCurStreak; cristinaLosses++; cristinaCurLoseStreak++; paulCurLoseStreak=0; }
+      else if (c>p) { cristinaWins++; cristinaCurStreak++; paulCurStreak=0; liveCurStreakWho='cristina'; liveCurStreak=cristinaCurStreak; paulLosses++; paulCurLoseStreak++; cristinaCurLoseStreak=0; }
+      else { ties++; paulCurStreak=0; cristinaCurStreak=0; liveCurStreakWho=''; liveCurStreak=0; paulCurLoseStreak=0; cristinaCurLoseStreak=0; }
       paulStreak = Math.max(paulStreak, paulCurStreak);
       cristinaStreak = Math.max(cristinaStreak, cristinaCurStreak);
+      paulLoseStreak = Math.max(paulLoseStreak, paulCurLoseStreak);
+      cristinaLoseStreak = Math.max(cristinaLoseStreak, cristinaCurLoseStreak);
     }
   });
   // Raw totals (pre-spend) — used for wardrobe/milestone unlocks and shop balance
@@ -1568,7 +1578,9 @@ function calcStats() {
   return { paulTotal, cristinaTotal, paulRawSteps, cristinaRawSteps, paulWins, cristinaWins, ties,
     paulStreak, cristinaStreak, weeksWithBothData, weeksWithData: weeks.length,
     paulBestWeek, cristinaBestWeek, biggestMargin, biggestMarginWho,
-    liveCurStreakWho, liveCurStreak, paulKm, cristinaKm };
+    liveCurStreakWho, liveCurStreak, paulKm, cristinaKm,
+    paulLoseStreak, cristinaLoseStreak, paulCurLoseStreak, cristinaCurLoseStreak,
+    paulLosses, cristinaLosses };
 }
 
 // Per-month champion calculator
@@ -1920,32 +1932,50 @@ function renderRewards() {
   const s = calcStats();
   // Rewards use raw steps so spending cosmetics doesn't revoke earned rewards
   const sRaw = { ...s, paulTotal: s.paulRawSteps, cristinaTotal: s.cristinaRawSteps };
+  // Winner = more wins; tie goes to paul (existing convention, kept for backward compat).
+  // Loser is simply the other person.
+  const winner = s.paulWins >= s.cristinaWins ? 'paul' : 'cristina';
+  const loser = winner === 'paul' ? 'cristina' : 'paul';
   const html = REWARDS.map(r => {
     const earned = r.condition(sRaw);
     const claimedBy = claims[r.name]; // 'paul' | 'cristina' | undefined
+    const assignTo = r.assignTo || (r.winner ? 'winner' : 'both');
     let statusHtml = '';
     let claimBtn = '';
+    let cardClass = 'reward-card';
 
     if (!earned) {
       statusHtml = `<span class="reward-status reward-locked">Locked</span>`;
     } else if (claimedBy) {
       const cName = claimedBy==='paul'?'Paul':'Cristina';
       statusHtml = `<span class="reward-status reward-${claimedBy}">✓ Claimed by ${cName}</span>`;
-    } else if (r.winner) {
-      const who = s.paulWins >= s.cristinaWins ? 'paul' : 'cristina';
+      cardClass += ' claimed';
+    } else if (assignTo === 'winner') {
+      const who = winner;
       const name = who==='paul'?'Paul':'Cristina';
       statusHtml = `<span class="reward-status reward-${who}">${name} earns this</span>`;
+      cardClass += ' claimed';
       // Show claim button only to the signed-in person if they're the earner
       if (currentUser === who) {
         claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--${who});color:${who==='paul'?'#fff':'#0A0A0C'};font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as claimed</button>`;
       }
+    } else if (assignTo === 'loser') {
+      const who = r.assignFn ? r.assignFn(sRaw) : loser;
+      const name = who==='paul'?'Paul':'Cristina';
+      statusHtml = `<span class="reward-status reward-penalty">${name} must do this 😅</span>`;
+      cardClass += ' penalty';
+      // Show "mark as done" only to the signed-in person if they're the one on the hook
+      if (currentUser === who) {
+        claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(226,91,91,0.15);border:1px solid rgba(226,91,91,0.3);color:#E25B5B;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as done</button>`;
+      }
     } else {
       statusHtml = `<span class="reward-status reward-earned">Both earn this!</span>`;
+      cardClass += ' claimed';
       if (currentUser) {
         claimBtn = `<button onclick="claimReward('${r.name.replace(/'/g,"\\'")}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:var(--surface3);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Mark as claimed</button>`;
       }
     }
-    return `<div class="reward-card ${earned?'claimed':''}">
+    return `<div class="${cardClass}">
       <span class="reward-icon">${r.icon}</span>
       <div class="reward-name">${r.name}</div>
       <div class="reward-trigger">${r.trigger}</div>
