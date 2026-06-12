@@ -930,16 +930,6 @@ tr:hover td { background: var(--surface2); }
     <div class="week-cards" id="week-cards"></div>
     <div id="week-updated" style="text-align:center;font-size:11px;color:var(--muted2);margin:-16px 0 16px;min-height:16px;"></div>
     <div id="backers-widget"></div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">Week over week</div>
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--paul)"></div>Paul</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--cristina)"></div>Cristina</div>
-        </div>
-      </div>
-      <div style="position:relative;height:260px;"><canvas id="wowChart"></canvas></div>
-    </div>
   </div>
 
   <!-- ══ RECORDS ══ -->
@@ -998,6 +988,17 @@ tr:hover td { background: var(--surface2); }
     </div>
 
     <div id="records-grid" class="milestones-grid"></div>
+    <!-- Week over week -->
+    <div class="chart-card" style="margin-top:24px;">
+      <div class="chart-header">
+        <div class="chart-title">Week over week</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--paul)"></div>Paul</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--cristina)"></div>Cristina</div>
+        </div>
+      </div>
+      <div style="position:relative;height:260px;"><canvas id="wowChart"></canvas></div>
+    </div>
     <!-- Trend sparkline -->
     <div class="chart-card" style="margin-top:24px;">
       <div class="chart-header">
@@ -1472,9 +1473,9 @@ const REWARDS = [
 // HONOUR ACHIEVEMENTS (honor system — self-claimed)
 // ══════════════════════════════════════════
 const ACHIEVEMENTS = [
-  { id:'bad_weather',   icon:'🌧️', name:'Defeated Bad Weather',           desc:'Walked outside despite rain, cold, or general meteorological betrayal.',  shameful:true, penalty:2000 },
-  { id:'didnt_want_to', icon:'😤', name:'Walked Despite Not Wanting To',  desc:'Got up and did it anyway. The bar was on the floor and you cleared it.', shameful:true, penalty:2000 },
-  { id:'located_legs',  icon:'🦵', name:'Successfully Located Own Legs',  desc:'A medical miracle. Science is still studying how this happened.',          shameful:true, penalty:2000 },
+  { id:'bad_weather',   icon:'🌧️', name:'Defeated Bad Weather',           desc:'Walked outside despite rain, cold, or general meteorological betrayal.',  bonus:1000 },
+  { id:'didnt_want_to', icon:'😤', name:'Walked Despite Not Wanting To',  desc:'Got up and did it anyway. The bar was on the floor and you cleared it.', bonus:1000 },
+  { id:'located_legs',  icon:'🦵', name:'Successfully Located Own Legs',  desc:'A medical miracle. Science is still studying how this happened.',          bonus:1000 },
 ];
 
 // ══════════════════════════════════════════
@@ -1659,17 +1660,19 @@ function calcStats() {
   // Raw totals (pre-spend) — used for wardrobe/milestone unlocks and shop balance
   const paulRawSteps = paulTotal;
   const cristinaRawSteps = cristinaTotal;
-  // Shame penalty — active shameful achievement claims this month (−2k each)
+  // Honour bonus — active honour achievement claims this month (+1k each)
   const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
-  let paulShame = 0, cristinaShame = 0;
+  let paulBonus = 0, cristinaBonus = 0;
   Object.entries(shameClaims).forEach(([k,v]) => {
     if (!k.endsWith('__'+curMK)) return;
-    if (v==='paul') paulShame++;
-    else if (v==='cristina') cristinaShame++;
+    const ach = ACHIEVEMENTS.find(a => k === `${a.id}__${curMK}`);
+    const amt = ach ? (ach.bonus||0) : 0;
+    if (v==='paul') paulBonus += amt;
+    else if (v==='cristina') cristinaBonus += amt;
   });
-  // Net totals (competition standing) = raw − spent − shame penalty, floored at 0
-  paulTotal = Math.max(0, paulRawSteps - (spent.paul||0) - paulShame*2000);
-  cristinaTotal = Math.max(0, cristinaRawSteps - (spent.cristina||0) - cristinaShame*2000);
+  // Net totals (competition standing) = raw − spent + honour bonus, floored at 0
+  paulTotal = Math.max(0, paulRawSteps - (spent.paul||0) + paulBonus);
+  cristinaTotal = Math.max(0, cristinaRawSteps - (spent.cristina||0) + cristinaBonus);
   // Distance equivalent (avg 0.75m per step → km, based on raw)
   const paulKm = Math.round(paulRawSteps * 0.00075);
   const cristinaKm = Math.round(cristinaRawSteps * 0.00075);
@@ -1906,31 +1909,6 @@ function renderWeekly() {
 
   // Backers widget
   renderBackers();
-
-  const mw = allWeeksFlat.filter(x=>x.month===w.month&&x.year===w.year);
-  if (wowChart) { wowChart.destroy(); wowChart=null; }
-  wowChart = new Chart(document.getElementById('wowChart'), {
-    type:'bar',
-    data:{
-      labels: mw.map(x=>`W${x.num}`),
-      datasets:[
-        { label:'Paul', data:mw.map(x=>DB[x.key]?.paul||0), backgroundColor:'rgba(255,107,53,0.65)', borderColor:'#FF6B35', borderWidth:2, borderRadius:8, borderSkipped:false },
-        { label:'Cristina', data:mw.map(x=>DB[x.key]?.cristina||0), backgroundColor:'rgba(78,205,196,0.65)', borderColor:'#4ECDC4', borderWidth:2, borderRadius:8, borderSkipped:false }
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{ backgroundColor:'#191920', borderColor:'#272730', borderWidth:1, titleColor:'#EDEDF0', bodyColor:'#72728A',
-          callbacks:{ label: ctx=>` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()} steps` } }
-      },
-      scales:{
-        x:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:12}} },
-        y:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:11},callback:v=>v>=1000?Math.round(v/1000)+'k':v}, beginAtZero:true }
-      }
-    }
-  });
 }
 
 // ══════════════════════════════════════════
@@ -2083,7 +2061,7 @@ function renderRewards() {
   }).join('');
   document.getElementById('rewards-grid').innerHTML = html;
 
-  // Shameful honour achievements — monthly-scoped, penalty-bearing
+  // Honour achievements — monthly-scoped, bonus-bearing
   const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
   const achHtml = ACHIEVEMENTS.map(a => {
     const shameKey = `${a.id}__${curMK}`;
@@ -2097,19 +2075,19 @@ function renderRewards() {
     const holderName = holder === 'paul' ? 'Paul' : holder === 'cristina' ? 'Cristina' : null;
     let statusHtml = '';
     if (isMine) {
-      statusHtml = `<div style="margin-top:6px;padding:6px 10px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:11px;color:#FCA5A5;">🤢 You're carrying this — <strong>−${a.penalty.toLocaleString()} steps penalty</strong></div>`;
+      statusHtml = `<div style="margin-top:6px;padding:6px 10px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);border-radius:8px;font-size:11px;color:#86EFAC;">🎉 You earned this — <strong>+${a.bonus.toLocaleString()} steps bonus</strong></div>`;
     } else if (holderName) {
-      statusHtml = `<span class="reward-status reward-${holder}" style="display:block;margin-top:4px;">🤢 ${holderName} is carrying this (−${a.penalty.toLocaleString()} steps)</span>`;
+      statusHtml = `<span class="reward-status reward-${holder}" style="display:block;margin-top:4px;">🎉 ${holderName} earned this (+${a.bonus.toLocaleString()} steps)</span>`;
     } else {
       statusHtml = `<span class="reward-status reward-locked">Not claimed this month</span>`;
     }
 
     let claimBtn = '';
     if (currentUser && !holder) {
-      claimBtn = `<button onclick="claimAchievement('${a.id}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#FCA5A5;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim (−${a.penalty.toLocaleString()} penalty) 🤢</button>`;
+      claimBtn = `<button onclick="claimAchievement('${a.id}')" style="margin-top:8px;width:100%;padding:7px;border:none;border-radius:8px;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#86EFAC;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Claim (+${a.bonus.toLocaleString()} steps) 🎉</button>`;
     }
 
-    const cardStyle = isMine ? 'border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.05);' : '';
+    const cardStyle = isMine ? 'border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.05);' : '';
     return `<div class="reward-card claimed" style="${cardStyle}">
       <span class="reward-icon">${a.icon}</span>
       <div class="reward-name">${a.name}</div>
@@ -2118,7 +2096,7 @@ function renderRewards() {
       ${claimBtn}
     </div>`;
   }).filter(Boolean).join('');
-  document.getElementById('achievements-grid').innerHTML = achHtml || '<div style="color:var(--muted);font-size:13px;padding:12px 0;">No shameful achievements available this month.</div>';
+  document.getElementById('achievements-grid').innerHTML = achHtml || '<div style="color:var(--muted);font-size:13px;padding:12px 0;">No honour achievements available this month.</div>';
 }
 
 async function claimReward(name) {
@@ -2196,23 +2174,16 @@ async function claimAchievement(id) {
   if (!currentUser) { showToast('Sign in first'); return; }
   const a = ACHIEVEMENTS.find(x=>x.id===id);
   if (!a) return;
-  if (a.shameful) {
-    const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
-    const shameKey = `${id}__${curMK}`;
-    if (shameClaims[shameKey]) { showToast('Already claimed this month!'); return; }
-    const ok = confirm(`⚠️ This is a shameful achievement. Claiming it will cost you ${a.penalty.toLocaleString()} steps from your competition total this month. Claim "${a.name}"?`);
-    if (!ok) return;
-    playClick();
-    await writeMeta('shame', currentUser, shameKey, new Date().toISOString());
-    renderAll();
-    renderRewards();
-    showToast('Achievement claimed — you\'re carrying the shame 🤢');
-  } else {
-    playClick();
-    await writeMeta('achievement', currentUser, id, new Date().toISOString());
-    renderRewards();
-    showToast('Achievement claimed ✓');
-  }
+  const curMK = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  const shameKey = `${id}__${curMK}`;
+  if (shameClaims[shameKey]) { showToast('Already claimed this month!'); return; }
+  const ok = confirm(`🎉 Claim "${a.name}"? This adds ${a.bonus.toLocaleString()} steps to your competition total this month.`);
+  if (!ok) return;
+  playClick();
+  await writeMeta('shame', currentUser, shameKey, new Date().toISOString());
+  renderAll();
+  renderRewards();
+  showToast(`Achievement claimed — +${a.bonus.toLocaleString()} steps 🎉`);
 }
 
 // ══════════════════════════════════════════
@@ -2423,6 +2394,33 @@ function renderRecords() {
       </div>
     </div>
   `).join('');
+
+  // ── Week over week (current month) ──
+  const wowWeek = allWeeksFlat[currentWeekIdx];
+  const mw = allWeeksFlat.filter(x=>x.month===wowWeek.month&&x.year===wowWeek.year);
+  if (wowChart) { wowChart.destroy(); wowChart=null; }
+  wowChart = new Chart(document.getElementById('wowChart'), {
+    type:'bar',
+    data:{
+      labels: mw.map(x=>`W${x.num}`),
+      datasets:[
+        { label:'Paul', data:mw.map(x=>DB[x.key]?.paul||0), backgroundColor:'rgba(255,107,53,0.65)', borderColor:'#FF6B35', borderWidth:2, borderRadius:8, borderSkipped:false },
+        { label:'Cristina', data:mw.map(x=>DB[x.key]?.cristina||0), backgroundColor:'rgba(78,205,196,0.65)', borderColor:'#4ECDC4', borderWidth:2, borderRadius:8, borderSkipped:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{ backgroundColor:'#191920', borderColor:'#272730', borderWidth:1, titleColor:'#EDEDF0', bodyColor:'#72728A',
+          callbacks:{ label: ctx=>` ${ctx.dataset.label}: ${ctx.raw.toLocaleString()} steps` } }
+      },
+      scales:{
+        x:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:12}} },
+        y:{ grid:{color:'rgba(39,39,48,0.8)'}, ticks:{color:'#72728A',font:{size:11},callback:v=>v>=1000?Math.round(v/1000)+'k':v}, beginAtZero:true }
+      }
+    }
+  });
 
   // ── Trend sparkline (last 8 weeks with any data) ──
   const trendWeeks = allWeeksFlat.filter(w=>DB[w.key]?.paul||DB[w.key]?.cristina).slice(-8);
