@@ -605,6 +605,21 @@ tr:hover td { background: var(--surface2); }
   display: block;
 }
 
+/* ── PUTREGAI FX (rotten mold overlay) ── */
+@keyframes putregai-rise { 0% { transform: translateY(0); opacity: .55; } 100% { transform: translateY(-8px); opacity: 0; } }
+.putregai-stink rect { animation: putregai-rise 2.4s ease-in infinite; transform-box: fill-box; transform-origin: center; }
+.putregai-stink2 rect { animation-delay: .8s; }
+.putregai-stink3 rect { animation-delay: 1.6s; }
+
+@keyframes putregai-buzz { 0%,100% { transform: translate(0,0); } 25% { transform: translate(2px,-1px); } 50% { transform: translate(-1px,1px); } 75% { transform: translate(1px,2px); } }
+.putregai-fly { animation: putregai-buzz .6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.putregai-fly2 { animation-duration: .5s; animation-delay: .15s; }
+.putregai-fly3 { animation-duration: .7s; animation-delay: .3s; }
+
+@keyframes putregai-drip-fall { 0%,70% { transform: translateY(0); opacity: .85; } 100% { transform: translateY(5px); opacity: 0; } }
+.putregai-drip { animation: putregai-drip-fall 1.8s ease-in infinite; transform-box: fill-box; transform-origin: top; }
+.putregai-drip2 { animation-delay: .9s; }
+
 /* ── RECORDS ── */
 .record-card {
   background: var(--surface);
@@ -2567,19 +2582,29 @@ function getBoxerSVG(who, hatId, colorId, hatColorId='hc_default', glovesId='non
         `<rect x="15" y="14" width="2" height="1" fill="${hc}" opacity="0.6"/>`;
       break;
     case 'putregai':
-      // Green mold patch on shoulder with rising spores — always green, forced shame item
-      hatSvg =
-        `<rect x="11" y="4" width="3" height="2" fill="#2d6a4f"/>` +
-        `<rect x="12" y="3" width="2" height="1" fill="#40916c"/>` +
-        `<rect x="10" y="3" width="1" height="2" fill="#1b4332"/>` +
-        `<rect x="13" y="2" width="1" height="2" fill="#2d6a4f"/>` +
-        `<rect x="10" y="1" width="1" height="1" fill="#52b788" opacity="0.9"/>` +
-        `<rect x="13" y="0" width="1" height="1" fill="#40916c" opacity="0.8"/>` +
-        `<rect x="11" y="-1" width="1" height="1" fill="#52b788" opacity="0.7"/>` +
-        `<rect x="14" y="-2" width="1" height="1" fill="#74c69d" opacity="0.6"/>` +
-        `<rect x="9" y="-2" width="1" height="1" fill="#74c69d" opacity="0.5"/>` +
-        `<rect x="12" y="-4" width="1" height="1" fill="#95d5b2" opacity="0.4"/>` +
-        `<rect x="10" y="-5" width="1" height="1" fill="#b7e4c7" opacity="0.3"/>`;
+      // Rancid mold mass smothering the head + rising stink lines, buzzing flies,
+      // dripping ooze — rendered in overlay so the curse sits ON TOP of the boxer
+      overlaySvg =
+        // mottled mold mass caked over the head/face
+        `<rect x="2" y="-3" width="12" height="6" fill="#3f4d1a" opacity="0.88"/>` +
+        `<rect x="0" y="-1" width="3" height="3" fill="#5c6b1f" opacity="0.85"/>` +
+        `<rect x="12" y="-2" width="3" height="4" fill="#4a3728" opacity="0.85"/>` +
+        `<rect x="4" y="-5" width="4" height="3" fill="#6b7a1f" opacity="0.8"/>` +
+        `<rect x="8" y="-6" width="4" height="3" fill="#4a3728" opacity="0.75"/>` +
+        `<rect x="3" y="-2" width="2" height="2" fill="#2a3310" opacity="0.95"/>` +
+        `<rect x="10" y="-1" width="2" height="2" fill="#9ACD32" opacity="0.5"/>` +
+        `<rect x="6" y="-4" width="2" height="2" fill="#c9a227" opacity="0.55"/>` +
+        // dripping ooze
+        `<rect class="putregai-drip" x="3" y="3" width="1" height="3" fill="#6b7a1f" opacity="0.85"/>` +
+        `<rect class="putregai-drip putregai-drip2" x="11" y="3" width="1" height="3" fill="#4a3728" opacity="0.85"/>` +
+        // rising stink lines
+        `<g class="putregai-stink"><rect x="-1" y="-8" width="1" height="2" fill="#9ACD32" opacity="0.55"/></g>` +
+        `<g class="putregai-stink putregai-stink2"><rect x="8" y="-9" width="1" height="2" fill="#9ACD32" opacity="0.55"/></g>` +
+        `<g class="putregai-stink putregai-stink3"><rect x="15" y="-8" width="1" height="2" fill="#9ACD32" opacity="0.55"/></g>` +
+        // flies circling
+        `<rect class="putregai-fly" x="-1" y="-3" width="1" height="1" fill="#15170d"/>` +
+        `<rect class="putregai-fly putregai-fly2" x="15" y="-2" width="1" height="1" fill="#15170d"/>` +
+        `<rect class="putregai-fly putregai-fly3" x="7" y="-7" width="1" height="1" fill="#15170d"/>`;
       break;
 
     // ── SEASONAL SVG cases ──
