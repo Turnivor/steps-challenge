@@ -1670,9 +1670,14 @@ function calcStats() {
     if (v==='paul') paulBonus += amt;
     else if (v==='cristina') cristinaBonus += amt;
   });
-  // Net totals (competition standing) = raw − spent + honour bonus, floored at 0
-  paulTotal = Math.max(0, paulRawSteps - (spent.paul||0) + paulBonus);
-  cristinaTotal = Math.max(0, cristinaRawSteps - (spent.cristina||0) + cristinaBonus);
+  // Crowd morale — whoever has more backers gets a small cheering-section boost
+  const MORALE_BONUS = 500;
+  let paulMorale = 0, cristinaMorale = 0;
+  if (backers.paul > backers.cristina) paulMorale = MORALE_BONUS;
+  else if (backers.cristina > backers.paul) cristinaMorale = MORALE_BONUS;
+  // Net totals (competition standing) = raw − spent + honour bonus + morale, floored at 0
+  paulTotal = Math.max(0, paulRawSteps - (spent.paul||0) + paulBonus + paulMorale);
+  cristinaTotal = Math.max(0, cristinaRawSteps - (spent.cristina||0) + cristinaBonus + cristinaMorale);
   // Distance equivalent (avg 0.75m per step → km, based on raw)
   const paulKm = Math.round(paulRawSteps * 0.00075);
   const cristinaKm = Math.round(cristinaRawSteps * 0.00075);
@@ -1681,7 +1686,7 @@ function calcStats() {
     paulBestWeek, cristinaBestWeek, biggestMargin, biggestMarginWho,
     liveCurStreakWho, liveCurStreak, paulKm, cristinaKm,
     paulLoseStreak, cristinaLoseStreak, paulCurLoseStreak, cristinaCurLoseStreak,
-    paulLosses, cristinaLosses };
+    paulLosses, cristinaLosses, paulMorale, cristinaMorale };
 }
 
 // Per-month champion calculator
@@ -2344,6 +2349,10 @@ function renderBackers() {
         <div style="width:${cPct}%;background:var(--cristina);border-radius:0 3px 3px 0;transition:width 0.4s;"></div>
       </div>
       <div style="font-size:10px;color:var(--muted2);text-align:center;margin-top:5px;">${pPct}% Paul · ${cPct}% Cristina · ${total} total</div>` : ''}
+      ${backers.paul !== backers.cristina ? `
+      <div style="font-size:11px;text-align:center;margin-top:10px;color:${backers.paul>backers.cristina?'var(--paul)':'var(--cristina)'};">
+        📣 Crowd morale: <strong>${backers.paul>backers.cristina?'Paul':'Cristina'}</strong> gets +500 steps this month from the cheering section
+      </div>` : ''}
     </div>`;
 }
 
