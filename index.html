@@ -1315,7 +1315,7 @@ function buildMe(who) {
   const bothAt100k = s.paulRawSteps >= 100000 && s.cristinaRawSteps >= 100000;
   const myWeeks = allWeeksFlat.filter(w => DB[w.key] && DB[w.key][who] != null);
   const lastWeek = myWeeks[myWeeks.length - 1];
-  const shameWeek = !!(lastWeek && (DB[lastWeek.key][who]||0) > 0 && (DB[lastWeek.key][who]||0) < 20000);
+  const shameWeek = !!(lastWeek && (DB[lastWeek.key][who]||0) < 20000);
   return { total, wins, streak, bigWin, bigVillainWin, losingStreak, bothAt100k, bestWeek, shameWeek };
 }
 
