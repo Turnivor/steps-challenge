@@ -1405,13 +1405,13 @@ async function writeMeta(type, person, key, value) {
   } catch(e) { return false; }
 }
 
-async function logGym(delta) {
+function logGym(delta) {
   if (!currentUser) { showToast('Sign in first'); return; }
   const wk = allWeeksFlat[currentWeekIdx].key;
   const cur = (gymVisits[currentUser] && gymVisits[currentUser][wk]) ? gymVisits[currentUser][wk] : 0;
   const next = Math.max(0, Math.min(GYM_WEEKLY_CAP, cur + delta));
   if (next === cur) return; // hit cap or floor
-  await writeMeta('gym', currentUser, wk, String(next));
+  writeMeta('gym', currentUser, wk, String(next)); // optimistic local update happens synchronously inside; network write fires in background
   playClick();
   renderWeekly(); renderHero();
   showToast(delta>0 ? 'Gym logged 💪 +6k' : 'Gym visit removed');
@@ -1904,7 +1904,9 @@ function renderHero() {
   const s = calcStats();
   const w = allWeeksFlat[currentWeekIdx];
   const d = DB[w.key]||{};
-  const pS = d.paul||0, cS = d.cristina||0;
+  const heroGymP = (gymVisits.paul && gymVisits.paul[w.key]) ? gymVisits.paul[w.key] : 0;
+  const heroGymC = (gymVisits.cristina && gymVisits.cristina[w.key]) ? gymVisits.cristina[w.key] : 0;
+  const pS = (d.paul||0) + heroGymP*GYM_BONUS_STEPS, cS = (d.cristina||0) + heroGymC*GYM_BONUS_STEPS;
 
   document.getElementById('paul-week-steps').textContent = pS ? pS.toLocaleString() : '–';
   document.getElementById('cristina-week-steps').textContent = cS ? cS.toLocaleString() : '–';
@@ -1967,7 +1969,7 @@ function renderHero() {
     if (currentUser === who) {
       box.style.display = '';
       hint.style.display = 'none';
-      if (document.activeElement !== inp) inp.value = (who==='paul'?pS:cS) || '';
+      if (document.activeElement !== inp) inp.value = (who==='paul'?(d.paul||0):(d.cristina||0)) || '';
     } else {
       box.style.display = 'none';
       hint.style.display = '';
