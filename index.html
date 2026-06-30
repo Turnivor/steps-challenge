@@ -2076,11 +2076,10 @@ function renderWeekly() {
     ${winnerHtml}
   `;
 
-  // Gym log card (current week, signed-in user only)
-  const isCurrentWeek = currentWeekIdx === allWeeksFlat.length-1 || w.key === allWeeksFlat[allWeeksFlat.length-1].key;
+  // Gym log card (currently viewed week, signed-in user only)
   const gymCardEl = document.getElementById('gym-card');
   if (gymCardEl) {
-    if (currentUser && isCurrentWeek) {
+    if (currentUser) {
       const myCount = currentUser==='paul' ? gymP : gymC;
       gymCardEl.style.display = '';
       gymCardEl.innerHTML = `
