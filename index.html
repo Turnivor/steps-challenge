@@ -395,6 +395,12 @@ nav.main-nav {
 /* ── WEEK CARDS ── */
 .week-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 @media(max-width:600px){ .week-cards { grid-template-columns: 1fr; } }
+.gym-card { background: var(--surface2,#16161a); border-radius: 12px; padding: 14px; margin: -10px 0 16px; font-size: 12px; box-sizing: border-box; }
+.gym-row { font-weight: 700; margin-bottom: 8px; }
+.gym-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.gym-controls button { flex: 1; min-width: 100px; padding: 8px; border: none; border-radius: 8px; background: var(--surface3,#222); color: var(--text,#fff); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
+.gym-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+.gym-both { color: var(--muted,#888); font-size: 11px; }
 .week-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1015,6 +1021,7 @@ tr:hover td { background: var(--surface2); }
     <div class="month-chips" id="month-chips" style="margin-bottom:20px;"></div>
     <div class="week-cards" id="week-cards"></div>
     <div id="week-updated" style="text-align:center;font-size:11px;color:var(--muted2);margin:-16px 0 16px;min-height:16px;"></div>
+    <div id="gym-card" class="gym-card" style="display:none;"></div>
     <div id="backers-widget"></div>
   </div>
 
@@ -1228,6 +1235,8 @@ const CONFIG = {
   // How often to auto-refresh from the sheet (milliseconds)
   AUTO_SYNC_MS: 60000,
 };
+const GYM_BONUS_STEPS = 6000;
+const GYM_WEEKLY_CAP = 4;
 // Backwards-compatible aliases (used throughout the code)
 const CSV_URL = CONFIG.CSV_URL;
 const SHEET_ID_WRITE = CONFIG.SHEET_ID_WRITE;
@@ -1324,6 +1333,7 @@ async function loadMeta() {
     const sp = { paul:0, cristina:0 };
     const so = { paul:[], cristina:[] };
     const sc = {};
+    const gp = { paul:{}, cristina:{} };
     const myId = getVoterId();
     for (let i=1; i<rows.length; i++) {
       const [type, person, key, value] = rows[i];
@@ -1339,14 +1349,19 @@ async function loadMeta() {
       else if (type==='spent' && (person==='paul'||person==='cristina')) { sp[person] = parseInt(value)||0; }
       else if (type==='owns' && (person==='paul'||person==='cristina')) { if (!so[person].includes(key)) so[person].push(key); }
       else if (type==='shame') { sc[key] = person; } // key = 'achId__YYYY-MM'
+      else if (type==='gym' && (person==='paul'||person==='cristina')) {
+        if (!gp[person]) gp[person] = {};
+        gp[person][key] = parseInt(value)||0;
+      }
     }
-    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk; spent = sp; shopOwned = so; shameClaims = sc;
+    equipped = eq; claims = cl; achievementClaims = ac; lastUpdated = lu; backers = bk; spent = sp; shopOwned = so; shameClaims = sc; gymVisits = gp;
     metaLoaded = true;
     // Persist locally as a fallback cache
     localStorage.setItem('steps_equipped', JSON.stringify(equipped));
     localStorage.setItem('steps_claims', JSON.stringify(claims));
     localStorage.setItem('steps_achievements', JSON.stringify(achievementClaims));
     localStorage.setItem('steps_lastUpdated', JSON.stringify(lastUpdated));
+    localStorage.setItem('steps_gymVisits', JSON.stringify(gymVisits));
   } catch(e) {
     // Fall back to local cache if available
     try {
@@ -1358,6 +1373,8 @@ async function loadMeta() {
       if (acCache) achievementClaims = JSON.parse(acCache);
       const luCache = localStorage.getItem('steps_lastUpdated');
       if (luCache) lastUpdated = JSON.parse(luCache);
+      const gvCache = localStorage.getItem('steps_gymVisits');
+      if (gvCache) gymVisits = JSON.parse(gvCache);
     } catch(_) {}
   }
 }
@@ -1373,9 +1390,11 @@ async function writeMeta(type, person, key, value) {
     // backers are recounted from meta on next sync — no local state to update beyond myVote
     backers.myVote = value;
   }
+  else if (type==='gym') { if (!gymVisits[person]) gymVisits[person]={}; gymVisits[person][key]=parseInt(value)||0; }
   localStorage.setItem('steps_equipped', JSON.stringify(equipped));
   localStorage.setItem('steps_claims', JSON.stringify(claims));
   localStorage.setItem('steps_achievements', JSON.stringify(achievementClaims));
+  localStorage.setItem('steps_gymVisits', JSON.stringify(gymVisits));
   try {
     await fetch(APPS_SCRIPT_URL, {
       method:'POST', mode:'no-cors',
@@ -1384,6 +1403,18 @@ async function writeMeta(type, person, key, value) {
     });
     return true;
   } catch(e) { return false; }
+}
+
+async function logGym(delta) {
+  if (!currentUser) { showToast('Sign in first'); return; }
+  const wk = allWeeksFlat[currentWeekIdx].key;
+  const cur = (gymVisits[currentUser] && gymVisits[currentUser][wk]) ? gymVisits[currentUser][wk] : 0;
+  const next = Math.max(0, Math.min(GYM_WEEKLY_CAP, cur + delta));
+  if (next === cur) return; // hit cap or floor
+  await writeMeta('gym', currentUser, wk, String(next));
+  playClick();
+  renderWeekly(); renderHero();
+  showToast(delta>0 ? 'Gym logged 💪 +6k' : 'Gym visit removed');
 }
 
 // Build "me" object for wardrobe unlock checks
@@ -1527,6 +1558,7 @@ let backers = { paul:0, cristina:0, myVote:null }; // public supporter tally
 let spent = { paul:0, cristina:0 }; // steps spent in cosmetic shop
 let shopOwned = { paul:[], cristina:[] }; // item ids owned (shop + seasonal)
 let shameClaims = {}; // { 'achId__YYYY-MM': 'paul'|'cristina' } — monthly-scoped, resets each month
+let gymVisits = { paul:{}, cristina:{} }; // { person: { week_key: count 0-4 } }
 let metaLoaded = false;
 let lastSyncTime = null; // timestamp (ms) of last successful sync
 
@@ -1757,10 +1789,12 @@ function calcStats() {
   let liveCurStreakWho='', liveCurStreak=0;
   // Results of completed (both-entered) weeks, in chronological order — used for rebound detection
   let completedResults = [];
-  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul||DB[w.key]?.cristina);
+  const weeks = allWeeksFlat.filter(w => DB[w.key]?.paul||DB[w.key]?.cristina||(gymVisits.paul&&gymVisits.paul[w.key])||(gymVisits.cristina&&gymVisits.cristina[w.key]));
   weeks.forEach(w => {
     const d = DB[w.key]||{};
-    const p = d.paul||0, c = d.cristina||0;
+    const gp = (gymVisits.paul && gymVisits.paul[w.key]) ? gymVisits.paul[w.key] : 0;
+    const gc = (gymVisits.cristina && gymVisits.cristina[w.key]) ? gymVisits.cristina[w.key] : 0;
+    const p = (d.paul||0) + gp*GYM_BONUS_STEPS, c = (d.cristina||0) + gc*GYM_BONUS_STEPS;
     paulTotal += p; cristinaTotal += c;
     if (p > paulBestWeek) paulBestWeek = p;
     if (c > cristinaBestWeek) cristinaBestWeek = c;
@@ -2006,7 +2040,10 @@ function renderWeekly() {
   ).join('');
 
   const prev = currentWeekIdx>0 ? DB[allWeeksFlat[currentWeekIdx-1].key] : null;
-  const pS = d.paul, cS = d.cristina;
+  const gymP = (gymVisits.paul && gymVisits.paul[w.key]) ? gymVisits.paul[w.key] : 0;
+  const gymC = (gymVisits.cristina && gymVisits.cristina[w.key]) ? gymVisits.cristina[w.key] : 0;
+  const pS = (d.paul||0) + gymP*GYM_BONUS_STEPS || null;
+  const cS = (d.cristina||0) + gymC*GYM_BONUS_STEPS || null;
 
   function delta(val, pv) {
     if (!val||!pv) return '';
@@ -2028,16 +2065,37 @@ function renderWeekly() {
       ${delta(pS, prev?.paul)}
       <div class="wc-name">Paul</div>
       <div class="wc-steps">${pS ? pS.toLocaleString() : '–'}</div>
-      <div class="wc-meta">${pS ? 'steps this week' : 'no data yet'}</div>
+      <div class="wc-meta">${pS ? 'steps this week' : 'no data yet'}${gymP>0?` (incl. +${gymP*GYM_BONUS_STEPS/1000}k gym)`:''}</div>
     </div>
     <div class="week-card wc-cristina">
       ${delta(cS, prev?.cristina)}
       <div class="wc-name">Cristina</div>
       <div class="wc-steps">${cS ? cS.toLocaleString() : '–'}</div>
-      <div class="wc-meta">${cS ? 'steps this week' : 'no data yet'}</div>
+      <div class="wc-meta">${cS ? 'steps this week' : 'no data yet'}${gymC>0?` (incl. +${gymC*GYM_BONUS_STEPS/1000}k gym)`:''}</div>
     </div>
     ${winnerHtml}
   `;
+
+  // Gym log card (current week, signed-in user only)
+  const isCurrentWeek = currentWeekIdx === allWeeksFlat.length-1 || w.key === allWeeksFlat[allWeeksFlat.length-1].key;
+  const gymCardEl = document.getElementById('gym-card');
+  if (gymCardEl) {
+    if (currentUser && isCurrentWeek) {
+      const myCount = currentUser==='paul' ? gymP : gymC;
+      gymCardEl.style.display = '';
+      gymCardEl.innerHTML = `
+        <div class="gym-row">🏋️ Gym visits this week: ${myCount}/${GYM_WEEKLY_CAP}</div>
+        <div class="gym-controls">
+          <button onclick="logGym(1)" ${myCount>=GYM_WEEKLY_CAP?'disabled':''}>+ Log visit (+6k)</button>
+          <button onclick="logGym(-1)" ${myCount<=0?'disabled':''}>undo</button>
+        </div>
+        <div class="gym-both">Paul: ${gymP}/${GYM_WEEKLY_CAP} · Cristina: ${gymC}/${GYM_WEEKLY_CAP}</div>
+      `;
+    } else {
+      gymCardEl.style.display = 'none';
+      gymCardEl.innerHTML = '';
+    }
+  }
 
   // "Last updated" timestamp
   const upd = lastUpdated[w.key];
