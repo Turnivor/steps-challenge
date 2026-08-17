@@ -382,7 +382,7 @@ nav.main-nav {
 
 /* ── CYBER PANEL (tab sections) ── */
 #section-records, #section-champions, #section-wardrobe, #section-shop,
-#section-milestones, #section-rewards, #section-leaderboard {
+#section-milestones, #section-rewards, #section-leaderboard, #section-bariatric {
   border: 1px solid var(--border);
   border-radius: 14px;
   background: linear-gradient(var(--surface), #080b0f);
@@ -401,6 +401,13 @@ nav.main-nav {
 .gym-controls button { flex: 1; min-width: 100px; padding: 8px; border: none; border-radius: 8px; background: var(--surface3,#222); color: var(--text,#fff); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; }
 .gym-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
 .gym-both { color: var(--muted,#888); font-size: 11px; }
+.bariatric-doc { max-width: 720px; font-size: 14px; line-height: 1.75; color: var(--text); }
+.bariatric-doc h2 { font-size: 18px; font-weight: 700; margin: 0 0 20px; color: var(--accent, #4ecdc4); }
+.bariatric-doc h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin: 24px 0 8px; color: var(--muted2, #aaa); }
+.bariatric-doc p { margin: 0 0 10px; }
+.bariatric-doc ul, .bariatric-doc ol { margin: 0 0 12px; padding-left: 20px; }
+.bariatric-doc li { margin-bottom: 6px; }
+.bariatric-doc strong { color: var(--text); }
 .week-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -995,6 +1002,7 @@ tr:hover td { background: var(--surface2); }
   <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('milestones')">Milestones</button>
   <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('rewards')">Rewards</button>
   <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('leaderboard')">Leaderboard</button>
+  <button class="nav-tab" role="tab" aria-selected="false" onclick="showSection('bariatric')">Bariatric Notes</button>
 </nav>
 
 <div class="wrap">
@@ -1199,6 +1207,88 @@ tr:hover td { background: var(--surface2); }
     <div id="lb-monthly-view" style="display:none"></div>
   </div>
 
+  <div id="section-bariatric" style="display:none" role="tabpanel">
+    <div class="sec-head" style="margin-bottom:20px;">
+      <div class="sec-title">Bariatric Notes</div>
+    </div>
+    <div class="bariatric-doc">
+<h2>Project Instructions — Transcript Handling</h2>
+
+<h3>Purpose</h3>
+<p>This project is for turning raw meeting material into a clear list of what I actually need to do. When I share a transcript, your job is to read it, work out what matters, and hand back a prioritised action list. Nothing else unless I ask.</p>
+
+<h3>What I'll give you</h3>
+<p>Any of these, and they won't always be labelled:</p>
+<ul>
+  <li>Auto-generated meeting transcripts (Teams/Zoom exports, often as .txt)</li>
+  <li>Handover notes and task files</li>
+  <li>A pasted debrief written after a call</li>
+  <li>Occasionally a mix — a transcript plus my own scribbled notes</li>
+</ul>
+<p>Some calls are conducted in Romanian. The English auto-translation is unreliable and has garbled meaning before. If the original is in another language, work from the original, not the auto-translation. Say so if you do.</p>
+
+<h3>How to read it</h3>
+<ul>
+  <li>Large files (1,000+ lines) need chunked reads with explicit ranges, roughly 500 lines at a time with a little overlap.</li>
+  <li>Transcript exports truncate mid-section. Spot-check the boundaries of any truncated span before concluding nothing was said there.</li>
+  <li>Read the whole thing before writing anything. Actions land in the last five minutes of a call as often as the first.</li>
+</ul>
+
+<h3>What to pull out</h3>
+<p>Four categories, in this order of importance:</p>
+<ol>
+  <li><strong>Actions on me</strong> — anything I agreed to, was assigned, or that will land on me by default because nobody else picked it up.</li>
+  <li><strong>Actions on others that I'm dependent on</strong> — who owes me what, and by when. I need these to know what to chase.</li>
+  <li><strong>Decisions made</strong> — especially process decisions, scope changes, and anything that contradicts a previous decision.</li>
+  <li><strong>Open questions</strong> — things left unresolved that will bite later if nobody asks them.</li>
+</ol>
+<p>Separate these clearly. Don't let an action on someone else appear in my list as if it's mine.</p>
+
+<h3>Prioritisation</h3>
+<p>Rank by damage if it slips, not by the order it came up on the call. Explicitly call out the one or two items that are highest-risk and say why. Typical high-risk categories here:</p>
+<ul>
+  <li>Comms that must go out before a maintenance window or release</li>
+  <li>Anything with an external or senior stakeholder waiting on a reply</li>
+  <li>Incident records left in the wrong state (open when resolved, wrong attribution)</li>
+  <li>Anything with a hard date attached</li>
+</ul>
+<p>Where an action has a natural deadline that wasn't stated on the call, say what you think it is and flag that you're inferring.</p>
+
+<h3>Output format</h3>
+<p>A prioritised action list in the chat. Not a file, not a document, unless I specifically ask for one. For each item:</p>
+<ul>
+  <li>What needs doing, in one line</li>
+  <li>Who I need to contact, by name</li>
+  <li>Why it matters / what breaks if it doesn't happen</li>
+  <li>Any deadline or dependency</li>
+</ul>
+<p>Then, at the end: a short note on the highest-risk items, and an offer to draft the outgoing messages.</p>
+
+<h3>Drafting</h3>
+<p>Don't draft messages unprompted. List the actions, then offer. I'll tell you which ones I want written. When I do ask for a draft:</p>
+<ul>
+  <li>Ask which channel it's going to if it isn't obvious — the wording changes a lot between Slack, a ticket, and an email</li>
+  <li>Give me one version, not five, unless the approach genuinely forks</li>
+</ul>
+
+<h3>Accuracy rules</h3>
+<p>These come from things that have gone wrong before:</p>
+<ul>
+  <li>Never state something is complete when it isn't. If a transcript says I agreed to update a runbook, the action is "update the runbook" — not "runbook updated".</li>
+  <li>Flag anything I said on the call that could be quoted back at me. Particularly admissions of lateness, "I'm not sure who owns that" statements, or anything that invites someone to hand me ownership of a thing I don't want.</li>
+  <li>Distinguish what was decided from what was suggested. If someone floated an idea and nobody agreed to it, it's not an action.</li>
+  <li>Don't invent detail. If a ticket reference, name, or date isn't in the transcript, say it's missing rather than guessing. Missing references are usually the thing holding up a reply.</li>
+</ul>
+
+<h3>What not to do</h3>
+<ul>
+  <li>Don't summarise the meeting. I was there. Go straight to what needs to happen.</li>
+  <li>Don't produce a file, report, or formatted document by default.</li>
+  <li>Don't pad with generic advice about following up or communicating clearly.</li>
+  <li>Don't ask me clarifying questions before giving me the list — give me the list, then ask about anything genuinely ambiguous at the end.</li>
+</ul>
+    </div>
+  </div>
 
 </div>
 
@@ -3327,11 +3417,11 @@ function jumpToMonth(mk) {
 
 function showSection(name) {
   playClick();
-  ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'].forEach(s => {
+  ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','bariatric'].forEach(s => {
     document.getElementById(`section-${s}`).style.display = s===name?'':'none';
   });
   document.querySelectorAll('.nav-tab').forEach((btn,i) => {
-    const isActive = ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard'][i]===name;
+    const isActive = ['weekly','records','champions','wardrobe','shop','milestones','rewards','leaderboard','bariatric'][i]===name;
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
